@@ -44,17 +44,17 @@ const baseline = run(`(() => {
 })()`);
 assert.ok(Math.abs(baseline.api - 839.25) < 1e-9, `API baseline ${baseline.api}`);
 assert.ok(Math.abs(baseline.cloud - 10000) < 1e-9, `cloud baseline ${baseline.cloud}`);
-assert.ok(Math.abs(baseline.own - 8601.084444444445) < 1e-9, `own baseline ${baseline.own}`);
+assert.ok(Math.abs(baseline.own - 7601.084444444445) < 1e-9, `own baseline ${baseline.own}`);
 const smallBaseline = run(`(() => {
   const s = { ...DEFAULTS };
   const small = smallCost(s);
   return { monthly: small.monthly, units: small.units, capex: small.capex, m0: cumulativeCost('small', small, 0), m12: cumulativeCost('small', small, 12), units300: smallCost(s, 300).units };
 })()`);
-assert.ok(Math.abs(smallBaseline.monthly - 1647.3262222222222) < 1e-9, `Dell GB10 baseline ${smallBaseline.monthly}`);
+assert.ok(Math.abs(smallBaseline.monthly - 1147.3262222222222) < 1e-9, `Dell GB10 baseline ${smallBaseline.monthly}`);
 assert.equal(smallBaseline.units, 1, 'one GB10 unit at scenario S1');
 assert.equal(smallBaseline.capex, 35000, 'Dell GB10 package costs 35 000 PLN');
 assert.equal(smallBaseline.m0, 35000, 'GB10 cumulative cost starts at the purchase price');
-assert.ok(Math.abs(smallBaseline.m12 - (35000 + 12 * (175.104 + 500))) < 1e-9, 'GB10 first year = purchase + 12 × running');
+assert.ok(Math.abs(smallBaseline.m12 - (35000 + 12 * 175.104)) < 1e-9, 'GB10 first year = purchase + 12 × running');
 assert.equal(smallBaseline.units300, 3, 'scenario S3 needs three GB10 units');
 
 const resultShape = run(`(() => {
@@ -68,19 +68,19 @@ const steps = run(`(() => {
   const result = computeResults(s, models);
   const be = result.breakEvenCloud;
   const at = (path, users) => totalCost(path, s, users, m).monthly;
-  return [be > 0 && be < 20000, at('api', be) <= at('cloud', be), at('api', be + 1) > at('cloud', be + 1), at('api', 463) < at('cloud', 463)];
+  return [be > 0 && be < 20000, at('api', be) <= at('cloud', be), at('api', be + 1) > at('cloud', be + 1)];
 })()`);
-assert.deepEqual(JSON.parse(JSON.stringify(steps)), [true, true, true, true], 'break-even is the end of the first interval and does not imply permanent advantage');
+assert.deepEqual(JSON.parse(JSON.stringify(steps)), [true, true, true], 'break-even is the end of the first API-over-cloud interval');
 const software = run(`(() => {
   const s = { ...DEFAULTS }, m = models.find((model) => model.id === 'gpt-5.6-terra');
   const r = computeResults(s, models);
-  return { api: r.api.monthly - apiCost(m, s).monthly, cloud: r.cloud.monthly - cloudCost(s).monthly, own: r.own.monthly - ownCost(s).monthly, small: r.small.monthly - smallCost(s).monthly,
+  return { api: r.api.monthly - apiCost(m, s).monthly - s.apiOps, cloud: r.cloud.monthly - cloudCost(s).monthly, own: r.own.monthly - ownCost(s).monthly, small: r.small.monthly - smallCost(s).monthly,
     small0: cumulativeCost('small', r.small, 0), small12: cumulativeCost('small', r.small, 12), rowSoft: r.modelRows[0].c.software.saas };
 })()`);
 assert.ok(Math.abs(software.api - 5000) < 1e-9 && Math.abs(software.cloud - 5000) < 1e-9, 'Zagłoba RAG SaaS: 5 000 with API and with cloud');
 assert.ok(Math.abs(software.own - (150000 / 36 + 20000 / 12)) < 1e-9 && Math.abs(software.small - software.own) < 1e-9, 'Zagłoba RAG licence 150 000 + 20 000/year on hardware paths');
 assert.equal(software.small0, 35000 + 150000, 'GB10 cumulative cost starts at hardware + licence');
-assert.ok(Math.abs(software.small12 - (185000 + 12 * (175.104 + 500 + 20000 / 12))) < 1e-9, 'GB10 first year adds support but not the licence again');
+assert.ok(Math.abs(software.small12 - (185000 + 12 * (175.104 + 20000 / 12))) < 1e-9, 'GB10 first year adds support but not the licence again');
 assert.equal(software.rowSoft, 5000, 'model table rows include the SaaS fee');
 assert.throws(() => run('computeResults({ ...DEFAULTS, users: 0 }, models)'), /invalid|state/i, 'invalid state blocks results');
 

@@ -47,13 +47,15 @@ Domyślne parametry są edytowalne w panelu ustawień:
 | --- | --- | --- |
 | `smallCapex` | 35 000 PLN | cena pakietu Dell GB10 z konfiguracją |
 | `smallAmort` / `smallReplace` | 36 mies. | amortyzacja i wymiana rozliczane osobno |
-| `smallOps` | 500 PLN / mies. | drobna administracja, bez etatu MLOps |
+| `smallOps` | 0 PLN / mies. | utrzymanie sprzętu nie jest liczone (wsparcie jest w kontrakcie Zagłoba RAG) |
 | `smallPower` | 240 W | pobór stacji GB10, pełna moc 24/7 jako górna granica |
 | `smallPrefill` / `smallDecode` | 3 000 / 250 tok/s | ilustracyjne; pamięć ~273 GB/s ogranicza generowanie |
 
 Parametry oprogramowania (sekcja „Oprogramowanie: Quantica Zagłoba RAG”):
 `softApi` 5 000, `softCloud` 5 000 PLN / mies., `softLicense` 150 000 PLN,
-`softSupport` 20 000 PLN / rok, `softAmort` 36 mies.
+`softSupport` 20 000 PLN / rok, `softAmort` 36 mies. Przy API doliczana jest
+stała infrastruktura `apiOps` 1 000 PLN / mies. Koszty obsługi sprzętu
+(`cloudOps`, `ownOps`, `smallOps`) domyślnie wynoszą 0.
 
 Gdy szczytowe obciążenie przekracza przepustowość, kalkulator dolicza kolejne
 sztuki GB10 (przy scenariuszu „Firma · 300” są to trzy maszyny). Wartości

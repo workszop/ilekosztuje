@@ -471,6 +471,7 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
         <div class="opt-settings">
           <div class="field"><label for="model" data-t="model"></label><select id="model"></select></div>
           <p class="hint" id="modelNote"></p>
+          <div class="field"><label for="apiOps" data-t="apiOps"></label><input id="apiOps" type="number" min="0" step="100"></div>
         </div>
       </details>
       <details class="panel settings-section" id="cloudSettings">
@@ -710,13 +711,13 @@ const PRESETS = {
   S3: { users: 300, reqPerDay: 20 },
 };
 const PRESET_FIELDS = Object.keys(PRESETS.S1);
-const SMALL_BASELINE = 1647.3262222222222; // Dell GB10 at scenario S1: 35 000 / 36 + 240 W × 24 h × 30.4 d × 1 PLN/kWh + 500 PLN support
+const SMALL_BASELINE = 1147.3262222222222; // Dell GB10 at scenario S1: 35 000 / 36 + 240 W × 24 h × 30.4 d × 1 PLN/kWh
 const DEFAULTS = {
   ...PRESETS.S1, chunks: 5, chunkTok: 2000, promptTok: 500, outTok: 500, docLang: 'pl', workDays: 250, workHours: 8,
-  model: 'OpenAI GPT-5.6 Terra', fx: 3.73, offPeak: false, thinking: false, thinkMult: 3,
+  model: 'OpenAI GPT-5.6 Terra', apiOps: 1000, fx: 3.73, offPeak: false, thinking: false, thinkMult: 3,
   cloudGpu: '1× NVIDIA H100 80GB', cloudPrice: 10000, cloudOps: 0, cloudMode: '247', cloudPrefill: 10000, cloudDecode: 1500,
-  ownGpu: '1× RTX PRO 6000 96GB', ownCapex: 250000, ownAmort: 36, ownReplace: 36, ownOps: 1000, ownPower: 900, kwh: 1.0, ownPrefill: 10000, ownDecode: 1500,
-  smallGpu: 'Dell Pro Max GB10 (128 GB)', smallCapex: 35000, smallAmort: 36, smallReplace: 36, smallOps: 500, smallPower: 240, smallPrefill: 3000, smallDecode: 250,
+  ownGpu: '1× RTX PRO 6000 96GB', ownCapex: 250000, ownAmort: 36, ownReplace: 36, ownOps: 0, ownPower: 900, kwh: 1.0, ownPrefill: 10000, ownDecode: 1500,
+  smallGpu: 'Dell Pro Max GB10 (128 GB)', smallCapex: 35000, smallAmort: 36, smallReplace: 36, smallOps: 0, smallPower: 240, smallPrefill: 3000, smallDecode: 250,
   peak: 2, horizon: 36,
   softApi: 5000, softCloud: 5000, softLicense: 150000, softSupport: 20000, softAmort: 36,
 };
@@ -729,6 +730,7 @@ const FIELD_SCHEMA = {
   outTok:      { min: 0,     max: 1000000,  integer: true },
   workDays:    { min: 1,     max: 365,      integer: true },
   workHours:   { min: 1,     max: 24,       integer: true },
+  apiOps:      { min: 0,     max: 100000000, integer: false },
   fx:          { min: 0.1,   max: 100,      integer: false },
   thinkMult:   { min: 1,     max: 20,       integer: false },
   cloudPrice:  { min: 0,     max: 100000000, integer: false },
@@ -858,7 +860,7 @@ Object.assign(T.pl, {
   workloadDetails: 'Szczegóły obciążenia', softwareTitle: 'Oprogramowanie: Quantica Zagłoba RAG',
   softwareHint: 'Warstwa oprogramowania nad infrastrukturą. Przy API i chmurze Zagłoba RAG działa jako SaaS (abonament miesięczny); przy Dell GB10 i własnym serwerze jest sprzedawana jako licencja z rocznym kontraktem wsparcia.',
   softApi: 'SaaS przy API (PLN / mies.)', softCloud: 'SaaS przy chmurze (PLN / mies.)', softLicense: 'Licencja przy sprzęcie (PLN)', softSupport: 'Kontrakt wsparcia (PLN / rok)', softAmort: 'Amortyzacja licencji (mies.)',
-  lSoftSaas: 'Zagłoba RAG · SaaS', lSoftLicense: 'Zagłoba RAG · licencja (amort.)', lSoftSupport: 'Zagłoba RAG · wsparcie', lInfra: 'Infrastruktura', lSoftware: 'Oprogramowanie',
+  apiOps: 'Infrastruktura API (PLN / mies.)', lApiInfra: 'Infrastruktura API', lSoftSaas: 'Zagłoba RAG · SaaS', lSoftLicense: 'Zagłoba RAG · licencja (amort.)', lSoftSupport: 'Zagłoba RAG · wsparcie', lInfra: 'Infrastruktura', lSoftware: 'Oprogramowanie',
   smallGpu: 'Sprzęt', smallPower: 'Moc Dell GB10 (W)', smallReplace: 'Dell GB10: wymiana co (mies.)', smallPrefill: 'Dell GB10: wejście', smallDecode: 'Dell GB10: wyjście',
   settingsTitle: 'Ustawienia', settingsDone: 'Pokaż wyniki', settingsClose: 'Zamknij ustawienia', scenarioTitle: 'Zapis i pliki',
   estimateNotice: 'Szacunek kosztów inferencji, nie oferta ani gwarancja jakości i wydajności. Kwoty netto.',
@@ -880,7 +882,7 @@ Object.assign(T.en, {
   workloadDetails: 'Workload details', softwareTitle: 'Software: Quantica Zagłoba RAG',
   softwareHint: 'The software layer above the infrastructure. With API and cloud, Zagłoba RAG runs as SaaS (monthly subscription); with Dell GB10 and own server it is sold as a licence with a yearly support contract.',
   softApi: 'SaaS with API (PLN / month)', softCloud: 'SaaS with cloud (PLN / month)', softLicense: 'Licence with hardware (PLN)', softSupport: 'Support contract (PLN / year)', softAmort: 'Licence depreciation (months)',
-  lSoftSaas: 'Zagłoba RAG · SaaS', lSoftLicense: 'Zagłoba RAG · licence (depr.)', lSoftSupport: 'Zagłoba RAG · support', lInfra: 'Infrastructure', lSoftware: 'Software',
+  apiOps: 'API infrastructure (PLN / month)', lApiInfra: 'API infrastructure', lSoftSaas: 'Zagłoba RAG · SaaS', lSoftLicense: 'Zagłoba RAG · licence (depr.)', lSoftSupport: 'Zagłoba RAG · support', lInfra: 'Infrastructure', lSoftware: 'Software',
   smallGpu: 'Hardware', smallPower: 'Dell GB10 power (W)', smallReplace: 'Dell GB10: replace every (months)', smallPrefill: 'Dell GB10: input', smallDecode: 'Dell GB10: output',
   settingsTitle: 'Settings', settingsDone: 'Show results', settingsClose: 'Close settings', scenarioTitle: 'Save and files',
   estimateNotice: 'Inference cost estimate, not a quote or a quality/capacity guarantee. Net amounts.',
@@ -1275,9 +1277,11 @@ function softwareCost(path, s) {
 function totalCost(path, s, users = s.users, model) {
   const infra = path === 'api' ? apiCost(model, s, users) : path === 'cloud' ? cloudCost(s, users) : path === 'own' ? ownCost(s, users) : smallCost(s, users);
   const software = softwareCost(path, s);
-  const monthly = infra.monthly + software.monthly;
+  const fixed = path === 'api' ? s.apiOps : 0;
+  const infraMonthly = infra.monthly + fixed;
+  const monthly = infraMonthly + software.monthly;
   const reqMonth = reqPerMonth(s, users);
-  const total = { ...infra, software, infraMonthly: infra.monthly, oneOff: software.oneOff, monthly, perReq: reqMonth ? monthly / reqMonth : 0 };
+  const total = { ...infra, software, fixed, infraMonthly, oneOff: software.oneOff, monthly, perReq: reqMonth ? monthly / reqMonth : 0 };
   if (Number.isFinite(infra.running)) total.running = infra.running + software.support;
   return total;
 }
@@ -1381,11 +1385,11 @@ function runRegressionChecks(models = []) {
     const own = ownCost(s);
     add('baseline API', Math.abs(api.monthly - 839.25) < 1e-6, api.monthly.toFixed(6));
     add('baseline cloud', Math.abs(cloud.monthly - 10000) < 1e-6, cloud.monthly.toFixed(6));
-    add('baseline own', Math.abs(own.monthly - 8601.084444444445) < 1e-6, own.monthly.toFixed(6));
+    add('baseline own', Math.abs(own.monthly - 7601.084444444445) < 1e-6, own.monthly.toFixed(6));
     const small = smallCost(s);
     add('baseline small (Dell GB10)', Math.abs(small.monthly - SMALL_BASELINE) < 1e-6 && small.capex === 35000, small.monthly.toFixed(6));
     const totals = { api: totalCost('api', s, s.users, terra), cloud: totalCost('cloud', s), small: totalCost('small', s), own: totalCost('own', s) };
-    const softOk = Math.abs(totals.api.monthly - (api.monthly + s.softApi)) < 1e-9 && Math.abs(totals.cloud.monthly - (cloud.monthly + s.softCloud)) < 1e-9
+    const softOk = Math.abs(totals.api.monthly - (api.monthly + s.apiOps + s.softApi)) < 1e-9 && Math.abs(totals.cloud.monthly - (cloud.monthly + s.softCloud)) < 1e-9
       && Math.abs(totals.own.monthly - (own.monthly + s.softLicense / s.softAmort + s.softSupport / 12)) < 1e-9
       && cumulativeCost('small', totals.small, 0) === small.capex + s.softLicense && cumulativeCost('api', totals.api, 12) === totals.api.monthly * 12;
     add('Zagłoba RAG software layer', softOk, `${totals.api.monthly.toFixed(2)} / ${totals.own.monthly.toFixed(2)}`);
@@ -1505,19 +1509,20 @@ function render() {
   let apiWarn = null;
   if (!api.eligible) apiWarn = t(api.reason);
   else if (api.tiered) apiWarn = t('tierNote', { k: m.tier.above / 1000 });
+  const opsLine = (v) => v > 0 ? [[t('lOps'), money(v, 0)]] : [];
   const hwSoftLines = (c) => [[t('lSoftLicense'), money(c.software.licenseAmort, 0)], [t('lSoftSupport'), money(c.software.support, 0)]];
   renderOption($('optApi'), { monthly: api.monthly, win: winner === 'api', warn: apiWarn, eligible: api.eligible, software: api.software.monthly, infra: api.infraMonthly,
-    lines: [[t('lSoftSaas'), money(api.software.saas, 0)], [t('lInput'), money(api.inMonthly, 0)], [t('lOutput'), money(api.outMonthly, 0)]],
+    lines: [[t('lSoftSaas'), money(api.software.saas, 0)], [t('lApiInfra'), money(api.fixed, 0)], [t('lInput'), money(api.inMonthly, 0)], [t('lOutput'), money(api.outMonthly, 0)]],
     extra: [[t('lYear'), money(api.monthly * 12, 0)], [t('lPerReq'), money(api.perReq, 4)]] });
   renderOption($('optCloud'), { monthly: cloud.monthly, win: winner === 'cloud', software: cloud.software.monthly, infra: cloud.infraMonthly,
-    lines: [[t('lSoftSaas'), money(cloud.software.saas, 0)], [t('lGpu') + ` (${cloud.units} × ${fmtNum(cloud.hours, 0)} h)`, money(cloud.gpuMonthly, 0)], [t('lOps'), money(s.cloudOps, 0)]],
+    lines: [[t('lSoftSaas'), money(cloud.software.saas, 0)], [t('lGpu') + ` (${cloud.units} × ${fmtNum(cloud.hours, 0)} h)`, money(cloud.gpuMonthly, 0)], ...opsLine(s.cloudOps)],
     extra: [[t('lYear'), money(cloud.monthly * 12, 0)], [t('lPerReq'), money(cloud.perReq, 4)], [t('lUtil'), cloud.units + ' GPU · ' + pct(cloud.load / cloud.units)]] });
   renderOption($('optOwn'), { monthly: own.monthly, win: winner === 'own', software: own.software.monthly, infra: own.infraMonthly,
-    lines: [...hwSoftLines(own), [t('lAmort'), money(own.amort, 0)], [t('lEnergy'), money(own.energy, 0)], [t('lOps'), money(s.ownOps, 0)]],
+    lines: [...hwSoftLines(own), [t('lAmort'), money(own.amort, 0)], [t('lEnergy'), money(own.energy, 0)], ...opsLine(s.ownOps)],
     extra: [[t('lYear'), money(own.monthly * 12, 0)], [t('lFirstYear'), money(cumulativeCost('own', own, 12), 0)], [t('lPerReq'), money(own.perReq, 4)],
       [t('lUtil'), own.units + ' GPU · ' + pct(own.load / own.units)]] });
   renderOption($('optSmall'), { monthly: small.monthly, win: winner === 'small', software: small.software.monthly, infra: small.infraMonthly,
-    lines: [...hwSoftLines(small), [t('lAmort'), money(small.amort, 0)], [t('lEnergy'), money(small.energy, 0)], [t('lOps'), money(s.smallOps, 0)]],
+    lines: [...hwSoftLines(small), [t('lAmort'), money(small.amort, 0)], [t('lEnergy'), money(small.energy, 0)], ...opsLine(s.smallOps)],
     extra: [[t('lYear'), money(small.monthly * 12, 0)], [t('lFirstYear'), money(cumulativeCost('small', small, 12), 0)], [t('lPerReq'), money(small.perReq, 4)],
       [t('lUtil'), small.units + ' × GB10 · ' + pct(small.load / small.units)]] });
 
@@ -1663,6 +1668,7 @@ function buildAssumptions() {
     { title: P('API', 'API'), rows: [
       [P('Cennik', 'Price list'), String(state.models.length) + ' ' + P('modeli', 'models'),
         P('Stawki standardowe, bez założenia cache i Batch, sprawdzone 14.09.2026. Cache zależy od dostawcy, hit rate i zgodności prefiksu; Batch jest trybem asynchronicznym, więc nie zakładamy rabatu dla interaktywnego RAG.', 'Standard rates, without assuming cache or Batch, checked on 14 Sep 2026. Caching depends on the provider, hit rate and prefix match; Batch is asynchronous, so we do not assume a discount for interactive RAG.'), 'openai'],
+      [P('Infrastruktura API', 'API infrastructure'), now(money(s.apiOps, 0) + P(' / mies.', ' / month')), P('Stały miesięczny koszt infrastruktury wokół API (hosting aplikacji, baza wektorowa, sieć). Edytowalna wartość scenariusza.', 'Fixed monthly cost of the infrastructure around the API (app hosting, vector store, networking). Editable scenario value.')],
       [P('Kurs USD/PLN', 'USD/PLN rate'), now(fmtNum(s.fx, 2)), P('Źródło zewnętrzne sprawdzone 14.09.2026; kurs w polu jest edytowalną wartością scenariusza.', 'External source checked on 14 Sep 2026; the field is an editable scenario value.'), 'nbp'],
       [P('Długi kontekst', 'Long context'), 'OpenAI > 272K', P('Powyżej progu droższa stawka dla całego żądania.', 'Above the threshold the whole request uses a higher rate.')],
       [P('DeepSeek', 'DeepSeek'), P('szczyt pon.–pt. 01–04 i 06–10 UTC', 'peak Mon–Fri 01–04 and 06–10 UTC'), P('Poza szczytem połowa ceny.', 'Half price off-peak.'), 'deepseek'],
@@ -1680,7 +1686,7 @@ function buildAssumptions() {
         P('Domyślna kwota oznacza ilustracyjny pakiet z GPU, serwerem, UPS i wdrożeniem. Wymaga indywidualnej wyceny i nie jest ofertą ani gwarancją kompletności.', 'The default is an illustrative bundle with GPU, server, UPS and setup. It requires an individual quote and is not an offer or completeness guarantee.'), 'pro6000'],
       [P('Amortyzacja', 'Depreciation'), now(s.ownAmort + ' ' + t('monthsUnit')), P('Amortyzacja jest osobnym rozliczeniem zakupu. Nie wyznacza terminu wymiany sprzętu.', 'Depreciation is a separate purchase accounting period. It does not set the replacement date.')],
       [P('Wymiana sprzętu', 'Hardware replacement'), now(ownReplace + ' ' + t('monthsUnit')), P('Osobny okres wymiany używany na wykresie; nie jest utożsamiany z amortyzacją.', 'A separate replacement period used by the chart; it is not the depreciation period.')],
-      [P('Obsługa', 'Support'), now(money(s.ownOps, 0) + P(' / mies.', ' / month')), P('Stały koszt scenariusza na drobną administrację i części. Bez etatu MLOps i bez drugiej karty na wypadek awarii.', 'Fixed scenario cost for light administration and parts. No MLOps role and no failover card.')],
+      [P('Obsługa', 'Support'), now(money(s.ownOps, 0) + P(' / mies.', ' / month')), P('Domyślnie 0 PLN: utrzymanie sprzętu nie jest liczone; wsparcie oprogramowania jest w kontrakcie Zagłoba RAG. Bez etatu MLOps i bez drugiej karty na wypadek awarii.', 'Defaults to PLN 0: hardware maintenance is not counted; software support sits in the Zagłoba RAG contract. No MLOps role and no failover card.')],
       [P('Prąd netto', 'Net power'), now(fmtNum(s.ownPower) + ' W · ' + fmtNum(s.kwh, 2) + ' PLN/kWh netto · 24/7'),
         P('Pełna moc przez całą dobę to górna granica. Stawka PLN/kWh jest edytowalnym kosztem netto; źródło nie kalibruje tu brutto ani dystrybucji.', 'Full power around the clock is an upper bound. PLN/kWh is an editable net input; the source is not used to calibrate gross price or distribution.'), 'power'],
     ]},
@@ -1691,7 +1697,7 @@ function buildAssumptions() {
         P('Cena pakietu małego wdrożenia (sprzęt Dell GB10 z konfiguracją). Jest edytowalną wartością scenariusza; nie obejmuje budowy aplikacji ani utrzymania.', 'Price of the small deployment package (Dell GB10 hardware with setup). It is an editable scenario value; it excludes app build and operations.')],
       [P('Amortyzacja', 'Depreciation'), now(s.smallAmort + ' ' + t('monthsUnit')), P('Rozliczane tak samo jak dla własnego serwera.', 'Accounted for exactly like the own server.')],
       [P('Wymiana sprzętu', 'Hardware replacement'), now(smallReplace + ' ' + t('monthsUnit')), P('Osobny okres wymiany używany na wykresie.', 'A separate replacement period used by the chart.')],
-      [P('Obsługa', 'Support'), now(money(s.smallOps, 0) + P(' / mies.', ' / month')), P('Stały koszt scenariusza na drobną administrację. Bez etatu MLOps i bez drugiej maszyny na wypadek awarii.', 'Fixed scenario cost for light administration. No MLOps role and no failover unit.')],
+      [P('Obsługa', 'Support'), now(money(s.smallOps, 0) + P(' / mies.', ' / month')), P('Domyślnie 0 PLN: utrzymanie sprzętu nie jest liczone; wsparcie oprogramowania jest w kontrakcie Zagłoba RAG.', 'Defaults to PLN 0: hardware maintenance is not counted; software support sits in the Zagłoba RAG contract.')],
       [P('Prąd netto', 'Net power'), now(fmtNum(s.smallPower) + ' W · ' + fmtNum(s.kwh, 2) + ' PLN/kWh netto · 24/7'), P('Ta sama stawka za energię co dla własnego serwera; pełna moc przez całą dobę to górna granica.', 'The same energy rate as the own server; full power around the clock is an upper bound.'), 'power'],
       [P('Przepustowość', 'Throughput'), now(fmtNum(s.smallPrefill) + ' / ' + fmtNum(s.smallDecode) + ' tok/s'),
         P('Domyślne wartości są ilustracyjne: pamięć LPDDR5x o przepustowości ok. 273 GB/s ogranicza generowanie do rzędu setek tok/s łącznie. Zmierz na własnym modelu przed decyzją.', 'Defaults are illustrative: LPDDR5x memory bandwidth of roughly 273 GB/s limits aggregate generation to the order of hundreds of tok/s. Measure with your own model before deciding.'), 'gb10'],
