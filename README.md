@@ -9,7 +9,7 @@ wariantach:
 4. własny serwer (RTX PRO 6000).
 
 Nad infrastrukturą liczona jest warstwa oprogramowania **Quantica Zagłoba RAG**:
-przy API i chmurze jako SaaS (domyślnie 3 000 i 5 000 PLN / mies.), przy Dell
+przy API i chmurze jako SaaS (domyślnie 5 000 PLN / mies. w obu), przy Dell
 GB10 i własnym serwerze jako sprzedaż licencji (150 000 PLN jednorazowo,
 amortyzowane przez 36 mies.) z rocznym kontraktem wsparcia (20 000 PLN / rok).
 Każda karta pokazuje sumę oraz podział „Oprogramowanie · Infrastruktura”;
@@ -52,7 +52,7 @@ Domyślne parametry są edytowalne w panelu ustawień:
 | `smallPrefill` / `smallDecode` | 3 000 / 250 tok/s | ilustracyjne; pamięć ~273 GB/s ogranicza generowanie |
 
 Parametry oprogramowania (sekcja „Oprogramowanie: Quantica Zagłoba RAG”):
-`softApi` 3 000, `softCloud` 5 000 PLN / mies., `softLicense` 150 000 PLN,
+`softApi` 5 000, `softCloud` 5 000 PLN / mies., `softLicense` 150 000 PLN,
 `softSupport` 20 000 PLN / rok, `softAmort` 36 mies.
 
 Gdy szczytowe obciążenie przekracza przepustowość, kalkulator dolicza kolejne
@@ -112,7 +112,7 @@ instaluje.
 `aicalc-q` is the Quantica-styled fork of `aicalc`: a dependency-free,
 single-file estimator of RAG inference costs across model API, cloud GPU,
 a small Dell Pro Max GB10 deployment priced at PLN 35,000, and own server,
-plus a Quantica Zagłoba RAG software layer (SaaS 3,000/5,000 PLN per month
+plus a Quantica Zagłoba RAG software layer (SaaS 5,000 PLN per month
 with API/cloud; a 150,000 PLN licence with a 20,000 PLN yearly support
 contract on hardware).
 It is an estimate, not a quote or a capacity guarantee. Prices were checked on

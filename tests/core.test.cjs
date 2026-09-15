@@ -77,11 +77,11 @@ const software = run(`(() => {
   return { api: r.api.monthly - apiCost(m, s).monthly, cloud: r.cloud.monthly - cloudCost(s).monthly, own: r.own.monthly - ownCost(s).monthly, small: r.small.monthly - smallCost(s).monthly,
     small0: cumulativeCost('small', r.small, 0), small12: cumulativeCost('small', r.small, 12), rowSoft: r.modelRows[0].c.software.saas };
 })()`);
-assert.ok(Math.abs(software.api - 3000) < 1e-9 && Math.abs(software.cloud - 5000) < 1e-9, 'Zagłoba RAG SaaS: 3 000 with API, 5 000 with cloud');
+assert.ok(Math.abs(software.api - 5000) < 1e-9 && Math.abs(software.cloud - 5000) < 1e-9, 'Zagłoba RAG SaaS: 5 000 with API and with cloud');
 assert.ok(Math.abs(software.own - (150000 / 36 + 20000 / 12)) < 1e-9 && Math.abs(software.small - software.own) < 1e-9, 'Zagłoba RAG licence 150 000 + 20 000/year on hardware paths');
 assert.equal(software.small0, 35000 + 150000, 'GB10 cumulative cost starts at hardware + licence');
 assert.ok(Math.abs(software.small12 - (185000 + 12 * (175.104 + 500 + 20000 / 12))) < 1e-9, 'GB10 first year adds support but not the licence again');
-assert.equal(software.rowSoft, 3000, 'model table rows include the SaaS fee');
+assert.equal(software.rowSoft, 5000, 'model table rows include the SaaS fee');
 assert.throws(() => run('computeResults({ ...DEFAULTS, users: 0 }, models)'), /invalid|state/i, 'invalid state blocks results');
 
 const tierRates = run(`(() => {
