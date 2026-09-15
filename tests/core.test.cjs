@@ -55,7 +55,7 @@ assert.equal(smallBaseline.units, 1, 'one GB10 unit at scenario S1');
 assert.equal(smallBaseline.capex, 35000, 'Dell GB10 package costs 35 000 PLN');
 assert.equal(smallBaseline.m0, 35000, 'GB10 cumulative cost starts at the purchase price');
 assert.ok(Math.abs(smallBaseline.m12 - (35000 + 12 * 175.104)) < 1e-9, 'GB10 first year = purchase + 12 × running');
-assert.equal(smallBaseline.units300, 3, 'scenario S3 needs three GB10 units');
+assert.equal(smallBaseline.units300, 4, 'scenario S3 needs four GB10 units at the 80% utilization ceiling');
 const smallLimit = run(`(() => {
   const s = { ...DEFAULTS };
   const ok = totalCost('small', s, 199), over = totalCost('small', s, 200), r = computeResults({ ...s, users: 300 }, models);
@@ -116,6 +116,196 @@ const invalidApi = run(`(() => {
 })()`);
 assert.deepEqual(JSON.parse(JSON.stringify(invalidApi.ctx)), [true, 'ctxOver', false], 'context overflow excludes API');
 assert.deepEqual(JSON.parse(JSON.stringify(invalidApi.out)), [true, 'outputOver', false], 'output overflow excludes API');
+
+assert.equal(run('DEFAULTS.maxUtilization'), 80, 'default hardware utilization ceiling is 80%');
+assert.deepEqual(JSON.parse(JSON.stringify(run('FIELD_SCHEMA.maxUtilization'))), { min: 1, max: 100, integer: true }, 'utilization ceiling field is an integer percentage');
+assert.equal(run('validateField("maxUtilization", 1).valid'), true, 'minimum utilization ceiling is valid');
+assert.equal(run('validateField("maxUtilization", 100).valid'), true, 'maximum utilization ceiling is valid');
+assert.equal(run('validateField("maxUtilization", 80.5).error'), 'integer', 'fractional utilization ceiling is rejected');
+assert.equal(run('validateField("maxUtilization", 0).error'), 'range', 'zero utilization ceiling is rejected');
+assert.equal(run('validateField("maxUtilization", 101).error'), 'range', 'over-100 utilization ceiling is rejected');
+
+const gpuBoundary = run(`(() => {
+  const exact = gpuUnits({ inPeakPerSec: 8, outPeakPerSec: 0 }, 10, 1);
+  const above = gpuUnits({ inPeakPerSec: 8.000000001, outPeakPerSec: 0 }, 10, 1);
+  const full = gpuUnits({ inPeakPerSec: 10, outPeakPerSec: 0 }, 10, 1, 100);
+  const fullAbove = gpuUnits({ inPeakPerSec: 10.000000001, outPeakPerSec: 0 }, 10, 1, 100);
+  const zero = gpuUnits({ inPeakPerSec: 0, outPeakPerSec: 0 }, 10, 1);
+  return { exact, above, full, fullAbove, zero };
+})()`);
+assert.equal(gpuBoundary.exact.load, 0.8, 'exact 80% load is accepted on one unit');
+assert.equal(gpuBoundary.exact.units, 1, 'exact utilization boundary does not over-provision');
+assert.equal(gpuBoundary.exact.utilization, 0.8, 'utilization is returned as a fraction');
+assert.equal(gpuBoundary.exact.utilizationLimit, 0.8, 'utilization limit is returned as a fraction');
+assert.equal(gpuBoundary.above.units, 2, 'load above the utilization boundary adds a unit');
+assert.ok(gpuBoundary.above.load > (gpuBoundary.above.units - 1) * gpuBoundary.above.utilizationLimit, 'the unit count is minimal above the boundary');
+assert.equal(gpuBoundary.full.units, 1, '100% ceiling accepts exact full-unit load');
+assert.equal(gpuBoundary.fullAbove.units, 2, '100% ceiling still adds a unit above full load');
+assert.deepEqual(JSON.parse(JSON.stringify(gpuBoundary.zero)), { load: 0, units: 1, utilization: 0, utilizationLimit: 0.8 }, 'zero token load keeps one idle unit');
+
+const workloadVariants = run(`(() => {
+  const s = { ...DEFAULTS, users: 100 };
+  const both = workload(s);
+  const inputOnly = workload({ ...s, outTok: 0 });
+  const outputOnly = workload({ ...s, chunks: 0, chunkTok: 0, promptTok: 0 });
+  const thinking = workload({ ...s, thinking: true });
+  const noThinking = workload({ ...s, thinking: false });
+  const higherPeak = workload({ ...s, peak: 3 });
+  const english = workload({ ...s, docLang: 'en' });
+  return { both, inputOnly, outputOnly, thinking, noThinking, higherPeak, english };
+})()`);
+assert.ok(workloadVariants.both.inPeakPerSec > 0 && workloadVariants.both.outPeakPerSec > 0, 'default workload has input and output load');
+assert.equal(workloadVariants.inputOnly.outPeakPerSec, 0, 'input-only workload removes output load');
+assert.ok(workloadVariants.inputOnly.inPeakPerSec > 0, 'input-only workload keeps input load');
+assert.equal(workloadVariants.outputOnly.inPeakPerSec, 0, 'output-only workload removes input load');
+assert.ok(workloadVariants.outputOnly.outPeakPerSec > 0, 'output-only workload keeps output load');
+assert.ok(workloadVariants.thinking.outPeakPerSec > workloadVariants.noThinking.outPeakPerSec, 'thinking increases output load');
+assert.ok(workloadVariants.higherPeak.inPeakPerSec > workloadVariants.both.inPeakPerSec && workloadVariants.higherPeak.outPeakPerSec > workloadVariants.both.outPeakPerSec, 'peak multiplier increases both loads');
+assert.notEqual(workloadVariants.english.inPeakPerSec, workloadVariants.both.inPeakPerSec, 'document language affects token workload');
+
+const capacityFixtures = run(`(() => {
+  const s = { ...DEFAULTS };
+  const at100 = { ...s, users: 100 };
+  const at400 = { ...s, users: 400 };
+  const at300 = { ...s, users: 300 };
+  return {
+    small100: smallCost(at100),
+    small300: smallCost(at300),
+    small300Total: totalCost('small', at300),
+    small100Full: smallCost({ ...at100, maxUtilization: 100 }),
+    cloud400: cloudCost(at400),
+    cloud400Full: cloudCost({ ...at400, maxUtilization: 100 }),
+  };
+})()`);
+assert.equal(capacityFixtures.small100.units, 2, 'GB10 adds a second unit for 100 users at 80%');
+assert.equal(capacityFixtures.small100Full.units, 1, '100% ceiling restores the previous GB10 count');
+assert.equal(capacityFixtures.cloud400.units, 2, 'cloud adds a second GPU for 400 users at 80%');
+assert.equal(capacityFixtures.cloud400Full.units, 1, '100% ceiling restores the previous cloud count');
+assert.equal(capacityFixtures.small300.units, 4, 'GB10 S3 scales to four units at 80%');
+assert.equal(capacityFixtures.small100.supportedUsers, 186, 'raw GB10 capacity is derived from unit headroom');
+assert.equal(capacityFixtures.small100.remainingUsers, 86, 'raw GB10 remaining capacity is users minus supported users');
+assert.equal(capacityFixtures.cloud400.supportedUsers, 740, 'cloud capacity reports users supported by two GPUs');
+assert.equal(capacityFixtures.cloud400.remainingUsers, 340, 'cloud remaining capacity is exposed');
+assert.ok(capacityFixtures.small300.supportedUsers > defaults.smallMaxUsers, 'raw GB10 capacity may exceed its deployment policy');
+assert.equal(capacityFixtures.small300Total.supportedUsers, defaults.smallMaxUsers, 'total GB10 capacity is capped by the eligible-user policy');
+assert.equal(capacityFixtures.small300Total.remainingUsers, 0, 'capped GB10 capacity has no remaining users at S3');
+assert.equal(capacityFixtures.small300Total.eligible, false, 'GB10 remains ineligible above its selected-user policy');
+
+const nonDefaultCeilings = run(`(() => {
+  const s = { ...DEFAULTS, users: 1024 };
+  return [11, 22, 44, 88].map((maxUtilization) => {
+    const cost = smallCost({ ...s, maxUtilization });
+    return { maxUtilization, load: cost.load, units: cost.units, utilization: cost.utilization, utilizationLimit: cost.utilizationLimit,
+      supportedUsers: cost.supportedUsers, remainingUsers: cost.remainingUsers };
+  });
+})()`);
+assert.deepEqual(JSON.parse(JSON.stringify(nonDefaultCeilings.map((row) => row.units))), [80, 40, 20, 10], 'non-default ceilings provision the minimal GB10 unit counts');
+for (const row of nonDefaultCeilings) {
+  assert.equal(row.load, 8.8, `GB10 load at 1024 users is exact for ${row.maxUtilization}%`);
+  assert.ok(row.utilization <= row.utilizationLimit, `utilization stays within ${row.maxUtilization}% ceiling`);
+  assert.ok(row.units === 1 || row.load > (row.units - 1) * row.utilizationLimit, `unit count is minimal at ${row.maxUtilization}%`);
+  assert.ok(row.supportedUsers >= 1024, `GB10 supports the selected 1024 users at ${row.maxUtilization}%`);
+  assert.equal(row.remainingUsers, row.supportedUsers - 1024, `remaining capacity is invertible at ${row.maxUtilization}%`);
+}
+
+const capacityInversion = run(`(() => {
+  const s = { ...DEFAULTS, users: 1024, maxUtilization: 57 };
+  return Object.entries({ cloud: cloudCost, own: ownCost, small: smallCost }).map(([name, cost]) => {
+    const selected = cost(s);
+    const atCapacity = cost({ ...s, users: selected.supportedUsers });
+    const aboveCapacity = cost({ ...s, users: selected.supportedUsers + 1 });
+    return { name, selected, atCapacity, aboveCapacity };
+  });
+})()`);
+for (const row of capacityInversion) {
+  assert.equal(row.atCapacity.supportedUsers, row.selected.supportedUsers, `${row.name} capacity is stable when inverted at 57%`);
+  assert.equal(row.atCapacity.remainingUsers, 0, `${row.name} has no remaining users at its inverted capacity`);
+  assert.equal(row.atCapacity.units, row.selected.units, `${row.name} keeps the same unit count at capacity`);
+  assert.ok(row.aboveCapacity.units > row.atCapacity.units, `${row.name} adds hardware above inverted capacity`);
+}
+
+const ceilingCoverage = run(`(() => {
+  const fixtures = [
+    { users: 1, docLang: 'pl', thinking: false },
+    { users: 37, docLang: 'pl', thinking: true },
+    { users: 199, docLang: 'en', thinking: false },
+    { users: 1024, docLang: 'en', thinking: true },
+    { users: 5000, docLang: 'pl', thinking: true },
+    { users: 20000, docLang: 'en', thinking: false },
+  ];
+  const rows = [];
+  for (let maxUtilization = 1; maxUtilization <= 100; maxUtilization++) {
+    for (const fixture of fixtures) {
+      for (const [name, cost] of Object.entries({ cloud: cloudCost, own: ownCost, small: smallCost })) {
+        const c = cost({ ...DEFAULTS, ...fixture, maxUtilization });
+        const withinCeiling = c.utilization <= c.utilizationLimit && c.load <= c.units * c.utilizationLimit;
+        const minimal = c.units === 1 || c.load > (c.units - 1) * c.utilizationLimit;
+        const supported = c.supportedUsers === null || (Number.isInteger(c.supportedUsers) && c.supportedUsers >= fixture.users);
+        const remaining = c.supportedUsers === null ? c.remainingUsers === null : c.remainingUsers === c.supportedUsers - fixture.users;
+        if (!withinCeiling || !minimal || !supported || !remaining) rows.push({ name, maxUtilization, users: fixture.users, docLang: fixture.docLang, thinking: fixture.thinking, units: c.units, load: c.load, utilization: c.utilization, utilizationLimit: c.utilizationLimit, supportedUsers: c.supportedUsers, remainingUsers: c.remainingUsers });
+      }
+    }
+  }
+  return rows;
+})()`);
+assert.deepEqual(JSON.parse(JSON.stringify(ceilingCoverage)), [], 'all 1..100% ceilings cover representative PL/EN and reasoning workloads');
+
+const zeroTokenCapacity = run(`(() => {
+  const s = { ...DEFAULTS, reqPerDay: 0 };
+  return { cloud: cloudCost(s), own: ownCost(s), small: smallCost(s), smallTotal: totalCost('small', s) };
+})()`);
+for (const pathName of ['cloud', 'own', 'small']) {
+  assert.equal(zeroTokenCapacity[pathName].units, 1, `${pathName} keeps one unit at zero token load`);
+  assert.equal(zeroTokenCapacity[pathName].supportedUsers, null, `${pathName} reports null capacity at zero token load`);
+  assert.equal(zeroTokenCapacity[pathName].remainingUsers, null, `${pathName} reports null remaining users at zero token load`);
+}
+assert.equal(zeroTokenCapacity.smallTotal.supportedUsers, defaults.smallMaxUsers, 'total GB10 keeps its policy ceiling with zero token load');
+assert.equal(zeroTokenCapacity.smallTotal.remainingUsers, defaults.smallMaxUsers - defaults.users, 'total GB10 remaining policy capacity is visible with zero tokens');
+
+const capacityCoverage = run(`(() => {
+  const s = { ...DEFAULTS };
+  const rows = [];
+  for (let users = 1; users <= 20000; users++) {
+    for (const [name, cost] of Object.entries({ cloud: cloudCost, own: ownCost, small: smallCost })) {
+      const c = cost({ ...s, users });
+      const loadWithinCeiling = c.load <= c.units * c.utilizationLimit;
+      const minimal = c.units === 1 || c.load > (c.units - 1) * c.utilizationLimit;
+      const supported = c.supportedUsers === null || (Number.isInteger(c.supportedUsers) && c.supportedUsers >= users);
+      const remaining = c.supportedUsers === null ? c.remainingUsers === null : c.remainingUsers === c.supportedUsers - users;
+      if (!loadWithinCeiling || !minimal || !supported || !remaining) rows.push({ name, users, units: c.units, load: c.load, limit: c.utilizationLimit, supported: c.supportedUsers, remaining: c.remainingUsers });
+    }
+  }
+  return rows;
+})()`);
+assert.deepEqual(JSON.parse(JSON.stringify(capacityCoverage)), [], 'hardware units are minimal, never under-provisioned, and cover users 1..20000');
+
+const costScaling = run(`(() => {
+  const s = { ...DEFAULTS, cloudOps: 123, ownOps: 321, smallOps: 17, softCloud: 456 };
+  const cloudLow = cloudCost({ ...s, users: 100 }), cloudHigh = cloudCost({ ...s, users: 400 });
+  const ownLow = ownCost({ ...s, users: 100 }), ownHigh = ownCost({ ...s, users: 400 });
+  const smallLow = smallCost({ ...s, users: 50 }), smallHigh = smallCost({ ...s, users: 100 });
+  const cloudTotalLow = totalCost('cloud', { ...s, users: 100 }), cloudTotalHigh = totalCost('cloud', { ...s, users: 400 });
+  const ownTotalLow = totalCost('own', { ...s, users: 100 }), ownTotalHigh = totalCost('own', { ...s, users: 400 });
+  const smallTotalLow = totalCost('small', { ...s, users: 50 }), smallTotalHigh = totalCost('small', { ...s, users: 100 });
+  const replacementMonth = 37;
+  const replacementDelta = (high, low) => cumulativeCost('small', high, replacementMonth) - cumulativeCost('small', low, replacementMonth);
+  return { cloudLow, cloudHigh, ownLow, ownHigh, smallLow, smallHigh, cloudTotalLow, cloudTotalHigh, ownTotalLow, ownTotalHigh, smallTotalLow, smallTotalHigh,
+    smallReplacementDelta: replacementDelta(smallTotalHigh, smallTotalLow),
+    smallReplacementExpected: (smallTotalHigh.capex - smallTotalLow.capex) * Math.ceil(replacementMonth / smallTotalHigh.replacementMonths)
+      + (smallTotalHigh.running - smallTotalLow.running) * replacementMonth };
+})()`);
+assert.equal(costScaling.cloudHigh.gpuMonthly, costScaling.cloudLow.gpuMonthly * 2, 'cloud rental scales with GPU count');
+assert.equal(costScaling.cloudHigh.cloudOps, costScaling.cloudLow.cloudOps, 'cloud fixed operations stay unchanged');
+assert.equal(costScaling.cloudTotalHigh.software.monthly, costScaling.cloudTotalLow.software.monthly, 'cloud software fee stays unchanged');
+assert.equal(costScaling.ownHigh.energy, costScaling.ownLow.energy * 2, 'own-server energy scales with GPU count');
+assert.equal(costScaling.ownHigh.capex, costScaling.ownLow.capex * 2, 'own-server capex scales with GPU count');
+assert.equal(costScaling.ownHigh.ops, costScaling.ownLow.ops, 'own-server fixed operations stay unchanged');
+assert.equal(costScaling.ownTotalHigh.software.monthly, costScaling.ownTotalLow.software.monthly, 'own-server software fee stays unchanged');
+assert.equal(costScaling.smallHigh.energy, costScaling.smallLow.energy * 2, 'GB10 energy scales with unit count');
+assert.equal(costScaling.smallHigh.capex, costScaling.smallLow.capex * 2, 'GB10 capex scales with unit count');
+assert.equal(costScaling.smallHigh.ops, costScaling.smallLow.ops, 'GB10 fixed operations stay unchanged');
+assert.equal(costScaling.smallTotalHigh.software.monthly, costScaling.smallTotalLow.software.monthly, 'GB10 software fee stays unchanged');
+assert.ok(Math.abs(costScaling.smallReplacementDelta - costScaling.smallReplacementExpected) < 1e-9, 'replacement chart repeats scaled hardware capex and running cost consistently');
 
 const csvWith = (body) => `nazwa,cena_wejscie_per_1M_USD,cena_wyjscie_per_1M_USD,okno_kontekstu,klasa,uwaga,id,family,max_output,always_thinks,tier_above,tier_input,tier_output,offpeak_input,offpeak_output,checked_at,source\n${body}`;
 assert.throws(() => run(`modelsFromCsv(${JSON.stringify(csvWith('Bad,-1,1,1000,mini,,bad,openai,128000,false,,,,,,2026-09-13,https://example.test'))})`), /row 2/i, 'negative CSV price has row');

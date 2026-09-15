@@ -60,8 +60,46 @@ stała infrastruktura `apiOps` 1 000 PLN / mies. Koszty obsługi sprzętu
 Opcja jest przeznaczona dla małych wdrożeń: od **200 użytkowników**
 (`smallMaxUsers` = 199) karta pokazuje „Opcja niedostępna” i GB10 nie bierze
 udziału w porównaniu, paskach ani wykresie. Poniżej limitu, gdy szczyt
-przekracza przepustowość, kalkulator dolicza kolejne sztuki GB10. Wartości
+przekracza zadany limit wykorzystania, kalkulator dolicza kolejne sztuki GB10. Wartości
 przepustowości trzeba zmierzyć na własnym modelu przed decyzją.
+
+## Dobór sprzętu do liczby użytkowników
+
+W ustawieniach zaawansowanych parametr `maxUtilization` ustala maksymalne
+wykorzystanie sprzętu (1–100%, domyślnie **80%**). Domyślnie zostaje więc
+co najmniej 20% rezerwy obliczeniowej przy szacowanym szczycie. Kalkulator
+sumuje obciążenie wejścia i wyjścia, dzieli je przez limit wykorzystania
+i zaokrągla w górę do pełnych jednostek. Przy zerowym ruchu pozostaje jedna
+jednostka, z jej normalnymi kosztami.
+
+Jednostka oznacza kompletną konfigurację: instancję GPU w chmurze, własny
+serwer albo stację GB10. Cena, moc i przepustowość w ustawieniach dotyczą
+jednej takiej jednostki. Kolejne jednostki zwiększają koszt najmu albo
+zakupu, amortyzacji, energii i wymiany sprzętu; stałe koszty obsługi oraz
+oprogramowania nie są mnożone. Zmiana samego opisu GPU nie zmienia parametrów.
+
+Karty pokazują liczbę jednostek, wykorzystanie w szczycie, limit oraz
+szacowaną liczbę obsługiwanych i dodatkowych użytkowników. Pojemność dotyczy
+bieżącego profilu na osobę (zapytania, kontekst, odpowiedź, język, myślenie,
+godziny i szczyt), **nie liczby jednoczesnych sesji**. Przy braku obciążenia
+tokenami pojemność z przepustowości nie jest wyznaczana. Limit wdrożenia GB10
+pozostaje niezależny i obowiązuje także wtedy.
+
+Przykłady przy pozostałych ustawieniach domyślnych:
+
+| Użytkownicy | Chmura GPU | Własny serwer | GB10 |
+| --- | --- | --- | --- |
+| 20 | 1 instancja | 1 serwer | 1 stacja |
+| 100 | 1 instancja | 1 serwer | 2 stacje |
+| 199 | 1 instancja | 1 serwer | 3 stacje |
+| 400 | 2 instancje | 2 serwery | niedostępne |
+
+Przy 400 użytkownikach dwie instancje chmurowe obsługują szacunkowo do
+740 osób, czyli zostaje miejsce na 340 dodatkowych użytkowników o tym samym
+profilu. Ustawienie limitu 100% wyłącza rezerwę i przywraca wcześniejszy
+model doboru liczby jednostek. To nadal szacunek: aplikacja nie weryfikuje
+VRAM, dopasowania modelu do sprzętu ani opóźnień. Przed zakupem lub najmem
+potrzebny jest test obciążeniowy własnej konfiguracji.
 
 ## Scenariusze i cennik
 
@@ -70,6 +108,9 @@ przepustowości trzeba zmierzyć na własnym modelu przed decyzją.
   przez oryginalny `aicalc` nie są odczytywane, bo nie mają pól GB10).
 - **Eksport JSON** i **Import JSON** przenoszą scenariusz między
   przeglądarkami. Import jest walidowany przed zastosowaniem.
+- Limit wykorzystania jest zapisywany i eksportowany wraz ze scenariuszem.
+  Starsze pliki bez `maxUtilization` otrzymują wartość 80%; ich wyniki
+  mogą więc wymagać większej liczby jednostek niż wcześniej.
 - **Reset scenariusza** przywraca ustawienia kalkulatora i od razu zapisuje
   reset. Zaimportowany cennik pozostaje zachowany.
 - **Cennik wbudowany** przywraca wyłącznie listę modeli dostarczoną z
@@ -95,8 +136,18 @@ Skróty: `1–3` scenariusze, `A` założenia, `L` język, `Ctrl/Cmd+S` zapis,
 `#app` publikuje stan przez `data-*` (m.in. `data-winner`, `data-small-monthly`,
 `data-small-units`, `data-break-even-small-users`, `data-payback-small-vs-cloud`,
 `data-small-first-year`, `data-api-software`, `data-own-software`), a każda
-karta wyniku `data-software` i `data-infra`. Tryb `?verify=1` uruchamia testy
-regresji i kontrakt DOM w samej aplikacji (23 sprawdzenia).
+karta wyniku `data-software` i `data-infra`. Limit wykorzystania jest
+publikowany jako `#app[data-max-utilization]`. Karty sprzętowe publikują
+`data-capacity-status` (`sized`, `idle`, `unavailable`, `invalid`),
+`data-units`, `data-utilization`, `data-utilization-limit`,
+`data-supported-users` i `data-remaining-users`. Wykorzystanie i limit w
+kontrakcie są ułamkami (0–1). Brak wyznaczonej pojemności to pusty atrybut,
+nie nieskończoność; przy niedostępnej opcji lub nieprawidłowych danych
+wszystkie liczbowe atrybuty pojemności karty są puste.
+
+Widoczne wartości mają `data-capacity-field` i są sprawdzane razem z
+atrybutami karty. Tryb `?verify=1` uruchamia testy regresji, pojemności i
+kontrakt DOM w samej aplikacji. Ten sam zestaw działa w testach Node i Chrome.
 
 ## Weryfikacja
 
