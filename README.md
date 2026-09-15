@@ -57,8 +57,10 @@ Parametry oprogramowania (sekcja „Oprogramowanie: Quantica Zagłoba RAG”):
 stała infrastruktura `apiOps` 1 000 PLN / mies. Koszty obsługi sprzętu
 (`cloudOps`, `ownOps`, `smallOps`) domyślnie wynoszą 0.
 
-Gdy szczytowe obciążenie przekracza przepustowość, kalkulator dolicza kolejne
-sztuki GB10 (przy scenariuszu „Firma · 300” są to trzy maszyny). Wartości
+Opcja jest przeznaczona dla małych wdrożeń: od **200 użytkowników**
+(`smallMaxUsers` = 199) karta pokazuje „Opcja niedostępna” i GB10 nie bierze
+udziału w porównaniu, paskach ani wykresie. Poniżej limitu, gdy szczyt
+przekracza przepustowość, kalkulator dolicza kolejne sztuki GB10. Wartości
 przepustowości trzeba zmierzyć na własnym modelu przed decyzją.
 
 ## Scenariusze i cennik

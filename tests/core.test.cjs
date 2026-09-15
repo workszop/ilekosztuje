@@ -56,6 +56,12 @@ assert.equal(smallBaseline.capex, 35000, 'Dell GB10 package costs 35 000 PLN');
 assert.equal(smallBaseline.m0, 35000, 'GB10 cumulative cost starts at the purchase price');
 assert.ok(Math.abs(smallBaseline.m12 - (35000 + 12 * 175.104)) < 1e-9, 'GB10 first year = purchase + 12 × running');
 assert.equal(smallBaseline.units300, 3, 'scenario S3 needs three GB10 units');
+const smallLimit = run(`(() => {
+  const s = { ...DEFAULTS };
+  const ok = totalCost('small', s, 199), over = totalCost('small', s, 200), r = computeResults({ ...s, users: 300 }, models);
+  return [ok.eligible, over.eligible, over.reason, r.winner !== 'small', r.paybackSmall];
+})()`);
+assert.deepEqual(JSON.parse(JSON.stringify(smallLimit)), [true, false, 'smallTooMany', true, null], 'Dell GB10 is unavailable from 200 users');
 
 const resultShape = run(`(() => {
   const result = computeResults({ ...DEFAULTS }, models);
