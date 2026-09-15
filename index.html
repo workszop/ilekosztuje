@@ -877,7 +877,7 @@ Object.assign(T.pl, {
   capacityUnitsCloud: 'Instancje GPU', capacityUnitsOwn: 'Serwery', capacityUnitsSmall: 'Stacje GB10',
   capacityUtilization: 'Szczyt / limit', capacitySupported: 'Obsługiwani użytk. (szac.)', capacityRemaining: 'Zapas użytkowników', capacityNoLoad: 'Nie wyznaczono',
   dashboardLead: 'Asystent RAG w firmie: porównaj API, chmurę GPU, własny serwer i małe wdrożenie na Dell GB10.', costBreakdown: 'Szczegóły kosztów',
-  workloadDetails: 'Szczegóły obciążenia', softwareTitle: 'Oprogramowanie: Quantica Zagłoba RAG',
+  workloadDetails: 'Szczegóły obciążenia', softwareTitle: 'Oprogramowanie: Zagłoba RAG',
   softwareHint: 'Warstwa oprogramowania nad infrastrukturą. Przy API i chmurze Zagłoba RAG działa jako SaaS (abonament miesięczny); przy Dell GB10 i własnym serwerze jest sprzedawana jako licencja z rocznym kontraktem wsparcia.',
   softApi: 'SaaS przy API (PLN / mies.)', softCloud: 'SaaS przy chmurze (PLN / mies.)', softLicense: 'Licencja przy sprzęcie (PLN)', softSupport: 'Kontrakt wsparcia (PLN / rok)', softAmort: 'Amortyzacja licencji (mies.)',
   apiOps: 'Infrastruktura API (PLN / mies.)', lApiInfra: 'Infrastruktura API', lSoftSaas: 'Zagłoba RAG · SaaS', lSoftLicense: 'Zagłoba RAG · licencja (amort.)', lSoftSupport: 'Zagłoba RAG · wsparcie', lInfra: 'Infrastruktura', lSoftware: 'Oprogramowanie',
@@ -905,7 +905,7 @@ Object.assign(T.en, {
   capacityUnitsCloud: 'GPU instances', capacityUnitsOwn: 'Servers', capacityUnitsSmall: 'GB10 units',
   capacityUtilization: 'Peak / ceiling', capacitySupported: 'Supported users (est.)', capacityRemaining: 'Additional users', capacityNoLoad: 'Not determined',
   dashboardLead: 'A company RAG assistant: compare API, cloud GPU, your own server and a small Dell GB10 deployment.', costBreakdown: 'Cost breakdown',
-  workloadDetails: 'Workload details', softwareTitle: 'Software: Quantica Zagłoba RAG',
+  workloadDetails: 'Workload details', softwareTitle: 'Software: Zagłoba RAG',
   softwareHint: 'The software layer above the infrastructure. With API and cloud, Zagłoba RAG runs as SaaS (monthly subscription); with Dell GB10 and own server it is sold as a licence with a yearly support contract.',
   softApi: 'SaaS with API (PLN / month)', softCloud: 'SaaS with cloud (PLN / month)', softLicense: 'Licence with hardware (PLN)', softSupport: 'Support contract (PLN / year)', softAmort: 'Licence depreciation (months)',
   apiOps: 'API infrastructure (PLN / month)', lApiInfra: 'API infrastructure', lSoftSaas: 'Zagłoba RAG · SaaS', lSoftLicense: 'Zagłoba RAG · licence (depr.)', lSoftSupport: 'Zagłoba RAG · support', lInfra: 'Infrastructure', lSoftware: 'Software',
@@ -1312,7 +1312,7 @@ function cumulativeCost(path, cost, month) {
   return cost.capex * purchases + (cost.oneOff || 0) + cost.running * month;
 }
 
-// Software layer: Quantica Zagłoba RAG as SaaS (API, cloud) or as a licence + yearly support (GB10, own server).
+// Software layer: Zagłoba RAG as SaaS (API, cloud) or as a licence + yearly support (GB10, own server).
 function softwareCost(path, s) {
   if (path === 'api') return { saas: s.softApi, licenseAmort: 0, support: 0, oneOff: 0, monthly: s.softApi };
   if (path === 'cloud') return { saas: s.softCloud, licenseAmort: 0, support: 0, oneOff: 0, monthly: s.softCloud };
@@ -1775,7 +1775,7 @@ function buildAssumptions() {
       [P('Tokeny myślenia', 'Thinking tokens'), now((s.thinking ? P('włączone', 'on') : P('wyłączone', 'off')) + ' · ×' + fmtNum(s.thinkMult, 1)),
         P('Tokeny rozumowania są płatne jak wyjście i nie są widoczne w odpowiedzi.', 'Reasoning tokens are billed as output and are not visible in the answer.')],
     ]},
-    { title: P('Oprogramowanie: Quantica Zagłoba RAG', 'Software: Quantica Zagłoba RAG'), rows: [
+    { title: P('Oprogramowanie: Zagłoba RAG', 'Software: Zagłoba RAG'), rows: [
       [P('SaaS przy API', 'SaaS with API'), now(money(s.softApi, 0) + P(' / mies.', ' / month')), P('Abonament Zagłoba RAG dla wariantu z płatnym API modelu. Doliczany do kosztu tokenów w każdym miesiącu.', 'Zagłoba RAG subscription for the paid model API variant. Added to token cost every month.')],
       [P('SaaS przy chmurze', 'SaaS with cloud'), now(money(s.softCloud, 0) + P(' / mies.', ' / month')), P('Abonament Zagłoba RAG dla wariantu z GPU w chmurze.', 'Zagłoba RAG subscription for the cloud GPU variant.')],
       [P('Licencja przy sprzęcie', 'Licence with hardware'), now(money(s.softLicense, 0) + ' · ' + s.softAmort + ' ' + t('monthsUnit')), P('Jednorazowa sprzedaż oprogramowania dla Dell GB10 i własnego serwera. W koszcie miesięcznym rozliczana przez okres amortyzacji licencji; na wykresie płatna w miesiącu 0 i nie powtarzana przy wymianie sprzętu.', 'One-off software sale for Dell GB10 and own server. Spread over the licence depreciation period in the monthly cost; on the chart paid in month 0 and not repeated with hardware replacement.')],
