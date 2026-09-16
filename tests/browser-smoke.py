@@ -164,12 +164,17 @@ CAPACITY_SMOKE_SCRIPT = r"""
     const ceiling57Checks = checkDomContract(document, App.results);
     expect(ceiling57Checks.every((check) => check.pass), 'DOM contract at 57% ceiling');
 
-    // GB10 remains unavailable at 200+ users, while 199 is still eligible.
+    // GB10 remains unavailable at 101+ users, while 100 is still eligible and recommends the next option.
     setInput('maxUtilization', 80);
-    setInput('users', 199);
-    assertSized('small', numeric(readCard('small'), 'units'), 199);
-    setInput('users', 200);
+    setInput('users', 100);
+    assertSized('small', numeric(readCard('small'), 'units'), 100);
+    const optData = (key) => document.querySelector(cardId(key)).dataset;
+    expect(optData('small').winner === 'true' && app.dataset.recommended === 'api' && optData('api').recommended === 'true' && document.querySelector(cardId('api') + ' .chip-rec'), 'API recommended while GB10 wins at 100 users');
+    setInput('users', 49);
+    expect(optData('small').winner === 'true' && app.dataset.recommended === '' && optData('api').recommended === 'false' && !document.querySelector('.chip-rec'), 'no recommendation below 50 users');
+    setInput('users', 101);
     assertUnavailable('small');
+    expect(app.dataset.recommended === '', 'no recommendation when GB10 is unavailable');
 
     // Zero request workload is idle: cloud/own do not invent a user capacity.
     setInput('users', 20);
@@ -183,7 +188,7 @@ CAPACITY_SMOKE_SCRIPT = r"""
     }
     const idleSmall = readCard('small');
     expect(idleSmall.dataset.capacityStatus === 'idle', 'small: zero workload should be idle');
-    if (!blank(idleSmall.dataset.supportedUsers)) expect(numeric(idleSmall, 'supportedUsers') >= 199, 'small: idle user cap');
+    if (!blank(idleSmall.dataset.supportedUsers)) expect(numeric(idleSmall, 'supportedUsers') >= 100, 'small: idle user cap');
     setInput('reqPerDay', 20);
 
     // Presets and language toggles keep the original behavior.

@@ -58,16 +58,23 @@ assert.ok(Math.abs(smallBaseline.m12 - (35000 + 12 * 175.104)) < 1e-9, 'GB10 fir
 assert.equal(smallBaseline.units300, 4, 'scenario S3 needs four GB10 units at the 80% utilization ceiling');
 const smallLimit = run(`(() => {
   const s = { ...DEFAULTS };
-  const ok = totalCost('small', s, 199), over = totalCost('small', s, 200), r = computeResults({ ...s, users: 300 }, models);
+  const ok = totalCost('small', s, 100), over = totalCost('small', s, 101), r = computeResults({ ...s, users: 300 }, models);
   return [ok.eligible, over.eligible, over.reason, r.winner !== 'small', r.paybackSmall];
 })()`);
-assert.deepEqual(JSON.parse(JSON.stringify(smallLimit)), [true, false, 'smallTooMany', true, null], 'Dell GB10 is unavailable from 200 users');
+assert.deepEqual(JSON.parse(JSON.stringify(smallLimit)), [true, false, 'smallTooMany', true, null], 'Dell GB10 is unavailable from 101 users');
+const smallRecommend = run(`(() => {
+  const s = { ...DEFAULTS };
+  const at = (users) => { const r = computeResults({ ...s, users }, models); return [r.winner, r.recommended]; };
+  const custom = computeResults({ ...s, users: 60, smallRecommendFrom: 70 }, models);
+  return { u20: at(20), u49: at(49), u50: at(50), u100: at(100), u101: at(101), custom: [custom.winner, custom.recommended] };
+})()`);
+assert.deepEqual(JSON.parse(JSON.stringify(smallRecommend)), { u20: ['api', null], u49: ['small', null], u50: ['small', 'api'], u100: ['small', 'api'], u101: ['api', null], custom: ['small', null] }, 'next cheapest option is recommended from 50 users while GB10 wins');
 
 const resultShape = run(`(() => {
   const result = computeResults({ ...DEFAULTS }, models);
   return { keys: Object.keys(result).sort(), winner: result.winner, rows: result.modelRows.length };
 })()`);
-assert.deepEqual(JSON.parse(JSON.stringify(resultShape.keys)), ['api', 'base', 'breakEvenCloud', 'breakEvenOwn', 'breakEvenSmall', 'cloud', 'model', 'modelRows', 'own', 'payback', 'paybackSmall', 'small', 'winner', 'workload'], 'computeResults shape');
+assert.deepEqual(JSON.parse(JSON.stringify(resultShape.keys)), ['api', 'base', 'breakEvenCloud', 'breakEvenOwn', 'breakEvenSmall', 'cloud', 'model', 'modelRows', 'own', 'payback', 'paybackSmall', 'recommended', 'small', 'winner', 'workload'], 'computeResults shape');
 assert.equal(resultShape.rows, models.length, 'computeResults returns all model rows');
 const steps = run(`(() => {
   const s = { ...DEFAULTS }, m = models.find((model) => model.id === 'gpt-5.6-terra');

@@ -20,6 +20,8 @@ vm.runInContext(`
   const customizedSaved = serializeScenario(customized);
   if (customizedSaved.values.maxUtilization !== 67 || parseScenario(JSON.stringify(customizedSaved)).values.maxUtilization !== 67) throw Error('max utilization round trip');
   function mustReject(value) { let rejected = false; try { parseScenario(JSON.stringify(value)); } catch (_) { rejected = true; } if (!rejected) throw Error('accepted invalid scenario'); }
+  const legacyScenario = { ...saved, values: { ...saved.values } }; delete legacyScenario.values.smallRecommendFrom;
+  if (parseScenario(JSON.stringify(legacyScenario)).values.smallRecommendFrom !== DEFAULTS.smallRecommendFrom) throw Error('smallRecommendFrom backfill');
   mustReject({ ...saved, version: 999 });
   mustReject({ ...saved, values: { ...saved.values, ownAmort: 0 } });
   mustReject({ ...saved, values: { ...saved.values, users: '20' } });

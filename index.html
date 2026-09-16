@@ -187,6 +187,8 @@ section { margin-bottom: var(--sp-8); }
 .chip-win { background: var(--quantica-pink); color: var(--white); }
 .chip-warn { background: var(--ink); color: var(--white); }
 .chip-mini { background: var(--bg-2); color: var(--fg-3); border-color: var(--border-1); }
+.chip-rec { background: var(--violet-primary); color: var(--white); }
+.option.recommended { border: 1.5px solid var(--violet-primary); }
 .chip-standard { background: var(--mist); color: var(--violet-primary); }
 .chip-frontier { background: var(--ink); color: var(--white); }
 .option { display: flex; flex-direction: column; }
@@ -504,6 +506,7 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
             <div class="field"><label for="smallOps" data-t="ops"></label><input id="smallOps" type="number" min="0" step="100"></div>
             <div class="field"><label for="smallMaxUsers" data-t="smallMaxUsers"></label><input id="smallMaxUsers" type="number" min="1" step="1"></div>
           </div>
+          <div class="field"><label for="smallRecommendFrom" data-t="smallRecommendFrom"></label><input id="smallRecommendFrom" type="number" min="1" step="1"></div>
         </div>
       </details>
       <details class="panel settings-section" id="ownSettings">
@@ -613,12 +616,14 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
         <div class="card-head"><span class="dot" style="background:var(--chart-api)"></span><h3 data-t="apiPath"></h3><span class="chip-slot"></span></div>
         <div class="opt-total"><span class="big"></span><span class="per" data-t="monthly"></span></div>
         <p class="opt-stack"></p>
+        <p class="hint opt-note" hidden></p>
         <details class="cost-breakdown"><summary data-t="costBreakdown"></summary><div class="opt-lines"></div></details>
       </div>
       <div class="card option" id="optCloud" data-path="cloud">
         <div class="card-head"><span class="dot" style="background:var(--chart-cloud)"></span><h3 data-t="cloudPath"></h3><span class="chip-slot"></span></div>
         <div class="opt-total"><span class="big"></span><span class="per" data-t="monthly"></span></div>
         <p class="opt-stack"></p>
+        <p class="hint opt-note" hidden></p>
         <div class="opt-capacity"></div>
         <details class="cost-breakdown"><summary data-t="costBreakdown"></summary><div class="opt-lines"></div></details>
       </div>
@@ -626,6 +631,7 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
         <div class="card-head"><span class="dot" style="background:var(--chart-small)"></span><h3 data-t="smallPath"></h3><span class="chip-slot"></span></div>
         <div class="opt-total"><span class="big"></span><span class="per" data-t="monthly"></span></div>
         <p class="opt-stack"></p>
+        <p class="hint opt-note" hidden></p>
         <div class="opt-capacity"></div>
         <details class="cost-breakdown"><summary data-t="costBreakdown"></summary><div class="opt-lines"></div></details>
       </div>
@@ -633,6 +639,7 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
         <div class="card-head"><span class="dot" style="background:var(--chart-own)"></span><h3 data-t="ownPath"></h3><span class="chip-slot"></span></div>
         <div class="opt-total"><span class="big"></span><span class="per" data-t="monthly"></span></div>
         <p class="opt-stack"></p>
+        <p class="hint opt-note" hidden></p>
         <div class="opt-capacity"></div>
         <details class="cost-breakdown"><summary data-t="costBreakdown"></summary><div class="opt-lines"></div></details>
       </div>
@@ -729,7 +736,7 @@ const DEFAULTS = {
   model: 'OpenAI GPT-5.6 Terra', apiOps: 1000, fx: 3.73, offPeak: false, thinking: false, thinkMult: 3,
   cloudGpu: '1× NVIDIA H100 80GB', cloudPrice: 10000, cloudOps: 0, cloudMode: '247', cloudPrefill: 10000, cloudDecode: 1500,
   ownGpu: '1× RTX PRO 6000 96GB', ownCapex: 250000, ownAmort: 36, ownReplace: 36, ownOps: 0, ownPower: 900, kwh: 1.0, ownPrefill: 10000, ownDecode: 1500,
-  smallGpu: 'Dell Pro Max GB10 (128 GB)', smallCapex: 35000, smallAmort: 36, smallReplace: 36, smallOps: 0, smallPower: 240, smallPrefill: 3000, smallDecode: 250, smallMaxUsers: 199,
+  smallGpu: 'Dell Pro Max GB10 (128 GB)', smallCapex: 35000, smallAmort: 36, smallReplace: 36, smallOps: 0, smallPower: 240, smallPrefill: 3000, smallDecode: 250, smallMaxUsers: 100, smallRecommendFrom: 50,
   peak: 2, horizon: 36, maxUtilization: 80,
   softApi: 5000, softCloud: 5000, softLicense: 150000, softSupport: 20000, softAmort: 36,
 };
@@ -765,6 +772,7 @@ const FIELD_SCHEMA = {
   smallPrefill:{ min: 1,     max: 100000000, integer: false },
   smallDecode: { min: 1,     max: 100000000, integer: false },
   smallMaxUsers:{ min: 1,    max: 20000,    integer: true },
+  smallRecommendFrom:{ min: 1, max: 20000,  integer: true },
   peak:        { min: 1,     max: 100,      integer: false },
   maxUtilization: { min: 1,  max: 100,      integer: true },
   horizon:     { min: 6,     max: 120,      integer: true },
@@ -810,7 +818,7 @@ const T = {
     capex: 'Zakup (PLN)', amort: 'Amortyzacja (mies.)', ops: 'Stała obsługa / mies. (PLN)', kwh: 'Prąd netto PLN / kWh',
     lInput: 'Tokeny wejścia', lOutput: 'Tokeny wyjścia', lGpu: 'GPU bez obsługi', lAmort: 'Amortyzacja zakupu', lEnergy: 'Prąd netto', lOps: 'Obsługa',
     lYear: 'Rocznie', lFirstYear: 'Pierwszy rok (z zakupem)', lPerReq: 'Za zapytanie', lUtil: 'Wykorzystanie GPU',
-    cheapest: 'Najtańsze', tierNote: 'Prompt powyżej {k}K tokenów: droższa stawka.', ctxOver: 'Prompt nie mieści się w oknie kontekstu modelu!',
+    cheapest: 'Najtańsze', recommended: 'Rekomendowane', tierNote: 'Prompt powyżej {k}K tokenów: droższa stawka.', ctxOver: 'Prompt nie mieści się w oknie kontekstu modelu!',
     summaryTitle: 'Podsumowanie miesięczne', summarySub: 'Koszt każdej opcji przy bieżącym obciążeniu.',
     aApiVsCloud: 'Pierwszy zakres przewagi API nad chmurą kończy się przy', aApiVsOwn: 'Pierwszy zakres przewagi API nad własnym serwerem kończy się przy',
     aApiVsSmall: 'Pierwszy zakres przewagi API nad Dell GB10 kończy się przy', aPaybackSmall: 'Pierwsze przecięcie kosztów gotówkowych Dell GB10 z chmurą po',
@@ -818,9 +826,9 @@ const T = {
     usersUnit: 'użytk.', monthsUnit: 'mies.', never: 'nie w ciągu 10 lat', apiNever: 'nigdy (już 1 osoba)',
     chartTime: 'Koszt narastająco w czasie', chartTimeSub: 'Dell GB10 i własny serwer startują od ceny sprzętu i licencji Zagłoba RAG. Co okres wymiany sprzętu doliczamy kolejny zakup sprzętu; licencja jest jednorazowa.',
     showData: 'Pokaż dane', monthLabel: 'Miesiąc',
-    secModels: 'Porównaj wszystkie modele API', modelsNote: 'Kwoty miesięczne zawierają Zagłoba RAG jako SaaS. Tokeny są szacowane dla rodziny modelu, nie liczone uruchomieniem tokenizerów. Kliknij wiersz, aby wybrać model.',
+    secModels: 'Porównaj wszystkie modele API', modelsNote: 'Kwoty miesięczne zawierają Zagłoba RAG jako SaaS i stałą infrastrukturę API. Tokeny są szacowane dla rodziny modelu, nie liczone uruchomieniem tokenizerów. Kliknij wiersz, aby wybrać model.',
     thModel: 'Model', thTok: 'Tokeny we / wy', thIn: 'We $/1M', thOut: 'Wy $/1M', thReq: 'Zapytanie', thMonth: 'Miesięcznie', thVs: 'Na tle GPU',
-    vsCheaper: 'tańsze niż GPU', vsDearer: 'droższe niż oba GPU', vsMid: 'pomiędzy',
+    vsCheaper: 'tańsze niż każda opcja GPU', vsDearer: 'droższe niż każda opcja GPU', vsMid: 'pomiędzy',
     secAdvanced: 'Ustawienia zaawansowane', advApi: 'API', advTime: 'Czas i obciążenie', advGpu: 'Przepustowość GPU (tok/s)',
     fx: 'Kurs USD → PLN', thinking: 'Tryb myślenia (reasoning)', thinkMult: 'Mnożnik wyjścia przy myśleniu', offPeak: 'DeepSeek poza szczytem',
     workDays: 'Dni robocze / rok', workHours: 'Godziny pracy / dzień', peak: 'Mnożnik szczytu', horizon: 'Horyzont wykresu (mies.)', power: 'Moc serwera (W)',
@@ -847,7 +855,7 @@ const T = {
     capex: 'Purchase (PLN)', amort: 'Depreciation (months)', ops: 'Fixed support / month (PLN)', kwh: 'Net power PLN / kWh',
     lInput: 'Input tokens', lOutput: 'Output tokens', lGpu: 'GPU excl. support', lAmort: 'Purchase depreciation', lEnergy: 'Net power', lOps: 'Support',
     lYear: 'Per year', lFirstYear: 'First year (with purchase)', lPerReq: 'Per request', lUtil: 'GPU utilisation',
-    cheapest: 'Cheapest', tierNote: 'Prompt above {k}K tokens: higher rate.', ctxOver: 'Prompt does not fit the model context window!',
+    cheapest: 'Cheapest', recommended: 'Recommended', tierNote: 'Prompt above {k}K tokens: higher rate.', ctxOver: 'Prompt does not fit the model context window!',
     summaryTitle: 'Monthly summary', summarySub: 'Cost of each option at the current workload.',
     aApiVsCloud: 'First API-over-cloud advantage interval ends at', aApiVsOwn: 'First API-over-own-server advantage interval ends at',
     aApiVsSmall: 'First API-over-Dell-GB10 advantage interval ends at', aPaybackSmall: 'First cash-cost crossing of Dell GB10 and cloud after',
@@ -855,9 +863,9 @@ const T = {
     usersUnit: 'users', monthsUnit: 'mo.', never: 'not within 10 years', apiNever: 'never (even 1 user)',
     chartTime: 'Cumulative cost over time', chartTimeSub: 'Dell GB10 and own server start at the hardware price plus the Zagłoba RAG licence. Hardware is bought again each replacement period; the licence is one-off.',
     showData: 'Show data', monthLabel: 'Month',
-    secModels: 'Compare all API models', modelsNote: 'Monthly amounts include Zagłoba RAG as SaaS. Tokens are estimated for the model family, not measured by running each tokenizer. Click a row to select the model.',
+    secModels: 'Compare all API models', modelsNote: 'Monthly amounts include Zagłoba RAG as SaaS and the fixed API infrastructure. Tokens are estimated for the model family, not measured by running each tokenizer. Click a row to select the model.',
     thModel: 'Model', thTok: 'Tokens in / out', thIn: 'In $/1M', thOut: 'Out $/1M', thReq: 'Request', thMonth: 'Monthly', thVs: 'Vs GPU',
-    vsCheaper: 'cheaper than GPU', vsDearer: 'dearer than both GPUs', vsMid: 'in between',
+    vsCheaper: 'cheaper than every GPU option', vsDearer: 'dearer than every GPU option', vsMid: 'in between',
     secAdvanced: 'Advanced settings', advApi: 'API', advTime: 'Time and load', advGpu: 'GPU throughput (tok/s)',
     fx: 'USD → PLN rate', thinking: 'Thinking mode (reasoning)', thinkMult: 'Output multiplier when thinking', offPeak: 'DeepSeek off-peak',
     workDays: 'Working days / year', workHours: 'Working hours / day', peak: 'Peak multiplier', horizon: 'Chart horizon (months)', power: 'Server power (W)',
@@ -871,7 +879,7 @@ const T = {
 
 Object.assign(T.pl, {
   maxUtilization: 'Maks. wykorzystanie sprzętu (%)',
-  capacityHint: 'Domyślnie 80%: co najmniej 20% mocy obliczeniowej pozostaje w rezerwie przy szacowanym szczycie. Dodajemy całe instancje lub serwery. Cena, moc i przepustowość dotyczą jednej skonfigurowanej jednostki.',
+  capacityHint: 'Domyślnie 80%: co najmniej 20% mocy obliczeniowej pozostaje w rezerwie przy szacowanym szczycie. Dodajemy całe instancje, serwery lub stacje GB10. Cena, moc i przepustowość dotyczą jednej skonfigurowanej jednostki.',
   capacitySized: 'Sprzęt dobrany do szacowanego szczytu', capacityIdle: 'Brak obciążenia tokenami',
   capacityNote: 'Szacunek dla bieżącego obciążenia na osobę, nie liczba jednoczesnych sesji. VRAM i opóźnienia wymagają testu modelu.',
   capacityUnitsCloud: 'Instancje GPU', capacityUnitsOwn: 'Serwery', capacityUnitsSmall: 'Stacje GB10',
@@ -881,7 +889,7 @@ Object.assign(T.pl, {
   softwareHint: 'Warstwa oprogramowania nad infrastrukturą. Przy API i chmurze Zagłoba RAG działa jako SaaS (abonament miesięczny); przy Dell GB10 i własnym serwerze jest sprzedawana jako licencja z rocznym kontraktem wsparcia.',
   softApi: 'SaaS przy API (PLN / mies.)', softCloud: 'SaaS przy chmurze (PLN / mies.)', softLicense: 'Licencja przy sprzęcie (PLN)', softSupport: 'Kontrakt wsparcia (PLN / rok)', softAmort: 'Amortyzacja licencji (mies.)',
   apiOps: 'Infrastruktura API (PLN / mies.)', lApiInfra: 'Infrastruktura API', lSoftSaas: 'Zagłoba RAG · SaaS', lSoftLicense: 'Zagłoba RAG · licencja (amort.)', lSoftSupport: 'Zagłoba RAG · wsparcie', lInfra: 'Infrastruktura', lSoftware: 'Oprogramowanie',
-  smallGpu: 'Sprzęt', smallMaxUsers: 'Maks. użytkowników', smallTooMany: 'Opcja niedostępna: Dell GB10 obsługuje do {n} użytkowników.', smallPower: 'Moc Dell GB10 (W)', smallReplace: 'Dell GB10: wymiana co (mies.)', smallPrefill: 'Dell GB10: wejście', smallDecode: 'Dell GB10: wyjście',
+  smallGpu: 'Sprzęt', smallMaxUsers: 'Maks. użytkowników', smallRecommendFrom: 'Rekomenduj inną opcję od (użytk.)', smallRecommendNote: 'Od {n} użytkowników rekomendujemy kolejną najtańszą opcję zamiast Dell GB10.', smallTooMany: 'Opcja niedostępna: Dell GB10 obsługuje do {n} użytkowników.', smallPower: 'Moc Dell GB10 (W)', smallReplace: 'Dell GB10: wymiana co (mies.)', smallPrefill: 'Dell GB10: wejście', smallDecode: 'Dell GB10: wyjście',
   settingsTitle: 'Ustawienia', settingsDone: 'Pokaż wyniki', settingsClose: 'Zamknij ustawienia', scenarioTitle: 'Zapis i pliki',
   estimateNotice: 'Szacunek kosztów inferencji, nie oferta ani gwarancja jakości i wydajności. Kwoty netto.',
   cloudOps: 'Stała obsługa chmury / mies. (PLN)', ownReplace: 'Wymiana sprzętu co (mies.)',
@@ -899,7 +907,7 @@ Object.assign(T.pl, {
 });
 Object.assign(T.en, {
   maxUtilization: 'Maximum hardware utilization (%)',
-  capacityHint: 'Default 80%: at least 20% of compute capacity stays in reserve at the estimated peak. We add complete instances or servers. Price, power and throughput describe one configured unit.',
+  capacityHint: 'Default 80%: at least 20% of compute capacity stays in reserve at the estimated peak. We add complete instances, servers or GB10 units. Price, power and throughput describe one configured unit.',
   capacitySized: 'Sized for the estimated peak', capacityIdle: 'No token workload',
   capacityNote: 'Estimate at the current per-user workload, not simultaneous sessions. Model VRAM and latency need testing.',
   capacityUnitsCloud: 'GPU instances', capacityUnitsOwn: 'Servers', capacityUnitsSmall: 'GB10 units',
@@ -909,7 +917,7 @@ Object.assign(T.en, {
   softwareHint: 'The software layer above the infrastructure. With API and cloud, Zagłoba RAG runs as SaaS (monthly subscription); with Dell GB10 and own server it is sold as a licence with a yearly support contract.',
   softApi: 'SaaS with API (PLN / month)', softCloud: 'SaaS with cloud (PLN / month)', softLicense: 'Licence with hardware (PLN)', softSupport: 'Support contract (PLN / year)', softAmort: 'Licence depreciation (months)',
   apiOps: 'API infrastructure (PLN / month)', lApiInfra: 'API infrastructure', lSoftSaas: 'Zagłoba RAG · SaaS', lSoftLicense: 'Zagłoba RAG · licence (depr.)', lSoftSupport: 'Zagłoba RAG · support', lInfra: 'Infrastructure', lSoftware: 'Software',
-  smallGpu: 'Hardware', smallMaxUsers: 'Max users', smallTooMany: 'Option unavailable: Dell GB10 supports up to {n} users.', smallPower: 'Dell GB10 power (W)', smallReplace: 'Dell GB10: replace every (months)', smallPrefill: 'Dell GB10: input', smallDecode: 'Dell GB10: output',
+  smallGpu: 'Hardware', smallMaxUsers: 'Max users', smallRecommendFrom: 'Recommend another option from (users)', smallRecommendNote: 'From {n} users we recommend the next cheapest option instead of Dell GB10.', smallTooMany: 'Option unavailable: Dell GB10 supports up to {n} users.', smallPower: 'Dell GB10 power (W)', smallReplace: 'Dell GB10: replace every (months)', smallPrefill: 'Dell GB10: input', smallDecode: 'Dell GB10: output',
   settingsTitle: 'Settings', settingsDone: 'Show results', settingsClose: 'Close settings', scenarioTitle: 'Save and files',
   estimateNotice: 'Inference cost estimate, not a quote or a quality/capacity guarantee. Net amounts.',
   cloudOps: 'Fixed cloud support / month (PLN)', ownReplace: 'Replace hardware every (months)',
@@ -1394,6 +1402,12 @@ function computeResults(s, models) {
   });
   const candidates = { api: api.eligible ? api.monthly : Infinity, cloud: cloud.monthly, own: own.monthly, small: small.eligible ? small.monthly : Infinity };
   const winner = Object.keys(candidates).reduce((a, b) => candidates[a] <= candidates[b] ? a : b);
+  // From smallRecommendFrom users a winning GB10 still shows as cheapest, but the next cheapest option is recommended.
+  let recommended = null;
+  if (winner === 'small' && s.users >= s.smallRecommendFrom) {
+    const rest = Object.keys(candidates).filter((key) => key !== 'small' && Number.isFinite(candidates[key]));
+    recommended = rest.length ? rest.reduce((a, b) => candidates[a] <= candidates[b] ? a : b) : null;
+  }
   const apiAtUsers = (users) => {
     try { const value = totalCost('api', s, users, model); return value.eligible ? value.monthly : Infinity; } catch (_) { return Infinity; }
   };
@@ -1409,6 +1423,7 @@ function computeResults(s, models) {
     own,
     small,
     winner,
+    recommended,
     modelRows,
     breakEvenCloud: breakEvenUsers(apiAtUsers, cloudAtUsers, 20000),
     breakEvenOwn: breakEvenUsers(apiAtUsers, ownAtUsers, 20000),
@@ -1437,7 +1452,7 @@ function runCapacityChecks() {
   });
   probe('scale with headroom', () => {
     const cloud = cloudCost({ ...DEFAULTS, users: 400 });
-    const small = totalCost('small', { ...DEFAULTS, users: 100 });
+    const small = smallCost({ ...DEFAULTS, users: 100 });
     return cloud.units === 2 && cloud.supportedUsers === 740 && cloud.remainingUsers === 340
       && small.units === 2 && small.supportedUsers === 186 && small.remainingUsers === 86;
   });
@@ -1453,9 +1468,9 @@ function runCapacityChecks() {
         && (c.units === 1 || c.load / (c.units - 1) > c.utilizationLimit);
     })));
   probe('GB10 deployment cap', () => {
-    const at = totalCost('small', { ...DEFAULTS, users: 199 });
-    const over = totalCost('small', { ...DEFAULTS, users: 200 });
-    return at.eligible && at.supportedUsers === 199 && at.remainingUsers === 0 && !over.eligible;
+    const at = totalCost('small', { ...DEFAULTS, users: 100 });
+    const over = totalCost('small', { ...DEFAULTS, users: 101 });
+    return at.eligible && at.supportedUsers === 100 && at.remainingUsers === 0 && !over.eligible;
   });
   return checks;
 }
@@ -1482,6 +1497,9 @@ function runRegressionChecks(models = []) {
     add('Zagłoba RAG software layer', softOk, `${totals.api.monthly.toFixed(2)} / ${totals.own.monthly.toFixed(2)}`);
     const smallLimit = totalCost('small', s, s.smallMaxUsers), smallOver = totalCost('small', s, s.smallMaxUsers + 1);
     add('Dell GB10 user limit', smallLimit.eligible === true && smallOver.eligible === false && smallOver.reason === 'smallTooMany' && computeResults({ ...s, users: 300 }, sourceModels).winner !== 'small', `${s.smallMaxUsers}`);
+    const below = computeResults({ ...s, users: s.smallRecommendFrom - 1 }, sourceModels), from = computeResults({ ...s, users: s.smallRecommendFrom }, sourceModels);
+    const nextCheapest = ['api', 'cloud', 'own'].filter((key) => from[key].eligible !== false).sort((a, b) => from[a].monthly - from[b].monthly)[0];
+    add('Dell GB10 recommendation', below.winner === 'small' && below.recommended === null && from.winner === 'small' && from.recommended === nextCheapest && from.recommended !== 'small', `${below.recommended} / ${from.recommended}`);
     const exact = apiCost(terra, { ...s, chunks: 1, chunkTok: 272000, promptTok: 0, outTok: 0 });
     const above = apiCost(terra, { ...s, chunks: 1, chunkTok: 272001, promptTok: 0, outTok: 0 });
     add('long-context threshold', exact.tiered === false && above.tiered === true, `${exact.pin}/${above.pin}`);
@@ -1545,11 +1563,11 @@ function syncSegs() {
   }
 }
 
-function renderOption(node, { monthly, win, lines, extra, warn, eligible = true, software = 0, infra = 0 }) {
-  node.classList.toggle('winner', win);
-  node.dataset.monthly = eligible ? monthly.toFixed(2) : ''; node.dataset.winner = String(win); node.dataset.eligible = String(eligible);
+function renderOption(node, { monthly, win, lines, extra, warn, note, eligible = true, software = 0, infra = 0, recommended = false }) {
+  node.classList.toggle('winner', win); node.classList.toggle('recommended', recommended);
+  node.dataset.monthly = eligible ? monthly.toFixed(2) : ''; node.dataset.winner = String(win); node.dataset.eligible = String(eligible); node.dataset.recommended = String(recommended);
   const slot = node.querySelector('.chip-slot');
-  slot.replaceChildren(); if (win) slot.append(el('span', { class: 'chip chip-win' }, t('cheapest')));
+  slot.replaceChildren(); if (win) slot.append(el('span', { class: 'chip chip-win' }, t('cheapest'))); if (recommended) slot.append(el('span', { class: 'chip chip-rec' }, t('recommended')));
   node.querySelector('.opt-total .big').textContent = eligible ? money(monthly, 0) : t('unavailable');
   node.dataset.software = eligible ? software.toFixed(2) : ''; node.dataset.infra = eligible ? infra.toFixed(2) : '';
   node.querySelector('.opt-stack').textContent = eligible ? `${t('lSoftware')} ${money(software, 0)} · ${t('lInfra')} ${money(infra, 0)}` : '';
@@ -1560,6 +1578,7 @@ function renderOption(node, { monthly, win, lines, extra, warn, eligible = true,
     extra.forEach(([l, v]) => { const d = el('div', { class: 'line line-muted' }); d.append(el('span', {}, l), el('b', {}, v)); box.append(d); });
   }
   if (warn) { const w = el('p', { class: 'hint warn-line' }); w.append(el('span', { class: 'chip chip-warn' }, '!'), document.createTextNode(' ' + warn)); box.append(w); }
+  const noteNode = node.querySelector('.opt-note'); noteNode.hidden = !note; noteNode.textContent = note || '';
 }
 
 function renderCapacity(node, cost, path) {
@@ -1610,7 +1629,7 @@ function render() {
   if (!renderValidation()) return;
   const result = computeResults(s, s.models);
   App.results = result;
-  const { model: m, workload: w, base, api, cloud, own, small, winner } = result;
+  const { model: m, workload: w, base, api, cloud, own, small, winner, recommended } = result;
   syncSegs();
   renderPresets();
 
@@ -1627,16 +1646,17 @@ function render() {
   else if (api.tiered) apiWarn = t('tierNote', { k: m.tier.above / 1000 });
   const opsLine = (v) => v > 0 ? [[t('lOps'), money(v, 0)]] : [];
   const hwSoftLines = (c) => [[t('lSoftLicense'), money(c.software.licenseAmort, 0)], [t('lSoftSupport'), money(c.software.support, 0)]];
-  renderOption($('optApi'), { monthly: api.monthly, win: winner === 'api', warn: apiWarn, eligible: api.eligible, software: api.software.monthly, infra: api.infraMonthly,
+  renderOption($('optApi'), { monthly: api.monthly, win: winner === 'api', recommended: recommended === 'api', warn: apiWarn, eligible: api.eligible, software: api.software.monthly, infra: api.infraMonthly,
     lines: [[t('lSoftSaas'), money(api.software.saas, 0)], [t('lApiInfra'), money(api.fixed, 0)], [t('lInput'), money(api.inMonthly, 0)], [t('lOutput'), money(api.outMonthly, 0)]],
     extra: [[t('lYear'), money(api.monthly * 12, 0)], [t('lPerReq'), money(api.perReq, 4)]] });
-  renderOption($('optCloud'), { monthly: cloud.monthly, win: winner === 'cloud', software: cloud.software.monthly, infra: cloud.infraMonthly,
+  renderOption($('optCloud'), { monthly: cloud.monthly, win: winner === 'cloud', recommended: recommended === 'cloud', software: cloud.software.monthly, infra: cloud.infraMonthly,
     lines: [[t('lSoftSaas'), money(cloud.software.saas, 0)], [t('lGpu') + ` (${cloud.units} × ${fmtNum(cloud.hours, 0)} h)`, money(cloud.gpuMonthly, 0)], ...opsLine(s.cloudOps)],
     extra: [[t('lYear'), money(cloud.monthly * 12, 0)], [t('lPerReq'), money(cloud.perReq, 4)]] });
-  renderOption($('optOwn'), { monthly: own.monthly, win: winner === 'own', software: own.software.monthly, infra: own.infraMonthly,
+  renderOption($('optOwn'), { monthly: own.monthly, win: winner === 'own', recommended: recommended === 'own', software: own.software.monthly, infra: own.infraMonthly,
     lines: [...hwSoftLines(own), [t('lAmort'), money(own.amort, 0)], [t('lEnergy'), money(own.energy, 0)], ...opsLine(s.ownOps)],
     extra: [[t('lYear'), money(own.monthly * 12, 0)], [t('lFirstYear'), money(cumulativeCost('own', own, 12), 0)], [t('lPerReq'), money(own.perReq, 4)]] });
   renderOption($('optSmall'), { monthly: small.monthly, win: winner === 'small', software: small.software.monthly, infra: small.infraMonthly, eligible: small.eligible,
+    note: recommended ? t('smallRecommendNote', { n: fmtNum(s.smallRecommendFrom) }) : null,
     warn: small.eligible ? null : t('smallTooMany', { n: fmtNum(s.smallMaxUsers) }),
     lines: [...hwSoftLines(small), [t('lAmort'), money(small.amort, 0)], [t('lEnergy'), money(small.energy, 0)], ...opsLine(s.smallOps)],
     extra: [[t('lYear'), money(small.monthly * 12, 0)], [t('lFirstYear'), money(cumulativeCost('small', small, 12), 0)], [t('lPerReq'), money(small.perReq, 4)]] });
@@ -1671,13 +1691,13 @@ function render() {
 
   // DOM contract
   Object.assign(appEl.dataset, {
-    state: 'ready', model: m.name, modelFamily: m.family, modelsLoaded: String(state.models.length), winner, docLang: s.docLang, apiEligible: String(api.eligible), apiReason: api.reason || '',
+    state: 'ready', model: m.name, modelFamily: m.family, modelsLoaded: String(state.models.length), winner, recommended: recommended || '', docLang: s.docLang, apiEligible: String(api.eligible), apiReason: api.reason || '',
     thinking: String(s.thinking), cloudMode: s.cloudMode, reqMonth: api.reqMonth.toFixed(0), maxUtilization: String(s.maxUtilization),
     baseInTokens: base.inTok.toFixed(0), baseOutTokens: base.outTok.toFixed(0), inTokens: api.inTok.toFixed(0), outTokens: api.outTok.toFixed(0),
     ossInTokens: w.inTok.toFixed(0), ossOutTokens: w.outTok.toFixed(0),
     apiMonthly: api.eligible ? api.monthly.toFixed(2) : '', cloudMonthly: cloud.monthly.toFixed(2), ownMonthly: own.monthly.toFixed(2), smallMonthly: small.eligible ? small.monthly.toFixed(2) : '',
     ownAmort: own.amort.toFixed(2), ownEnergy: own.energy.toFixed(2), smallAmort: small.amort.toFixed(2), smallEnergy: small.energy.toFixed(2), apiPerReq: api.eligible ? api.perReq.toFixed(6) : '',
-    cloudUnits: String(cloud.units), ownUnits: String(own.units), smallUnits: String(small.units), smallEligible: String(small.eligible), smallMaxUsers: String(s.smallMaxUsers),
+    cloudUnits: String(cloud.units), ownUnits: String(own.units), smallUnits: String(small.units), smallEligible: String(small.eligible), smallMaxUsers: String(s.smallMaxUsers), smallRecommendFrom: String(s.smallRecommendFrom),
     breakEvenCloudUsers: api.eligible ? String(beCloud) : '', breakEvenOwnUsers: api.eligible ? String(beOwn) : '', breakEvenSmallUsers: api.eligible ? String(beSmall) : '',
     paybackVsCloud: String(pbCloud ?? ''), paybackSmallVsCloud: String(pbSmall ?? ''), lang: state.lang,
     effectiveThinking: String(modelThinks(m, s)), ownReplacementMonths: String(s.ownReplace), ownFirstYear: cumulativeCost('own', own, 12).toFixed(2),
@@ -1766,7 +1786,7 @@ function buildAssumptions() {
       [P('Odpowiedź', 'Answer'), now(fmtNum(s.outTok) + ' ' + P('tokenów', 'tokens')), P('Limit odpowiedzi jest edytowalnym parametrem scenariusza. Bez historii rozmowy.', 'The answer limit is an editable scenario parameter. No conversation history.')],
       [P('Bieżące zapytanie', 'Current request'), now(pair(b.inTok, b.outTok) + ' tok.'), P('Liczba zmienia się między rodzinami tokenizerów i dla języka angielskiego (szacunki w sekcji niżej).', 'The count varies across tokenizer families and for English (estimates below).')],
       [P('Nie liczymy', 'Not counted'), P('embeddingi, indeksowanie', 'embeddings, indexing'),
-        P('Nie obejmujemy budowy aplikacji, wdrożenia RAG, embeddingów, indeksowania, licencji, redundancji ani pracy operacyjnej. Ich koszt zależy od projektu, więc nie zakładamy, że zawsze wynosi grosze.', 'We exclude app build, RAG implementation, embeddings, indexing, licences, redundancy and operations. Their cost is project-dependent, so we do not assume they always cost pennies.')],
+        P('Nie obejmujemy wdrożenia i integracji u klienta, embeddingów, indeksowania, redundancji ani pracy operacyjnej. Oprogramowanie Zagłoba RAG jest liczone osobno (sekcja niżej). Koszt pominiętych pozycji zależy od projektu, więc nie zakładamy, że zawsze wynosi grosze.', 'We exclude on-site implementation and integration, embeddings, indexing, redundancy and operations. The Zagłoba RAG software is counted separately (section below). The cost of the excluded items is project-dependent, so we do not assume they always cost pennies.')],
     ]},
     { title: P('Tokeny i język', 'Tokens and language'), rows: [
       ...tokenRows,
@@ -1787,7 +1807,7 @@ function buildAssumptions() {
       [P('Infrastruktura API', 'API infrastructure'), now(money(s.apiOps, 0) + P(' / mies.', ' / month')), P('Stały miesięczny koszt infrastruktury wokół API (hosting aplikacji, baza wektorowa, sieć). Edytowalna wartość scenariusza.', 'Fixed monthly cost of the infrastructure around the API (app hosting, vector store, networking). Editable scenario value.')],
       [P('Kurs USD/PLN', 'USD/PLN rate'), now(fmtNum(s.fx, 2)), P('Źródło zewnętrzne sprawdzone 14.09.2026; kurs w polu jest edytowalną wartością scenariusza.', 'External source checked on 14 Sep 2026; the field is an editable scenario value.'), 'nbp'],
       [P('Długi kontekst', 'Long context'), 'OpenAI > 272K', P('Powyżej progu droższa stawka dla całego żądania.', 'Above the threshold the whole request uses a higher rate.')],
-      [P('DeepSeek', 'DeepSeek'), P('szczyt pon.–pt. 01–04 i 06–10 UTC', 'peak Mon–Fri 01–04 and 06–10 UTC'), P('Poza szczytem połowa ceny.', 'Half price off-peak.'), 'deepseek'],
+      [P('DeepSeek', 'DeepSeek'), P('szczyt pon.–pt. 01–04 i 06–10 UTC', 'peak Mon–Fri 01–04 and 06–10 UTC'), P('Połowa ceny poza szczytem, tylko gdy w ustawieniach zaawansowanych włączono „DeepSeek poza szczytem”.', 'Half price off-peak, only when “DeepSeek off-peak” is enabled in the advanced settings.'), 'deepseek'],
     ]},
     { title: P('Chmura GPU', 'Cloud GPU'), rows: [
       [P('Cena GPU', 'GPU price'), now(money(cloudGpuPrice, 0) + P(' / mies. bez obsługi', ' / month excl. support')),
@@ -1809,9 +1829,10 @@ function buildAssumptions() {
     { title: P('Małe wdrożenie: Dell GB10', 'Small deployment: Dell GB10'), rows: [
       [P('Sprzęt', 'Hardware'), now(s.smallGpu),
         P('Stacja Dell Pro Max z układem NVIDIA GB10 Grace Blackwell: 128 GB pamięci zunifikowanej, pobór mocy stacji do ok. 240 W. Jedna maszyna obsługuje jeden model klasy 30–70B w kwantyzacji; kalkulator liczy kolejne sztuki, gdy szczyt przekracza przepustowość.', 'A Dell Pro Max workstation with the NVIDIA GB10 Grace Blackwell superchip: 128 GB unified memory, system power draw around 240 W. One box serves one quantised 30–70B-class model; the calculator adds units when the peak exceeds throughput.'), 'gb10'],
-      [P('Limit użytkowników', 'User limit'), now(fmtNum(s.smallMaxUsers) + ' ' + t('usersUnit')), P('Powyżej tej liczby użytkowników opcja Dell GB10 jest oznaczana jako niedostępna i nie bierze udziału w porównaniu.', 'Above this number of users the Dell GB10 option is marked unavailable and left out of the comparison.')],
+      [P('Limit użytkowników', 'User limit'), now(fmtNum(s.smallMaxUsers) + ' ' + t('usersUnit')), P('Do tej liczby użytkowników włącznie opcja Dell GB10 bierze udział w porównaniu. Powyżej jest oznaczana jako niedostępna i pomijana na kartach, paskach i wykresie.', 'Up to and including this number of users the Dell GB10 option takes part in the comparison. Above it, it is marked unavailable and left out of the cards, bars and chart.')],
+      [P('Rekomendacja innej opcji', 'Recommending another option'), now(P('od ', 'from ') + fmtNum(s.smallRecommendFrom) + ' ' + t('usersUnit')), P('Gdy Dell GB10 jest najtańszy przy tej liczbie użytkowników lub większej, karta GB10 zachowuje etykietę „Najtańsze”, a kolejna najtańsza opcja dostaje etykietę „Rekomendowane”. Poniżej progu rekomendacja nie jest pokazywana.', 'When Dell GB10 is the cheapest at this number of users or more, the GB10 card keeps the “Cheapest” label and the next cheapest option gets the “Recommended” label. Below the threshold no recommendation is shown.')],
       [P('Zakup', 'Purchase'), now(money(s.smallCapex, 0)),
-        P('Cena pakietu małego wdrożenia (sprzęt Dell GB10 z konfiguracją). Jest edytowalną wartością scenariusza; nie obejmuje budowy aplikacji ani utrzymania.', 'Price of the small deployment package (Dell GB10 hardware with setup). It is an editable scenario value; it excludes app build and operations.')],
+        P('Cena pakietu małego wdrożenia (sprzęt Dell GB10 z konfiguracją) za jedną stację. Jest edytowalną wartością scenariusza; nie obejmuje licencji Zagłoba RAG (liczona osobno) ani utrzymania.', 'Price of the small deployment package (Dell GB10 hardware with setup) per unit. It is an editable scenario value; it excludes the Zagłoba RAG licence (counted separately) and operations.')],
       [P('Amortyzacja', 'Depreciation'), now(s.smallAmort + ' ' + t('monthsUnit')), P('Rozliczane tak samo jak dla własnego serwera.', 'Accounted for exactly like the own server.')],
       [P('Wymiana sprzętu', 'Hardware replacement'), now(smallReplace + ' ' + t('monthsUnit')), P('Osobny okres wymiany używany na wykresie.', 'A separate replacement period used by the chart.')],
       [P('Obsługa', 'Support'), now(money(s.smallOps, 0) + P(' / mies.', ' / month')), P('Domyślnie 0 PLN: utrzymanie sprzętu nie jest liczone; wsparcie oprogramowania jest w kontrakcie Zagłoba RAG.', 'Defaults to PLN 0: hardware maintenance is not counted; software support sits in the Zagłoba RAG contract.')],
@@ -1827,7 +1848,7 @@ function buildAssumptions() {
       [P('Obsługiwani użytkownicy', 'Supported users'), P('szacunek przy bieżącym profilu', 'estimate at the current workload profile'),
         P('Pojemność to liczba osób przy zadanej liczbie zapytań, długości kontekstu i odpowiedzi, języku, myśleniu, godzinach pracy oraz mnożniku szczytu. Zapas oznacza dodatkowych użytkowników do limitu wykorzystania, nie wolny VRAM ani gwarantowane jednoczesne sesje. Przy zerowym obciążeniu tokenami nie wyznaczamy pojemności z przepustowości. Limit wdrożenia GB10 nadal obowiązuje.', 'Capacity is the number of users at the configured requests, context and response lengths, language, reasoning, work hours and peak multiplier. Additional users are headroom up to the utilization ceiling, not free VRAM or guaranteed simultaneous sessions. Zero token load does not determine throughput-based user capacity. The GB10 deployment cap still applies.')],
       [P('Pola wejście / wyjście', 'Input / output fields'), now(fmtNum(s.cloudPrefill) + ' / ' + fmtNum(s.cloudDecode) + ' tok/s'),
-        P('Domyślne 10 000 / 1 500 tok/s są edytowalne i ilustracyjne: to niezależne wartości wejścia i wyjścia, bez walidacji dla kontekstu RAG ani opóźnienia.', 'The default 10,000 / 1,500 tok/s values are editable illustrations: independent input and output values, not validated for RAG context or latency.')],
+        P('Wartości dla chmury i własnego serwera (domyślnie 10 000 / 1 500 tok/s) oraz osobne dla Dell GB10 są edytowalne i ilustracyjne: to niezależne wartości wejścia i wyjścia, bez walidacji dla kontekstu RAG ani opóźnienia.', 'The cloud and own-server values (default 10,000 / 1,500 tok/s) and the separate Dell GB10 values are editable illustrations: independent input and output values, not validated for RAG context or latency.')],
       [P('Benchmark stres-testu', 'Stress-test benchmark'), P('RTX PRO 6000: 1 655 · H100: 1 482 tok/s', 'RTX PRO 6000: 1,655 · H100: 1,482 tok/s'),
         P('To łączna przepustowość w konkretnym teście obciążeniowym dla modelu DeepSeek-R1-Distill-Qwen32B, a nie uniwersalna szybkość wyjścia dla każdej konfiguracji.', 'This is total throughput in a specific load test for DeepSeek-R1-Distill-Qwen32B, not universal output speed for every configuration.'), 'bench'],
       [P('Model i zakres', 'Model and scope'), 'DeepSeek-R1-Distill-Qwen32B',
@@ -1838,7 +1859,7 @@ function buildAssumptions() {
       [P('Minuta pracy', 'Minute of work'), fmtNum(MINUTE_OF_WORK, 2) + ' PLN', P('15 000 PLN / 168 h / 60 min.', '15,000 PLN / 168 h / 60 min.')],
       [P('API', 'API'), P('dane poza firmą', 'data leaves the company'), P('RODO i umowa powierzenia, zależność od dostawcy.', 'GDPR and a data processing agreement, vendor lock-in.')],
       [P('GPU', 'GPU'), P('jakość i utrzymanie', 'quality and upkeep'), P('Model open-source może różnić się jakością po polsku; ktoś musi go aktualizować i zabezpieczać. Kalkulator nie ocenia jakości ani pojemności.', 'Open-source models can vary in Polish quality; someone must update and secure them. The calculator does not assess quality or capacity.')],
-      [P('Pominięte', 'Left out'), P('budowa aplikacji, VAT', 'app build, VAT'), P('Bez budowy aplikacji i wdrożenia RAG, licencji, redundancji i spadku cen API w czasie.', 'No app build or RAG implementation, licences, redundancy or API price drops over time.')],
+      [P('Pominięte', 'Left out'), P('budowa aplikacji, VAT', 'app build, VAT'), P('Bez wdrożenia i integracji u klienta, redundancji, VAT i spadku cen API w czasie.', 'No on-site implementation or integration, redundancy, VAT or API price drops over time.')],
     ]},
   ];
 }
@@ -2019,6 +2040,7 @@ function parseScenario(text) {
   if (!parsed || parsed.version !== 1 || !parsed.values || typeof parsed.values !== 'object' || Array.isArray(parsed.values)) throw new Error('version / values');
   const values = Object.fromEntries([...Object.keys(DEFAULTS), 'lang'].map((key) => [key, parsed.values[key]]));
   if (!Object.prototype.hasOwnProperty.call(parsed.values, 'maxUtilization')) values.maxUtilization = DEFAULTS.maxUtilization;
+  if (!Object.prototype.hasOwnProperty.call(parsed.values, 'smallRecommendFrom')) values.smallRecommendFrom = DEFAULTS.smallRecommendFrom;
   if (NUM_FIELDS.some((key) => typeof values[key] !== 'number')) throw new Error('numeric settings');
   if (Object.keys(validateState(values)).length) throw new Error('invalid settings');
   if (!['pl', 'en'].includes(values.lang) || !['pl', 'en'].includes(values.docLang) || !['work', '247'].includes(values.cloudMode)) throw new Error('language / mode');
@@ -2059,7 +2081,7 @@ function renderValidation() {
     for (const key of Object.keys(appEl.dataset)) if (key !== 'settings') delete appEl.dataset[key];
     appEl.dataset.state = 'invalid'; appEl.dataset.invalidFields = [...errors].join(',');
     document.querySelectorAll('.option').forEach((n) => {
-      n.dataset.winner = 'false'; n.dataset.monthly = ''; n.classList.remove('winner'); n.querySelector('.chip-slot').replaceChildren();
+      n.dataset.winner = 'false'; n.dataset.recommended = 'false'; n.dataset.monthly = ''; n.classList.remove('winner', 'recommended'); n.querySelector('.chip-slot').replaceChildren(); n.querySelector('.opt-note').hidden = true;
       if (n.querySelector('.opt-capacity')) {
         n.dataset.capacityStatus = 'invalid';
         for (const key of ['units', 'utilization', 'utilizationLimit', 'supportedUsers', 'remainingUsers']) n.dataset[key] = '';
@@ -2139,7 +2161,8 @@ function checkDomContract(doc, result) {
     probe('DOM: ' + key + ' monthly cost', () => {
       const node = doc.querySelector('#opt' + key[0].toUpperCase() + key.slice(1));
       const expected = result[key].eligible === false ? '' : result[key].monthly.toFixed(2);
-      return node && node.dataset.monthly === expected && node.dataset.winner === String(result.winner === key);
+      return node && node.dataset.monthly === expected && node.dataset.winner === String(result.winner === key) && node.dataset.recommended === String(result.recommended === key)
+        && Boolean(node.querySelector('.chip-rec')) === (result.recommended === key) && doc.querySelector('#app').dataset.recommended === (result.recommended || '');
     });
   }
   probe('DOM: capacity control', () => {

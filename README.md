@@ -57,11 +57,18 @@ Parametry oprogramowania (sekcja „Oprogramowanie: Zagłoba RAG”):
 stała infrastruktura `apiOps` 1 000 PLN / mies. Koszty obsługi sprzętu
 (`cloudOps`, `ownOps`, `smallOps`) domyślnie wynoszą 0.
 
-Opcja jest przeznaczona dla małych wdrożeń: od **200 użytkowników**
-(`smallMaxUsers` = 199) karta pokazuje „Opcja niedostępna” i GB10 nie bierze
-udziału w porównaniu, paskach ani wykresie. Poniżej limitu, gdy szczyt
-przekracza zadany limit wykorzystania, kalkulator dolicza kolejne sztuki GB10. Wartości
-przepustowości trzeba zmierzyć na własnym modelu przed decyzją.
+Opcja jest przeznaczona dla małych wdrożeń: do **100 użytkowników** włącznie
+(`smallMaxUsers` = 100) GB10 bierze udział w porównaniu; od 101 karta pokazuje
+„Opcja niedostępna” i GB10 nie bierze udziału w porównaniu, paskach ani
+wykresie. Poniżej limitu, gdy szczyt przekracza zadany limit wykorzystania,
+kalkulator dolicza kolejne sztuki GB10. Wartości przepustowości trzeba
+zmierzyć na własnym modelu przed decyzją.
+
+Od **50 użytkowników** (`smallRecommendFrom`, edytowalne), gdy GB10 jest
+najtańszy, karta GB10 zachowuje etykietę „Najtańsze”, a kolejna najtańsza
+opcja dostaje etykietę „Rekomendowane” (`data-recommended` na karcie i
+`#app[data-recommended]`). Poniżej progu, albo gdy GB10 nie wygrywa,
+rekomendacja nie jest pokazywana.
 
 ## Dobór sprzętu do liczby użytkowników
 
@@ -90,8 +97,9 @@ Przykłady przy pozostałych ustawieniach domyślnych:
 | Użytkownicy | Chmura GPU | Własny serwer | GB10 |
 | --- | --- | --- | --- |
 | 20 | 1 instancja | 1 serwer | 1 stacja |
+| 50 | 1 instancja | 1 serwer | 1 stacja |
 | 100 | 1 instancja | 1 serwer | 2 stacje |
-| 199 | 1 instancja | 1 serwer | 3 stacje |
+| 101 | 1 instancja | 1 serwer | niedostępne |
 | 400 | 2 instancje | 2 serwery | niedostępne |
 
 Przy 400 użytkownikach dwie instancje chmurowe obsługują szacunkowo do
@@ -134,7 +142,7 @@ Skróty: `1–3` scenariusze, `A` założenia, `L` język, `Ctrl/Cmd+S` zapis,
 ## Kontrakt DOM
 
 `#app` publikuje stan przez `data-*` (m.in. `data-winner`, `data-small-monthly`,
-`data-small-units`, `data-break-even-small-users`, `data-payback-small-vs-cloud`,
+`data-small-units`, `data-recommended`, `data-break-even-small-users`, `data-payback-small-vs-cloud`,
 `data-small-first-year`, `data-api-software`, `data-own-software`), a każda
 karta wyniku `data-software` i `data-infra`. Limit wykorzystania jest
 publikowany jako `#app[data-max-utilization]`. Karty sprzętowe publikują
