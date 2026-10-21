@@ -398,7 +398,7 @@ for (const lang of ['pl', 'en']) {
   const keys = [...block.matchAll(/(?:^|[{,]\s*)([A-Za-z_][\w]*):\s/g)].map((m) => m[1]);
   const dupes = keys.filter((k, i) => keys.indexOf(k) !== i);
   assert.deepEqual(dupes, [], `duplicate T.${lang} keys: ${dupes.join(', ')}`);
-  for (const key of ['thChecked', 'aApiVsCloudNever', 'aApiVsCloudAlways', 'aApiVsSmallNever', 'aApiVsSmallAlways', 'aApiVsOwnNever', 'aApiVsOwnAlways', 'aPaybackNever', 'aPaybackSmallNever', 'linkIgnored'])
+  for (const key of ['thChecked', 'aApiVsCloudNever', 'aApiVsCloudAlways', 'aApiVsSmallNever', 'aApiVsSmallAlways', 'aApiVsOwnNever', 'aApiVsOwnAlways', 'aPaybackNever', 'aPaybackSmallNever'])
     assert.equal(typeof run(`T.${lang}.${key}`), 'string', `${lang}.${key}`);
   assert.ok(!/\{n\}/.test(run(`T.${lang}.aPaybackNever`)), 'never template has no placeholder');
 }

@@ -119,19 +119,9 @@ assert.ok(resetButton.parent === descendants(documentRoot, (node) => hasClass(no
 const assumpButton = descendants(documentRoot, (node) => hasClass(node, 'js-assump'))[0];
 assert.ok(assumpButton && !hasClass(assumpButton, 'pill-solid'), 'assumptions button is outlined, not solid');
 
-const scenarioButtonIds = ['scenarioExport', 'scenarioImport'];
-const scenarioButtons = scenarioButtonIds.map(byId);
-function commonAncestor(nodes) {
-  let candidate = nodes[0].parent;
-  while (candidate && !nodes.every((node) => contains(candidate, node))) candidate = candidate.parent;
-  return candidate;
-}
-
-const scenarioToolbar = commonAncestor(scenarioButtons);
-assert.ok(
-  scenarioToolbar && contains(settingsPanel, scenarioToolbar),
-  'scenario controls must share a toolbar inside #settingsPanel',
-);
+const statusLine = byId('scenarioStatus');
+assert.ok(statusLine && contains(settingsPanel, statusLine), '#scenarioStatus lives in #settingsPanel');
+assert.equal(descendants(documentRoot, (node) => node.attrs.id === 'scenarioPanel').length, 0, 'scenario file panel removed');
 
 const pageHeads = descendants(documentRoot, (node) => hasClass(node, 'page-head'));
 assert.equal(pageHeads.length, 1, 'expected one compact .page-head');

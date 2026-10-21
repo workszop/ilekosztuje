@@ -217,15 +217,9 @@ CAPACITY_SMOKE_SCRIPT = r"""
     // Save, serialize/import and apply the scenario with a non-default ceiling.
     setInput('maxUtilization', 73);
     expect(state.maxUtilization === 73 && app.dataset.maxUtilization === '73', 'max utilization input event');
-    const savedText = JSON.stringify(serializeScenario(state));
-    expect(JSON.parse(savedText).values.maxUtilization === 73, 'serialized scenario ceiling');
-    const loaded = parseScenario(savedText);
-    expect(loaded.values.maxUtilization === 73, 'parsed scenario ceiling');
-    setInput('maxUtilization', 91);
-    applyScenario(loaded);
-    expect(state.maxUtilization === 73 && document.querySelector('#maxUtilization').value === '73', 'applied scenario ceiling');
-    const imported = parseScenario(JSON.stringify(serializeScenario(state)));
-    expect(imported.values.maxUtilization === 73, 'export/import ceiling');
+    const savedText = localStorage.getItem(LS_SCENARIO);
+    expect(savedText && JSON.parse(savedText).values.maxUtilization === 73, 'scenario autosaved to localStorage');
+    expect(parseScenario(savedText).values.maxUtilization === 73, 'autosaved scenario parses');
     setInput('maxUtilization', 80);
     assertSizedSet(20, { cloud: 1, own: 1, small: 1 });
 
@@ -264,15 +258,7 @@ CAPACITY_SMOKE_SCRIPT = r"""
     setInput('users', 20);
     expect(document.querySelector('#validationStatus').hidden === true, 'banner hides after recovery');
 
-    // Review fix C1/I5: rendering never writes the hash; applying a hash consumes it and keeps the custom model list.
-    expect(location.hash === '', 'render must not write the URL hash');
-    const keptModels = state.models.length;
-    expect(applyShareHash('#users=77') === true, 'applyShareHash accepts a valid hash');
-    expect(state.users === 77 && document.querySelector('#users').value === '77', 'hash values applied');
-    expect(location.hash === '' && state.models.length === keptModels, 'hash consumed, models untouched');
-    expect(applyShareHash('#users=0') === false && state.users === 77, 'invalid hash ignored');
     click('[data-preset="S1"]');
-    expect(location.hash === '', 'preset change leaves the URL alone');
     // Deferred minors: singular grammar at one user; software-off copy swap; unavailable stack shows a dash.
     setInput('users', 1);
     expect(/Przy 1 użytkowniku/.test(document.querySelector('#verdict').textContent), 'singular user phrase: ' + document.querySelector('#verdict').textContent);
@@ -319,8 +305,6 @@ class ContractParser(HTMLParser):
         "settingsToggle",
         "settingsClose",
         "settingsBackdrop",
-        "scenarioExport",
-        "scenarioImport",
         "scenarioReset",
     }
     VOID_TAGS = {
@@ -707,11 +691,6 @@ def check_layout_contract(parser: ContractParser, label: str) -> None:
         )
 
     for node_id in ("presets", "advancedPanel"):
-        records = records_with_id(node_id)
-        if len(records) != 1 or not is_descendant(records[0], "settingsPanel"):
-            raise SmokeFailure(f"{label}: #{node_id} must be inside #settingsPanel")
-
-    for node_id in ("scenarioExport", "scenarioImport"):
         records = records_with_id(node_id)
         if len(records) != 1 or not is_descendant(records[0], "settingsPanel"):
             raise SmokeFailure(f"{label}: #{node_id} must be inside #settingsPanel")

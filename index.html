@@ -412,9 +412,9 @@ details.settings-section { border: 0; border-top: 1px solid var(--border-1); bor
 details.settings-section > summary { padding: var(--sp-4) 0; font-size: var(--body); }
 details.settings-section > :not(summary) { margin-left: 0; margin-right: 0; }
 details.settings-section[open] { padding-bottom: var(--sp-4); }
-#scenarioPanel .toolbar { gap: var(--sp-2); margin: 0; }
-#scenarioPanel .pill { flex: 1 1 42%; font-size: var(--small-size); padding: 9px 10px; justify-content: center; }
 #scenarioStatus { flex-basis: 100%; }
+.status-line { margin: var(--sp-2) 0 0; min-height: 1em; }
+.status-line:empty { display: none; }
 
 /* ─── Results workspace ─── */
 #resultsPanel { min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--sp-6) clamp(20px, 2.5vw, 40px) var(--sp-8); scrollbar-gutter: stable; background: var(--bg-2); }
@@ -513,6 +513,7 @@ td.src a:hover { text-decoration: underline; }
     <div class="sec-row">
       <h2 class="sec-title" id="workloadTitle" data-t="secWorkload"></h2>
       <div class="presets" id="presets" role="group" aria-labelledby="workloadTitle"></div>
+      <p id="scenarioStatus" class="hint status-line" role="status" aria-live="polite"></p>
     </div>
     <details class="panel settings-section" id="workloadDetails">
     <summary><span data-t="workloadDetails"></span><span class="sum-meta" data-meta="workloadDetails"></span></summary>
@@ -656,6 +657,7 @@ td.src a:hover { text-decoration: underline; }
         <div class="csv-row" style="margin-top:var(--sp-3)">
           <button class="pill pill-ghost" type="button" id="csvBtn" data-t="csvLoad"></button>
           <input type="file" id="csvFile" accept=".csv,text/csv" hidden>
+          <progress id="fileProgress" hidden aria-label="Import" max="1"></progress>
           <button class="pill pill-ghost" id="csvReset" type="button" data-t="csvReset"></button>
           <button class="pill pill-ghost" id="csvTemplate" type="button" data-t="csvTemplate"></button>
         </div>
@@ -664,17 +666,6 @@ td.src a:hover { text-decoration: underline; }
       </div>
     </div>
   </details>
-      <details class="panel settings-section" id="scenarioPanel">
-        <summary><span data-t="scenarioTitle"></span><span class="sum-meta" data-meta="scenarioPanel"></span></summary>
-        <div class="toolbar" role="group" aria-label="Scenariusz / Scenario">
-    <button class="pill pill-ghost" id="scenarioExport" type="button" data-t="scenarioExport"></button>
-    <button class="pill pill-ghost" id="scenarioImport" type="button" data-t="scenarioImport"></button>
-    <button class="pill pill-ghost" id="shareLink" type="button" data-t="shareLink"></button>
-    <input id="scenarioFile" type="file" accept=".json,application/json" hidden>
-    <span id="scenarioStatus" class="hint" role="status" aria-live="polite"></span>
-    <progress id="fileProgress" hidden aria-label="Import" max="1"></progress>
-  </div>
-      </details>
       </div>
     </div>
   </aside>
@@ -907,8 +898,7 @@ const T = {
     crossAt: 'm. {m}',
     apiCapacity: 'Skalowanie po stronie dostawcy – bez limitu użytkowników.', changeUsers: 'Zmień liczbę użytkowników',
     yes: 'tak', no: 'nie',
-    shareLink: 'Kopiuj link', linkCopied: 'Link skopiowany.', linkNoCsv: 'Link skopiowany. Nie zawiera własnego cennika CSV.', linkIgnored: 'Link zawierał nieprawidłowe wartości – zignorowano.', linkNeedsValid: 'Popraw pola, zanim skopiujesz link.', linkFailed: 'Nie udało się skopiować. Skopiuj adres z paska przeglądarki.',
-    softwareOn: 'Uwzględnij koszt\noprogramowania AI', softwareOff: 'bez oprogramowania',
+        softwareOn: 'Uwzględnij koszt\noprogramowania AI', softwareOff: 'bez oprogramowania',
     help_users: 'Osoby, które będą zadawać pytania asystentowi.',
     help_chunks: 'RAG dokleja do pytania fragmenty Twoich dokumentów. Tyle fragmentów trafia do jednego zapytania.',
     help_chunkTok: 'Długość jednego fragmentu. 2000 tokenów to ok. 1500 słów.',
@@ -976,8 +966,7 @@ const T = {
     crossAt: 'mo {m}',
     apiCapacity: 'Scales on the provider side – no user cap.', changeUsers: 'Change the number of users',
     yes: 'yes', no: 'no',
-    shareLink: 'Copy link', linkCopied: 'Link copied.', linkNoCsv: 'Link copied. It does not carry the custom CSV price list.', linkIgnored: 'The link had invalid values – ignored.', linkNeedsValid: 'Fix the fields before copying a link.', linkFailed: 'Could not copy. Copy the address from the browser bar.',
-    softwareOn: 'Include\nAI software cost', softwareOff: 'software excluded',
+        softwareOn: 'Include\nAI software cost', softwareOff: 'software excluded',
     help_users: 'People who will ask the assistant questions.',
     help_chunks: 'RAG attaches excerpts of your documents to each question. This many excerpts go into one request.',
     help_chunkTok: 'Length of one excerpt. 2000 tokens is about 1500 words.',
@@ -1054,12 +1043,11 @@ Object.assign(T.pl, {
   softApi: 'SaaS przy API (PLN / mies.)', softCloud: 'SaaS przy chmurze (PLN / mies.)', softLicense: 'Licencja przy sprzęcie (PLN)', softSupport: 'Kontrakt wsparcia (PLN / rok)', softAmort: 'Amortyzacja licencji (mies.)',
   apiOps: 'Infrastruktura API (PLN / mies.)', lApiInfra: 'Infrastruktura API', lSoftSaas: 'Zagłoba RAG · SaaS', lSoftLicense: 'Zagłoba RAG · licencja (amort.)', lSoftSupport: 'Zagłoba RAG · wsparcie', lInfra: 'Infrastruktura', lSoftware: 'Oprogramowanie',
   smallGpu: 'Sprzęt', smallMaxUsers: 'Maks. użytkowników', smallRecommendFrom: 'Rekomenduj inną opcję od (użytk.)', smallRecommendNote: 'Od {n} użytkowników rekomendujemy kolejną najtańszą opcję zamiast Dell GB10.', smallTooMany: 'Opcja niedostępna: Dell GB10 obsługuje do {n} użytkowników.', smallPower: 'Moc Dell GB10 (W)', smallReplace: 'Dell GB10: wymiana co (mies.)', smallPrefill: 'Dell GB10: wejście', smallDecode: 'Dell GB10: wyjście',
-  settingsTitle: 'Ustawienia', settingsDone: 'Pokaż wyniki', settingsClose: 'Zamknij ustawienia', scenarioTitle: 'Zapis i pliki',
+  settingsTitle: 'Ustawienia', settingsDone: 'Pokaż wyniki', settingsClose: 'Zamknij ustawienia',
   estimateNotice: 'Szacunek kosztów inferencji, nie oferta ani gwarancja jakości i wydajności. Kwoty netto.',
   cloudOps: 'Stała obsługa chmury / mies. (PLN)', ownReplace: 'Wymiana sprzętu co (mies.)',
-  scenarioExport: 'Eksport JSON', scenarioImport: 'Import JSON', scenarioReset: 'Reset scenariusza',
-  scenarioLoaded: 'Scenariusz wczytany.', scenarioResetDone: 'Defaults restored.',
-  scenarioError: 'Nie można wczytać scenariusza: {error}',
+  scenarioReset: 'Reset scenariusza',
+  scenarioResetDone: 'Defaults restored.',
   invalidFieldsLead: 'Popraw pola:', resultsPaused: 'Wyniki wstrzymane.', invalidNumber: 'Podaj liczbę z zakresu {min}–{max}.', invalidInteger: 'Podaj liczbę całkowitą z zakresu {min}–{max}.',
   unavailable: 'Niedostępne', outputOver: 'Odpowiedź z rozumowaniem przekracza limit wyjścia modelu.',
   forcedThinking: 'Ten model zawsze używa rozumowania. Mnożnik jest szacunkiem.',
@@ -1082,12 +1070,11 @@ Object.assign(T.en, {
   softApi: 'SaaS with API (PLN / month)', softCloud: 'SaaS with cloud (PLN / month)', softLicense: 'Licence with hardware (PLN)', softSupport: 'Support contract (PLN / year)', softAmort: 'Licence depreciation (months)',
   apiOps: 'API infrastructure (PLN / month)', lApiInfra: 'API infrastructure', lSoftSaas: 'Zagłoba RAG · SaaS', lSoftLicense: 'Zagłoba RAG · licence (depr.)', lSoftSupport: 'Zagłoba RAG · support', lInfra: 'Infrastructure', lSoftware: 'Software',
   smallGpu: 'Hardware', smallMaxUsers: 'Max users', smallRecommendFrom: 'Recommend another option from (users)', smallRecommendNote: 'From {n} users we recommend the next cheapest option instead of Dell GB10.', smallTooMany: 'Option unavailable: Dell GB10 supports up to {n} users.', smallPower: 'Dell GB10 power (W)', smallReplace: 'Dell GB10: replace every (months)', smallPrefill: 'Dell GB10: input', smallDecode: 'Dell GB10: output',
-  settingsTitle: 'Settings', settingsDone: 'Show results', settingsClose: 'Close settings', scenarioTitle: 'Save and files',
+  settingsTitle: 'Settings', settingsDone: 'Show results', settingsClose: 'Close settings',
   estimateNotice: 'Inference cost estimate, not a quote or a quality/capacity guarantee. Net amounts.',
   cloudOps: 'Fixed cloud support / month (PLN)', ownReplace: 'Replace hardware every (months)',
-  scenarioExport: 'Export JSON', scenarioImport: 'Import JSON', scenarioReset: 'Reset scenario',
-  scenarioLoaded: 'Scenario loaded.', scenarioResetDone: 'Settings reset. Price list retained.',
-  scenarioError: 'Could not load scenario: {error}',
+  scenarioReset: 'Reset scenario',
+  scenarioResetDone: 'Settings reset. Price list retained.',
   invalidFieldsLead: 'Correct these fields:', resultsPaused: 'Results paused.', invalidNumber: 'Enter a number between {min} and {max}.', invalidInteger: 'Enter an integer between {min} and {max}.',
   unavailable: 'Unavailable', outputOver: 'Answer plus reasoning exceeds the model output limit.',
   forcedThinking: 'This model always reasons. The multiplier is an estimate.',
@@ -1743,7 +1730,6 @@ function renderSectionMeta() {
     ownSettings: `${s.ownGpu} · ${money(s.ownCapex, 0)}`,
     softwareSettings: s.softwareOn ? `SaaS ${money(s.softApi, 0)}${P('/mies.', '/mo')} · ${P('licencja', 'licence')} ${money(s.softLicense, 0)}` : t('metaOff'),
     advancedPanel: `${t('fx')} ${fmtNum(s.fx, 2)} · ${t('peak')} ×${fmtNum(s.peak, 1)} · ${fmtNum(s.maxUtilization)}%`,
-    scenarioPanel: s.csvSource ? `CSV: ${s.csvSource}` : '',
   };
   for (const [id, text] of Object.entries(metas)) { const n = document.querySelector(`[data-meta="${id}"]`); if (n) n.textContent = text; }
 }
@@ -2311,6 +2297,7 @@ function onSettingsKeydown(e) {
 
 // ─── Scenario helpers ───
 const MAX_SCENARIO_BYTES = 1024 * 1024;
+const LS_SCENARIO = 'quantica-aicalc-scenario-v3';
 function serializeScenario(s) {
   const values = Object.fromEntries([...Object.keys(DEFAULTS), 'lang'].map((key) => [key, s[key]]));
   return { version: 1, values, csvText: s.csvText, csvSource: s.csvSource || null };
@@ -2336,40 +2323,14 @@ function parseScenario(text) {
   return { values, models, csvText: parsed.csvText, csvSource: parsed.csvSource };
 }
 
-const SHARE_KEYS = [...Object.keys(DEFAULTS), 'lang'];
-const SHARE_BOOLEANS = ['thinking', 'offPeak', 'softwareOn'];
-function toShareHash(s, builtinModels = []) {
-  const params = new URLSearchParams();
-  const base = { ...DEFAULTS, lang: 'pl' };
-  for (const key of SHARE_KEYS) {
-    if (s[key] === base[key] || s[key] === undefined) continue;
-    if (key === 'model' && builtinModels.length && !builtinModels.some((m) => m.name === s[key])) continue;
-    params.set(key, SHARE_BOOLEANS.includes(key) ? (s[key] ? '1' : '0') : String(s[key]));
-  }
-  return params.toString();
-}
-function fromShareHash(hash, models = []) {
-  const raw = String(hash || '').replace(/^#/, '');
-  if (!raw) return null;
-  let params;
-  try { params = new URLSearchParams(raw); } catch (_) { return null; }
-  const values = { ...DEFAULTS, lang: 'pl' };
-  for (const [key, value] of params) {
-    if (!SHARE_KEYS.includes(key)) return null;
-    if (SHARE_BOOLEANS.includes(key)) { if (value !== '0' && value !== '1') return null; values[key] = value === '1'; }
-    else if (NUM_FIELDS.includes(key)) { const n = exactNumber(value); if (!Number.isFinite(n)) return null; values[key] = n; }
-    else if (TEXT_FIELDS.includes(key) || key === 'model') { if (value.length > 200) return null; values[key] = value; }
-    else values[key] = value;
-  }
-  if (Object.keys(validateState(values)).length) return null;
-  if (!['pl', 'en'].includes(values.lang) || !['pl', 'en'].includes(values.docLang) || !['work', '247'].includes(values.cloudMode)) return null;
-  if (Array.isArray(models) && models.length && !models.some((m) => m.name === values.model)) return null;
-  if (Array.isArray(models) && models.length) { try { computeResults(values, models); } catch (_) { return null; } }
-  return { values };
+function persistScenario() {
+  if (Object.keys(validateState(state)).length || App.invalidFields.size) return false;
+  try { localStorage.setItem(LS_SCENARIO, JSON.stringify(serializeScenario(state))); return true; } catch (_) { return false; }
 }
 function markDirty() {
   App.dirty = true;
   appEl.dataset.dirty = 'true';
+  persistScenario();
 }
 function renderValidation() {
   const errors = new Set([...App.invalidFields, ...Object.keys(validateState(state))]);
@@ -2394,7 +2355,6 @@ function renderValidation() {
     });
     status.append(document.createTextNode('. ' + t('resultsPaused')));
   }
-  $('scenarioExport').disabled = invalid || App.fileBusy;
   if (invalid) {
     App.results = null;
     for (const key of Object.keys(appEl.dataset)) if (key !== 'settings') delete appEl.dataset[key];
@@ -2412,12 +2372,6 @@ function renderValidation() {
   } else { appEl.dataset.invalidFields = ''; $('modelsPanel').hidden = false; }
   return !invalid;
 }
-function applyScenario(loaded) {
-  Object.assign(state, loaded.values, { lang: state.lang, models: loaded.models, csvText: loaded.csvText, csvSource: loaded.csvSource });
-  App.invalidFields.clear();
-  applyI18n(); renderModelSelect(); syncInputs(true); render(); markDirty();
-  $('scenarioStatus').textContent = t('scenarioLoaded');
-}
 function downloadText(text, filename, type) {
   const url = URL.createObjectURL(new Blob([text], { type }));
   const link = el('a', { href: url, download: filename }); document.body.append(link); link.click(); link.remove();
@@ -2432,7 +2386,7 @@ async function readLocalFile(file, accept, errorNode, onError) {
   }
   App.fileBusy = true; $('fileProgress').hidden = false; $('fileProgress').removeAttribute('value');
   $('scenarioStatus').textContent = t('importBusy');
-  document.querySelectorAll('#scenarioExport, #scenarioImport, #scenarioReset, #csvBtn, #csvReset').forEach((n) => n.disabled = true);
+  document.querySelectorAll('#scenarioReset, #csvBtn, #csvReset').forEach((n) => n.disabled = true);
   try {
     const text = await file.text();
     if (revision !== App.fileRevision) return;
@@ -2445,7 +2399,7 @@ async function readLocalFile(file, accept, errorNode, onError) {
   } finally {
     if (revision === App.fileRevision) {
       App.fileBusy = false; $('fileProgress').hidden = true;
-      document.querySelectorAll('#scenarioImport, #scenarioReset, #csvBtn, #csvReset').forEach((n) => n.disabled = false);
+      document.querySelectorAll('#scenarioReset, #csvBtn, #csvReset').forEach((n) => n.disabled = false);
       renderValidation();
     }
   }
@@ -2456,7 +2410,7 @@ function checkDomContract(doc, result) {
   probe('DOM: ready state', () => doc.querySelector('#app')?.dataset.state === 'ready' && result);
   probe('DOM: settings containment', () => {
     const sidebar = doc.querySelector('#settingsPanel');
-    return sidebar && [...NUM_FIELDS, ...TEXT_FIELDS, 'model', 'thinking', 'offPeak', 'presets', 'scenarioExport', 'advancedPanel'].every((id) => sidebar.contains(doc.querySelector('#' + id)));
+    return sidebar && [...NUM_FIELDS, ...TEXT_FIELDS, 'model', 'thinking', 'offPeak', 'presets', 'csvBtn', 'advancedPanel'].every((id) => sidebar.contains(doc.querySelector('#' + id)));
   });
   probe('DOM: results without settings', () => {
     const results = doc.querySelector('#resultsPanel');
@@ -2527,20 +2481,6 @@ function focusField(id) {
   node.focus();
 }
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-focus]'); if (b) focusField(b.dataset.focus); });
-let builtinModelCache = null;
-function builtinModels() { return builtinModelCache || (builtinModelCache = modelsFromCsv($('csvData').textContent)); }
-// Apply a shared link's values over the current scenario (keeps the loaded model list) and consume the hash.
-function applyShareHash(hash) {
-  const shared = fromShareHash(hash, state.models);
-  const clean = location.pathname + location.search;
-  if (!shared) { if (String(hash || '').length > 1) { history.replaceState(null, '', clean); $('scenarioStatus').textContent = t('linkIgnored'); } return false; }
-  Object.assign(state, shared.values);
-  App.invalidFields.clear();
-  history.replaceState(null, '', clean);
-  applyI18n(); renderModelSelect(); syncInputs(true); render(); markDirty();
-  return true;
-}
-window.addEventListener('hashchange', () => applyShareHash(location.hash));
 settingsToggle.addEventListener('click', () => setSettingsOpen(!App.settingsOpen));
 $('settingsClose').addEventListener('click', () => setSettingsOpen(false));
 $('settingsBackdrop').addEventListener('click', () => setSettingsOpen(false));
@@ -2624,31 +2564,10 @@ $('csvTemplate').addEventListener('click', () => downloadText($('csvData').textC
 ['dragleave', 'drop'].forEach((ev) => dropEl.addEventListener(ev, (e) => { e.preventDefault(); dropEl.classList.remove('over'); }));
 dropEl.addEventListener('drop', (e) => readLocalFile(e.dataTransfer.files[0], loadCsvText, $('csvError'), (error) => t('csvLoadError', { error: error.message })));
 
-$('scenarioExport').addEventListener('click', () => {
-  if (!renderValidation()) return;
-  try {
-    const text = JSON.stringify(serializeScenario(state), null, 2);
-    parseScenario(text);
-    downloadText(text, 'aicalc-scenario.json', 'application/json');
-  } catch (error) { $('scenarioStatus').textContent = t('scenarioError', { error: error.message }); }
-});
-$('scenarioImport').addEventListener('click', () => $('scenarioFile').click());
-$('shareLink').addEventListener('click', async () => {
-  if (!renderValidation()) { $('scenarioStatus').textContent = t('linkNeedsValid'); return; }
-  const hash = toShareHash(state, builtinModels());
-  const url = location.href.split('#')[0] + (hash ? '#' + hash : '');
-  try {
-    await navigator.clipboard.writeText(url);
-    $('scenarioStatus').textContent = t(state.csvSource ? 'linkNoCsv' : 'linkCopied');
-  } catch (_) { $('scenarioStatus').textContent = t('linkFailed'); }
-});
-$('scenarioFile').addEventListener('change', (e) => {
-  readLocalFile(e.target.files[0], (text) => applyScenario(parseScenario(text)), $('scenarioStatus'), (error) => t('scenarioError', { error: error.message }));
-  e.target.value = '';
-});
 $('scenarioReset').addEventListener('click', () => {
   Object.assign(state, DEFAULTS); App.invalidFields.clear();
   renderModelSelect(); syncInputs(true); render();
+  persistScenario();
   $('scenarioStatus').textContent = t('scenarioResetDone');
 });
 $('runChecks').addEventListener('click', showChecks);
@@ -2700,20 +2619,16 @@ function initDots(canvas) {
   try { const l = localStorage.getItem(LS_LANG); if (l === 'pl' || l === 'en') preferredLang = l; } catch (_) {}
   state.csvText = $('csvData').textContent;
   state.models = modelsFromCsv(state.csvText);
-  let linkInvalid = false;
   if (preferredLang) state.lang = preferredLang;
-  if (location.hash.length > 1) {
-    const shared = fromShareHash(location.hash, state.models);
-    if (shared) { const sharedLang = new URLSearchParams(location.hash.slice(1)).has('lang'); Object.assign(state, shared.values, sharedLang || !preferredLang ? {} : { lang: preferredLang }); }
-    else linkInvalid = true;
-    history.replaceState(null, '', location.pathname + location.search);
-  }
+  try {
+    const saved = localStorage.getItem(LS_SCENARIO);
+    if (saved) { const loaded = parseScenario(saved); Object.assign(state, loaded.values, { models: loaded.models, csvText: loaded.csvText, csvSource: loaded.csvSource }); }
+  } catch (_) { try { localStorage.removeItem(LS_SCENARIO); } catch (_e) {} }
   applyI18n();
   renderModelSelect();
   syncInputs();
   syncSettingsPanel();
   render();
-  if (linkInvalid) $('scenarioStatus').textContent = t('linkIgnored');
   document.querySelectorAll('canvas[data-dots]').forEach(initDots);
   if ('IntersectionObserver' in window) {
     const ticker = $('ticker');

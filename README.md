@@ -31,11 +31,9 @@ jakości lub przepustowości. Wszystkie kwoty są netto, bez VAT.
 - **Werdykt** jednym zdaniem nad kartami (`#verdict`, `data-verdict-winner`,
   `data-verdict-recommended`, `data-verdict-savings-pct`) oraz wnioski zapisane
   jako zdania.
-- **Link do scenariusza** („Kopiuj link”): wartości różne od domyślnych trafiają
-  do `#hash` adresu. Link nie przenosi własnego cennika CSV ani modelu spoza
-  wbudowanej listy. Otwarcie linku nakłada wartości na zapisany lokalnie
-  scenariusz (zachowując wczytany cennik) i czyści hash; sam adres nie zmienia
-  się podczas pracy.
+- Scenariusz (wartości i wczytany cennik CSV) zapisuje się automatycznie w
+  localStorage przeglądarki i wraca po odświeżeniu; „Reset scenariusza” w
+  nagłówku przywraca domyślne.
 - Pomoc pod polami, słowniczek, pasek bieżących sum przy przewijaniu, skok z
   komunikatu walidacji do pola, kolumna „Sprawdzono” ze źródłem cen w tabeli
   modeli, znaczniki przecięć kosztów na wykresie (`data-crossovers`).

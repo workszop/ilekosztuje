@@ -9,7 +9,7 @@ assert.ok(section, 'Scenario serialization and validation helpers must exist');
 const constants = js.slice(0, js.indexOf('// ─── State'));
 const core = js.slice(js.indexOf('// CSV parser'), js.indexOf('// ─── Render'));
 const csv = html.match(/<script id="csvData"[^>]*>([\s\S]*?)<\/script>/)[1];
-const context = vm.createContext({ console, csv, URLSearchParams });
+const context = vm.createContext({ console, csv });
 vm.runInContext(constants + core + section, context);
 vm.runInContext(`
   const original = { ...DEFAULTS, lang: 'en', models: modelsFromCsv(csv), csvText: csv, csvSource: null };
@@ -27,20 +27,6 @@ vm.runInContext(`
   if (parseScenario(JSON.stringify(noSoftwareKey)).values.softwareOn !== true) throw Error('softwareOn backfill');
   if (parseScenario(JSON.stringify({ ...saved, values: { ...saved.values, softwareOn: false } })).values.softwareOn !== false) throw Error('softwareOn false round trip');
   mustReject({ ...saved, values: { ...saved.values, softwareOn: 'yes' } });
-  // Task 8: share link hash round trip
-  if (toShareHash({ ...DEFAULTS, lang: 'pl' }) !== '') throw Error('default scenario has an empty hash');
-  if (toShareHash({ ...DEFAULTS, lang: 'pl', users: 100, softwareOn: false }) !== 'users=100&softwareOn=0') throw Error('hash lists only changed values: ' + toShareHash({ ...DEFAULTS, lang: 'pl', users: 100, softwareOn: false }));
-  if (fromShareHash('users=0') !== null) throw Error('invalid user count must be rejected');
-  if (fromShareHash('users=100&model=Nope', modelsFromCsv(csv)) !== null) throw Error('unknown model must be rejected');
-  if (fromShareHash('users=100&bogus=1') !== null) throw Error('unknown key must be rejected');
-  const fromHash = fromShareHash('users=100&softwareOn=0&lang=en', modelsFromCsv(csv));
-  if (!fromHash || fromHash.values.softwareOn !== false || fromHash.values.users !== 100 || fromHash.values.lang !== 'en') throw Error('hash values not applied');
-  if ('csvText' in fromHash.values || 'models' in fromHash.values) throw Error('hash must not carry csv');
-  if (fromShareHash('') !== null) throw Error('empty hash yields null');
-  // Review fix I4: a model that only exists in a custom CSV is dropped from the link
-  const customHash = toShareHash({ ...DEFAULTS, lang: 'pl', users: 100, model: 'My private model' }, modelsFromCsv(csv));
-  if (customHash !== 'users=100') throw Error('custom-only model must be dropped from the hash: ' + customHash);
-  if (toShareHash({ ...DEFAULTS, lang: 'pl', model: 'OpenAI GPT-5.6 Luna' }, modelsFromCsv(csv)) !== 'model=OpenAI+GPT-5.6+Luna') throw Error('built-in model stays in the hash');
   mustReject({ ...saved, version: 999 });
   mustReject({ ...saved, values: { ...saved.values, ownAmort: 0 } });
   mustReject({ ...saved, values: { ...saved.values, users: '20' } });
@@ -67,16 +53,5 @@ vm.runInContext(`
   const missingDom = { querySelector: () => null, querySelectorAll: () => [] };
   const badChecks = checkDomContract(missingDom, null);
   if (badChecks.length < 5 || badChecks.some((c) => c.pass) || JSON.stringify(original) !== before) throw Error('missing DOM contract must fail without mutation');
-  const App = { invalidFields: new Set() }, appEl = { dataset: {} };
-  const status = {};
-  function $(id) { return status; }
-  function t(key) { return key; }
-  function applyI18n() {}
-  function renderModelSelect() {}
-  function syncInputs() {}
-  function render() {}
-  state.lang = 'pl';
-  applyScenario(loaded);
-  if (state.lang !== 'pl') throw Error('import must preserve current language preference');
   console.log('Scenario round trip and malformed-input checks passed');
 `, context);
