@@ -119,7 +119,7 @@ assert.ok(resetButton.parent === descendants(documentRoot, (node) => hasClass(no
 const assumpButton = descendants(documentRoot, (node) => hasClass(node, 'js-assump'))[0];
 assert.ok(assumpButton && !hasClass(assumpButton, 'pill-solid'), 'assumptions button is outlined, not solid');
 
-const scenarioButtonIds = ['scenarioSave', 'scenarioExport', 'scenarioImport'];
+const scenarioButtonIds = ['scenarioExport', 'scenarioImport'];
 const scenarioButtons = scenarioButtonIds.map(byId);
 function commonAncestor(nodes) {
   let candidate = nodes[0].parent;

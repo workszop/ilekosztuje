@@ -217,10 +217,8 @@ CAPACITY_SMOKE_SCRIPT = r"""
     // Save, serialize/import and apply the scenario with a non-default ceiling.
     setInput('maxUtilization', 73);
     expect(state.maxUtilization === 73 && app.dataset.maxUtilization === '73', 'max utilization input event');
-    expect(saveScenario() === true, 'saveScenario should succeed');
-    const savedText = localStorage.getItem(LS_SCENARIO);
-    expect(savedText, 'saved scenario missing');
-    expect(JSON.parse(savedText).values.maxUtilization === 73, 'saved scenario ceiling');
+    const savedText = JSON.stringify(serializeScenario(state));
+    expect(JSON.parse(savedText).values.maxUtilization === 73, 'serialized scenario ceiling');
     const loaded = parseScenario(savedText);
     expect(loaded.values.maxUtilization === 73, 'parsed scenario ceiling');
     setInput('maxUtilization', 91);
@@ -321,7 +319,6 @@ class ContractParser(HTMLParser):
         "settingsToggle",
         "settingsClose",
         "settingsBackdrop",
-        "scenarioSave",
         "scenarioExport",
         "scenarioImport",
         "scenarioReset",
@@ -714,7 +711,7 @@ def check_layout_contract(parser: ContractParser, label: str) -> None:
         if len(records) != 1 or not is_descendant(records[0], "settingsPanel"):
             raise SmokeFailure(f"{label}: #{node_id} must be inside #settingsPanel")
 
-    for node_id in ("scenarioSave", "scenarioExport", "scenarioImport"):
+    for node_id in ("scenarioExport", "scenarioImport"):
         records = records_with_id(node_id)
         if len(records) != 1 or not is_descendant(records[0], "settingsPanel"):
             raise SmokeFailure(f"{label}: #{node_id} must be inside #settingsPanel")

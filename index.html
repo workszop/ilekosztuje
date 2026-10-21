@@ -455,23 +455,6 @@ td.src a:hover { text-decoration: underline; }
 .cross-list { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: var(--sp-2) 0 0; font-size: var(--small-size); color: var(--fg-3); }
 .cross-list .cross-lead { font-weight: 700; color: var(--fg-1); }
 .cross-list .cross-item::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; border: 2px solid var(--quantica-pink); margin-right: 5px; vertical-align: middle; }
-.print-only { display: none; }
-@media print {
-  .nav, #settingsPanel, #settingsBackdrop, .toolbar, details.cost-breakdown, canvas, .glossary-wrap, .shortcuts, #modelsPanel, #checksPanel, #validationStatus, #ticker { display: none !important; }
-  main { display: block; height: auto; }
-  #resultsPanel { overflow: visible; height: auto; padding: 0; }
-  .page-head { background: none; color: var(--fg-1); padding: 0 0 12px; border-radius: 0; border-bottom: 1px solid var(--border-1); }
-  .page-head .hero-tag, .page-head .lead, .page-head .stat span, .page-head .stat b, .page-head .app-title, .page-head .hint, .page-head .app-title em { color: var(--fg-1); opacity: 1; }
-  .page-head .results-context { border-top-color: var(--border-1); }
-  #options { grid-template-columns: repeat(2, 1fr) !important; }
-  .opt-capacity, .option .opt-note { display: none; }
-  .print-only { display: block; margin: 12px 0 20px; }
-  .print-only .line { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0; border-bottom: 1px dashed var(--border-1); font-size: var(--tiny-size); }
-  .card, .option { box-shadow: none; border: 1px solid var(--border-1); break-inside: avoid; }
-  #options { grid-template-columns: repeat(2, 1fr); }
-  .two-col { grid-template-columns: 1fr; }
-  details#chartDetails, #tableTime { display: block; }
-}
 @media (max-width: 768px) {
   :root { --title-size: 1.7rem; --total-size: 30px; }
   main { display: block; padding: 0; }
@@ -684,11 +667,9 @@ td.src a:hover { text-decoration: underline; }
       <details class="panel settings-section" id="scenarioPanel">
         <summary><span data-t="scenarioTitle"></span><span class="sum-meta" data-meta="scenarioPanel"></span></summary>
         <div class="toolbar" role="group" aria-label="Scenariusz / Scenario">
-    <button class="pill pill-ghost" id="scenarioSave" type="button" data-t="scenarioSave"></button>
     <button class="pill pill-ghost" id="scenarioExport" type="button" data-t="scenarioExport"></button>
     <button class="pill pill-ghost" id="scenarioImport" type="button" data-t="scenarioImport"></button>
     <button class="pill pill-ghost" id="shareLink" type="button" data-t="shareLink"></button>
-    <button class="pill pill-ghost" id="printBtn" type="button" data-t="printBtn"></button>
     <input id="scenarioFile" type="file" accept=".json,application/json" hidden>
     <span id="scenarioStatus" class="hint" role="status" aria-live="polite"></span>
     <progress id="fileProgress" hidden aria-label="Import" max="1"></progress>
@@ -726,7 +707,6 @@ td.src a:hover { text-decoration: underline; }
       </dl>
     </details>
     <section>
-    <div id="printSummary" class="print-only"></div>
     <p id="verdict" class="verdict"></p>
     <div class="grid-4" id="options">
       <div class="card option" id="optApi" data-path="api">
@@ -927,7 +907,7 @@ const T = {
     crossAt: 'm. {m}',
     apiCapacity: 'Skalowanie po stronie dostawcy – bez limitu użytkowników.', changeUsers: 'Zmień liczbę użytkowników',
     yes: 'tak', no: 'nie',
-    shareLink: 'Kopiuj link', printBtn: 'Drukuj / PDF', linkCopied: 'Link skopiowany.', linkNoCsv: 'Link skopiowany. Nie zawiera własnego cennika CSV.', linkIgnored: 'Link zawierał nieprawidłowe wartości – zignorowano.', linkNeedsValid: 'Popraw pola, zanim skopiujesz link.', linkFailed: 'Nie udało się skopiować. Skopiuj adres z paska przeglądarki.', printTitle: 'Scenariusz',
+    shareLink: 'Kopiuj link', linkCopied: 'Link skopiowany.', linkNoCsv: 'Link skopiowany. Nie zawiera własnego cennika CSV.', linkIgnored: 'Link zawierał nieprawidłowe wartości – zignorowano.', linkNeedsValid: 'Popraw pola, zanim skopiujesz link.', linkFailed: 'Nie udało się skopiować. Skopiuj adres z paska przeglądarki.',
     softwareOn: 'Uwzględnij koszt\noprogramowania AI', softwareOff: 'bez oprogramowania',
     help_users: 'Osoby, które będą zadawać pytania asystentowi.',
     help_chunks: 'RAG dokleja do pytania fragmenty Twoich dokumentów. Tyle fragmentów trafia do jednego zapytania.',
@@ -987,7 +967,7 @@ const T = {
     cloudPrefill: 'Chmura: wejście', cloudDecode: 'Chmura: wyjście', ownPrefill: 'Serwer: wejście', ownDecode: 'Serwer: wyjście',
     csvTitle: 'Cennik modeli', csvSource: 'Źródło:', csvLoad: 'Wczytaj CSV', csvReset: 'Cennik wbudowany',
     csvBuiltIn: 'cennik_modeli_2026-09.csv (wbudowany)', csvError: 'Nie udało się odczytać CSV: brak wymaganych kolumn.',
-    shortcuts: 'Skróty: 1–3 scenariusze · A założenia · L język · Ctrl/Cmd+S zapisz · ↑/↓ na liście modeli',
+    shortcuts: 'Skróty: 1–3 scenariusze · A założenia · L język · ↑/↓ na liście modeli',
     live: 'API {api}, chmura {cloud}, własny serwer {own}, Dell GB10 {small} miesięcznie.',
   },
   en: {
@@ -996,7 +976,7 @@ const T = {
     crossAt: 'mo {m}',
     apiCapacity: 'Scales on the provider side – no user cap.', changeUsers: 'Change the number of users',
     yes: 'yes', no: 'no',
-    shareLink: 'Copy link', printBtn: 'Print / PDF', linkCopied: 'Link copied.', linkNoCsv: 'Link copied. It does not carry the custom CSV price list.', linkIgnored: 'The link had invalid values – ignored.', linkNeedsValid: 'Fix the fields before copying a link.', linkFailed: 'Could not copy. Copy the address from the browser bar.', printTitle: 'Scenario',
+    shareLink: 'Copy link', linkCopied: 'Link copied.', linkNoCsv: 'Link copied. It does not carry the custom CSV price list.', linkIgnored: 'The link had invalid values – ignored.', linkNeedsValid: 'Fix the fields before copying a link.', linkFailed: 'Could not copy. Copy the address from the browser bar.',
     softwareOn: 'Include\nAI software cost', softwareOff: 'software excluded',
     help_users: 'People who will ask the assistant questions.',
     help_chunks: 'RAG attaches excerpts of your documents to each question. This many excerpts go into one request.',
@@ -1056,7 +1036,7 @@ const T = {
     cloudPrefill: 'Cloud: input', cloudDecode: 'Cloud: output', ownPrefill: 'Server: input', ownDecode: 'Server: output',
     csvTitle: 'Model price list', csvSource: 'Source:', csvLoad: 'Load CSV', csvReset: 'Built-in list',
     csvBuiltIn: 'cennik_modeli_2026-09.csv (built-in)', csvError: 'Could not read the CSV: required columns missing.',
-    shortcuts: 'Shortcuts: 1–3 scenarios · A assumptions · L language · Ctrl/Cmd+S save · ↑/↓ in the model list',
+    shortcuts: 'Shortcuts: 1–3 scenarios · A assumptions · L language · ↑/↓ in the model list',
     live: 'API {api}, cloud {cloud}, own server {own}, Dell GB10 {small} per month.',
   },
 };
@@ -1077,9 +1057,9 @@ Object.assign(T.pl, {
   settingsTitle: 'Ustawienia', settingsDone: 'Pokaż wyniki', settingsClose: 'Zamknij ustawienia', scenarioTitle: 'Zapis i pliki',
   estimateNotice: 'Szacunek kosztów inferencji, nie oferta ani gwarancja jakości i wydajności. Kwoty netto.',
   cloudOps: 'Stała obsługa chmury / mies. (PLN)', ownReplace: 'Wymiana sprzętu co (mies.)',
-  scenarioSave: 'Zapisz lokalnie', scenarioExport: 'Eksport JSON', scenarioImport: 'Import JSON', scenarioReset: 'Reset scenariusza',
-  scenarioSaved: 'Scenariusz zapisany w tej przeglądarce.', scenarioLoaded: 'Scenariusz wczytany.', scenarioResetDone: 'Przywrócono ustawienia. Cennik zachowany.',
-  scenarioUnsaved: 'Zmiany niezapisane.', storageError: 'Zapis lokalny niedostępny. Użyj eksportu JSON.', scenarioError: 'Nie można wczytać scenariusza: {error}',
+  scenarioExport: 'Eksport JSON', scenarioImport: 'Import JSON', scenarioReset: 'Reset scenariusza',
+  scenarioLoaded: 'Scenariusz wczytany.', scenarioResetDone: 'Defaults restored.',
+  scenarioError: 'Nie można wczytać scenariusza: {error}',
   invalidFieldsLead: 'Popraw pola:', resultsPaused: 'Wyniki wstrzymane.', invalidNumber: 'Podaj liczbę z zakresu {min}–{max}.', invalidInteger: 'Podaj liczbę całkowitą z zakresu {min}–{max}.',
   unavailable: 'Niedostępne', outputOver: 'Odpowiedź z rozumowaniem przekracza limit wyjścia modelu.',
   forcedThinking: 'Ten model zawsze używa rozumowania. Mnożnik jest szacunkiem.',
@@ -1105,9 +1085,9 @@ Object.assign(T.en, {
   settingsTitle: 'Settings', settingsDone: 'Show results', settingsClose: 'Close settings', scenarioTitle: 'Save and files',
   estimateNotice: 'Inference cost estimate, not a quote or a quality/capacity guarantee. Net amounts.',
   cloudOps: 'Fixed cloud support / month (PLN)', ownReplace: 'Replace hardware every (months)',
-  scenarioSave: 'Save locally', scenarioExport: 'Export JSON', scenarioImport: 'Import JSON', scenarioReset: 'Reset scenario',
-  scenarioSaved: 'Scenario saved in this browser.', scenarioLoaded: 'Scenario loaded.', scenarioResetDone: 'Settings reset. Price list retained.',
-  scenarioUnsaved: 'Unsaved changes.', storageError: 'Local storage unavailable. Use JSON export.', scenarioError: 'Could not load scenario: {error}',
+  scenarioExport: 'Export JSON', scenarioImport: 'Import JSON', scenarioReset: 'Reset scenario',
+  scenarioLoaded: 'Scenario loaded.', scenarioResetDone: 'Settings reset. Price list retained.',
+  scenarioError: 'Could not load scenario: {error}',
   invalidFieldsLead: 'Correct these fields:', resultsPaused: 'Results paused.', invalidNumber: 'Enter a number between {min} and {max}.', invalidInteger: 'Enter an integer between {min} and {max}.',
   unavailable: 'Unavailable', outputOver: 'Answer plus reasoning exceeds the model output limit.',
   forcedThinking: 'This model always reasons. The multiplier is an estimate.',
@@ -1774,12 +1754,6 @@ function renderTicker(values) {
     span.replaceChildren(document.createTextNode(t(key + 'Path') + ' '), el('b', {}, text));
   }
 }
-function renderPrintSummary() {
-  const box = $('printSummary'); if (!box) return;
-  const s = state;
-  const rows = [[t('users'), fmtNum(s.users)], [t('reqPerDay'), fmtNum(s.reqPerDay)], [t('model'), s.model], [t('softwareOn').replace('\n', ' '), s.softwareOn ? t('yes') : t('no')], [t('fx'), fmtNum(s.fx, 2)]];
-  box.replaceChildren(el('h2', {}, t('printTitle')), ...rows.map(([l, v]) => { const d = el('div', { class: 'line' }); d.append(el('span', {}, l), el('b', {}, v)); return d; }));
-}
 function renderHelp() {
   for (const [id, key] of Object.entries(FIELD_HELP)) {
     const input = $(id); if (!input) continue;
@@ -1990,7 +1964,6 @@ function render() {
     softwareLicense: String(s.softLicense), softwareSupportYear: String(s.softSupport),
     assumptionsOpen: String(dialogEl.open), softwareOn: String(s.softwareOn), verdictWinner: v.winner, verdictRecommended: v.recommended || '', verdictSavingsPct: v.savingsPct == null ? '' : v.savingsPct.toFixed(4),
   });
-  renderPrintSummary();
   renderSectionMeta();
   renderTicker({ api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable'), own: money(own.monthly, 0) });
   $('live').textContent = t('live', { api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), own: money(own.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable') });
@@ -2337,7 +2310,6 @@ function onSettingsKeydown(e) {
 }
 
 // ─── Scenario helpers ───
-const LS_SCENARIO = 'quantica-aicalc-scenario-v2';
 const MAX_SCENARIO_BYTES = 1024 * 1024;
 function serializeScenario(s) {
   const values = Object.fromEntries([...Object.keys(DEFAULTS), 'lang'].map((key) => [key, s[key]]));
@@ -2398,7 +2370,6 @@ function fromShareHash(hash, models = []) {
 function markDirty() {
   App.dirty = true;
   appEl.dataset.dirty = 'true';
-  $('scenarioStatus').textContent = t('scenarioUnsaved');
 }
 function renderValidation() {
   const errors = new Set([...App.invalidFields, ...Object.keys(validateState(state))]);
@@ -2423,7 +2394,6 @@ function renderValidation() {
     });
     status.append(document.createTextNode('. ' + t('resultsPaused')));
   }
-  $('scenarioSave').disabled = invalid || App.fileBusy;
   $('scenarioExport').disabled = invalid || App.fileBusy;
   if (invalid) {
     App.results = null;
@@ -2448,17 +2418,6 @@ function applyScenario(loaded) {
   applyI18n(); renderModelSelect(); syncInputs(true); render(); markDirty();
   $('scenarioStatus').textContent = t('scenarioLoaded');
 }
-function saveScenario() {
-  if (App.fileBusy || !renderValidation()) return false;
-  try {
-    const text = JSON.stringify(serializeScenario(state));
-    parseScenario(text);
-    localStorage.setItem(LS_SCENARIO, text);
-    App.dirty = false; appEl.dataset.dirty = 'false';
-    $('scenarioStatus').textContent = t('scenarioSaved');
-    return true;
-  } catch (_) { $('scenarioStatus').textContent = t('storageError'); return false; }
-}
 function downloadText(text, filename, type) {
   const url = URL.createObjectURL(new Blob([text], { type }));
   const link = el('a', { href: url, download: filename }); document.body.append(link); link.click(); link.remove();
@@ -2473,7 +2432,7 @@ async function readLocalFile(file, accept, errorNode, onError) {
   }
   App.fileBusy = true; $('fileProgress').hidden = false; $('fileProgress').removeAttribute('value');
   $('scenarioStatus').textContent = t('importBusy');
-  document.querySelectorAll('#scenarioSave, #scenarioExport, #scenarioImport, #scenarioReset, #csvBtn, #csvReset').forEach((n) => n.disabled = true);
+  document.querySelectorAll('#scenarioExport, #scenarioImport, #scenarioReset, #csvBtn, #csvReset').forEach((n) => n.disabled = true);
   try {
     const text = await file.text();
     if (revision !== App.fileRevision) return;
@@ -2497,7 +2456,7 @@ function checkDomContract(doc, result) {
   probe('DOM: ready state', () => doc.querySelector('#app')?.dataset.state === 'ready' && result);
   probe('DOM: settings containment', () => {
     const sidebar = doc.querySelector('#settingsPanel');
-    return sidebar && [...NUM_FIELDS, ...TEXT_FIELDS, 'model', 'thinking', 'offPeak', 'presets', 'scenarioSave', 'advancedPanel'].every((id) => sidebar.contains(doc.querySelector('#' + id)));
+    return sidebar && [...NUM_FIELDS, ...TEXT_FIELDS, 'model', 'thinking', 'offPeak', 'presets', 'scenarioExport', 'advancedPanel'].every((id) => sidebar.contains(doc.querySelector('#' + id)));
   });
   probe('DOM: results without settings', () => {
     const results = doc.querySelector('#resultsPanel');
@@ -2582,7 +2541,6 @@ function applyShareHash(hash) {
   return true;
 }
 window.addEventListener('hashchange', () => applyShareHash(location.hash));
-window.addEventListener('beforeprint', () => { if (App.results) render(); });
 settingsToggle.addEventListener('click', () => setSettingsOpen(!App.settingsOpen));
 $('settingsClose').addEventListener('click', () => setSettingsOpen(false));
 $('settingsBackdrop').addEventListener('click', () => setSettingsOpen(false));
@@ -2666,7 +2624,6 @@ $('csvTemplate').addEventListener('click', () => downloadText($('csvData').textC
 ['dragleave', 'drop'].forEach((ev) => dropEl.addEventListener(ev, (e) => { e.preventDefault(); dropEl.classList.remove('over'); }));
 dropEl.addEventListener('drop', (e) => readLocalFile(e.dataTransfer.files[0], loadCsvText, $('csvError'), (error) => t('csvLoadError', { error: error.message })));
 
-$('scenarioSave').addEventListener('click', saveScenario);
 $('scenarioExport').addEventListener('click', () => {
   if (!renderValidation()) return;
   try {
@@ -2685,7 +2642,6 @@ $('shareLink').addEventListener('click', async () => {
     $('scenarioStatus').textContent = t(state.csvSource ? 'linkNoCsv' : 'linkCopied');
   } catch (_) { $('scenarioStatus').textContent = t('linkFailed'); }
 });
-$('printBtn').addEventListener('click', () => { renderPrintSummary(); window.print(); });
 $('scenarioFile').addEventListener('change', (e) => {
   readLocalFile(e.target.files[0], (text) => applyScenario(parseScenario(text)), $('scenarioStatus'), (error) => t('scenarioError', { error: error.message }));
   e.target.value = '';
@@ -2693,12 +2649,11 @@ $('scenarioFile').addEventListener('change', (e) => {
 $('scenarioReset').addEventListener('click', () => {
   Object.assign(state, DEFAULTS); App.invalidFields.clear();
   renderModelSelect(); syncInputs(true); render();
-  if (saveScenario()) $('scenarioStatus').textContent = t('scenarioResetDone');
+  $('scenarioStatus').textContent = t('scenarioResetDone');
 });
 $('runChecks').addEventListener('click', showChecks);
 
 document.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); saveScenario(); return; }
   if (e.ctrlKey || e.metaKey || e.altKey) return;
   if (e.target.closest?.('input, select, textarea')) return;
   if (dialogEl.open) return;
@@ -2745,11 +2700,7 @@ function initDots(canvas) {
   try { const l = localStorage.getItem(LS_LANG); if (l === 'pl' || l === 'en') preferredLang = l; } catch (_) {}
   state.csvText = $('csvData').textContent;
   state.models = modelsFromCsv(state.csvText);
-  let restoreError = false, linkInvalid = false;
-  try {
-    const saved = localStorage.getItem(LS_SCENARIO);
-    if (saved) { const loaded = parseScenario(saved); Object.assign(state, loaded.values, { models: loaded.models, csvText: loaded.csvText, csvSource: loaded.csvSource }); }
-  } catch (_) { restoreError = true; }
+  let linkInvalid = false;
   if (preferredLang) state.lang = preferredLang;
   if (location.hash.length > 1) {
     const shared = fromShareHash(location.hash, state.models);
@@ -2762,7 +2713,6 @@ function initDots(canvas) {
   syncInputs();
   syncSettingsPanel();
   render();
-  if (restoreError) $('scenarioStatus').textContent = t('scenarioError', { error: 'local storage' });
   if (linkInvalid) $('scenarioStatus').textContent = t('linkIgnored');
   document.querySelectorAll('canvas[data-dots]').forEach(initDots);
   if ('IntersectionObserver' in window) {
