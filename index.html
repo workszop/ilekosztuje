@@ -660,7 +660,7 @@ td.src a:hover { text-decoration: underline; }
       </div>
     </div>
     <p id="validationStatus" role="alert" hidden></p>
-    <details class="glossary-wrap" id="glossaryWrap" open>
+    <details class="glossary-wrap" id="glossaryWrap">
       <summary data-t="glossaryTitle"></summary>
       <dl class="glossary" id="glossary">
         <div><dt data-t="glossaryRagTerm"></dt><dd data-t="glossaryRag"></dd></div>
@@ -2616,7 +2616,11 @@ function initDots(canvas) {
   document.querySelectorAll('canvas[data-dots]').forEach(initDots);
   if ('IntersectionObserver' in window) {
     const ticker = $('ticker');
-    new IntersectionObserver((entries) => { const visible = entries.some((e) => e.isIntersecting); ticker.hidden = visible; ticker.setAttribute('aria-hidden', String(visible)); }, { root: $('resultsPanel'), threshold: 0 }).observe($('options'));
+    new IntersectionObserver((entries) => {
+      // Show the strip only once the option cards have scrolled above the viewport.
+      const scrolledPast = entries.some((e) => !e.isIntersecting && e.boundingClientRect.bottom < (e.rootBounds ? e.rootBounds.top : 0));
+      ticker.hidden = !scrolledPast; ticker.setAttribute('aria-hidden', String(!scrolledPast));
+    }, { root: $('resultsPanel'), threshold: 0 }).observe($('options'));
   }
   if (new URLSearchParams(location.search).has('verify')) { $('checksPanel').open = true; showChecks(); }
 })();
