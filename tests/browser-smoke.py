@@ -275,6 +275,16 @@ CAPACITY_SMOKE_SCRIPT = r"""
     expect(applyShareHash('#users=0') === false && state.users === 77, 'invalid hash ignored');
     click('[data-preset="S1"]');
     expect(location.hash === '', 'preset change leaves the URL alone');
+    // Deferred minors: singular grammar at one user; software-off copy swap; unavailable stack shows a dash.
+    setInput('users', 1);
+    expect(/Przy 1 użytkowniku/.test(document.querySelector('#verdict').textContent), 'singular user phrase: ' + document.querySelector('#verdict').textContent);
+    setInput('users', 20);
+    document.querySelector('#softwareOn').checked = false; document.querySelector('#softwareOn').dispatchEvent(new Event('input', { bubbles: true }));
+    expect(!/Zagłoba/.test(document.querySelector('#modelNote').textContent) && document.querySelector('[data-t="modelsNote"]').textContent === T.pl.modelsNoteNoSoft, 'models note swaps when software is off');
+    document.querySelector('#softwareOn').checked = true; document.querySelector('#softwareOn').dispatchEvent(new Event('input', { bubbles: true }));
+    setInput('users', 300);
+    expect(document.querySelector('#optSmall .opt-stack').textContent === '–', 'unavailable stack shows a dash');
+    setInput('users', 20);
 
     expect(document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1, 'horizontal overflow');
     finish({ ok: true });

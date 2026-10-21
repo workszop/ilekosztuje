@@ -212,4 +212,13 @@ const twoCol = descendants(resultsPanel, (node) => hasClass(node, 'two-col'))[0]
 assert.ok(twoCol, 'summary/chart section exists');
 assert.ok(twoCol.children.filter((n) => hasClass(n, 'card')).every((n) => hasClass(n, 'secondary')), 'summary and chart cards carry .secondary');
 
+// Deferred minors: no hardcoded px font sizes outside the token block; one live region; chips are sans
+const css = html.match(/<style>([\s\S]*?)<\/style>/)[1];
+const rules = css.replace(/:root\s*\{[\s\S]*?\n\}/, '');
+const hardcoded = [...rules.matchAll(/font-size:\s*(\d+(?:\.\d+)?px)/g)].map((m) => m[1]);
+assert.deepEqual(hardcoded, [], `hardcoded font sizes: ${hardcoded.join(', ')}`);
+assert.equal(descendants(documentRoot, (node) => node.attrs['aria-live'] !== undefined && node.attrs.id !== 'live' && node.attrs.id !== 'scenarioStatus').length, 0, 'only #live and #scenarioStatus announce');
+assert.ok(/\.chip \{[^}]*font-family: var\(--font-sans\)/.test(css) && !/\.chip \{[^}]*uppercase/.test(css), 'chips are sans, not uppercase');
+assert.ok(!/\.settings-body \.field label \{[^}]*letter-spacing/.test(css), 'no leftover letter-spacing on sidebar labels');
+
 console.log('Sidebar layout and keyboard contracts passed');

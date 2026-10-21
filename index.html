@@ -81,6 +81,9 @@
   --label-size: 12px;
   --field-label-size: 13px;
   --small-size: 12.5px;
+  --pill-size: 14px;
+  --pill-sm-size: 13px;
+  --chevron-size: 18px;
   --tiny-size: 12px;
   --body-sm: 14px;
   --body: 15px;
@@ -141,14 +144,14 @@ section { margin-bottom: var(--sp-8); }
 /* ─── Controls ─── */
 .seg { display: inline-flex; flex-wrap: nowrap; gap: 2px; padding: 3px; background: var(--bg-2); border: 1px solid var(--border-1); border-radius: var(--radius-pill); }
 .seg button { border: none; background: transparent; padding: 7px 14px; border-radius: var(--radius-pill);
-  font-family: var(--font-sans); font-weight: 700; font-size: 13px; color: var(--fg-3); cursor: pointer; transition: background-color .2s, color .2s; }
+  font-family: var(--font-sans); font-weight: 700; font-size: var(--pill-sm-size); color: var(--fg-3); cursor: pointer; transition: background-color .2s, color .2s; }
 .seg button:hover { color: var(--quantica-pink); }
 .seg button.active { background: var(--quantica-pink); color: var(--white); box-shadow: var(--shadow-pink-soft); }
 .seg button:focus-visible, .pill:focus-visible, input:focus-visible, select:focus-visible, tr:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-5); }
 .toolbar .label { font-family: var(--font-sans); font-weight: 600; font-size: var(--label-size); letter-spacing: 0; text-transform: none; color: var(--fg-3); }
 
-.pill { font-family: var(--font-sans); font-weight: 700; font-size: 14px; text-decoration: none; padding: 10px 20px; border-radius: var(--radius-pill);
+.pill { font-family: var(--font-sans); font-weight: 700; font-size: var(--pill-size); text-decoration: none; padding: 10px 20px; border-radius: var(--radius-pill);
   display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid transparent; cursor: pointer; line-height: 1.2;
   transition: transform .2s, background-color .2s, color .2s, border-color .2s; }
 .pill:hover { transform: translateY(-1px); }
@@ -185,7 +188,7 @@ section { margin-bottom: var(--sp-8); }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }
 
 /* ─── Results ─── */
-.chip { font-family: var(--font-mono); font-weight: 500; font-size: var(--tag-size); text-transform: uppercase; letter-spacing: .08em; padding: 4px 10px; border-radius: var(--radius-pill); white-space: nowrap; border: 1px solid transparent; }
+.chip { font-family: var(--font-sans); font-weight: 700; font-size: var(--tag-size); letter-spacing: 0; padding: 4px 10px; border-radius: var(--radius-pill); white-space: nowrap; border: 1px solid transparent; }
 .chip-win { background: var(--quantica-pink); color: var(--white); }
 .chip-warn { background: var(--ink); color: var(--white); }
 .chip-mini { background: var(--bg-2); color: var(--fg-3); border-color: var(--border-1); }
@@ -202,7 +205,7 @@ section { margin-bottom: var(--sp-8); }
 .opt-total { display: flex; align-items: baseline; gap: 6px; }
 .opt-total .big { min-width: 0; overflow-wrap: anywhere; font-family: var(--font-display); font-weight: 700; font-size: var(--total-size); letter-spacing: -.03em; color: var(--fg-1); line-height: 1.05; }
 .opt-total .per { font-family: var(--font-mono); font-size: var(--tiny-size); color: var(--fg-3); }
-.opt-stack { font-family: var(--font-mono); font-size: var(--tiny-size); letter-spacing: .02em; color: var(--fg-3); margin: 6px 0 0; }
+.opt-stack { font-family: var(--font-sans); font-size: var(--small-size); letter-spacing: 0; color: var(--fg-3); margin: 6px 0 0; }
 #app[data-state="invalid"] .opt-stack { display: none; }
 .opt-capacity { margin-top: var(--sp-3); padding-top: var(--sp-2); border-top: 1px solid var(--border-1); }
 .opt-capacity .line { flex-wrap: wrap; font-size: var(--small-size); }
@@ -220,7 +223,7 @@ section { margin-bottom: var(--sp-8); }
 .opt-settings { min-width: 0; }
 .cost-breakdown { margin-top: var(--sp-4); }
 .opt-capacity:empty { display: none; }
-.cost-breakdown > summary { cursor: pointer; font-family: var(--font-mono); font-size: var(--tiny-size); letter-spacing: .04em; color: var(--fg-3); padding: var(--sp-2) 0; }
+.cost-breakdown > summary { cursor: pointer; font-family: var(--font-sans); font-weight: 600; font-size: var(--small-size); letter-spacing: 0; color: var(--fg-3); padding: var(--sp-2) 0; }
 .cost-breakdown > summary:hover { color: var(--quantica-pink); }
 .results-context { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-2) var(--sp-6); margin-top: var(--sp-4); padding-top: var(--sp-3); border-top: 1px solid var(--white-20); }
 .results-context .stat span { color: var(--white-92); opacity: .8; }
@@ -247,7 +250,7 @@ section { margin-bottom: var(--sp-8); }
 .bar-value { font-family: var(--font-mono); font-weight: 500; color: var(--fg-1); white-space: nowrap; }
 .bar-row[data-unavailable="true"] .bar-label { opacity: .7; }
 .legend-unavailable { opacity: .7; }
-.verdict { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--fg-1); margin: 0 0 var(--sp-4); line-height: 1.35; }
+.verdict { font-family: var(--font-display); font-size: var(--h4); font-weight: 600; color: var(--fg-1); margin: 0 0 var(--sp-4); line-height: 1.35; }
 .answers { list-style: none; margin: 0; padding: 0; }
 .answers li { display: block; padding: 9px 0; border-top: 1px dashed var(--border-1); font-size: var(--body-sm); color: var(--fg-3); }
 .answers li.key { color: var(--fg-1); font-weight: 600; font-size: var(--body); padding-left: 14px; position: relative; }
@@ -293,7 +296,7 @@ td.name { color: var(--fg-1); font-weight: 700; }
 .drop { border: 1.5px dashed var(--border-2); border-radius: var(--radius-md); padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); color: var(--fg-3); font-size: var(--body-sm); transition: background-color .15s, border-color .15s; }
 .drop.over { background: var(--magenta-tint); border-color: var(--quantica-pink); }
 .drop .src { font-family: var(--font-mono); font-size: var(--tiny-size); color: var(--fg-1); }
-footer.shortcuts { font-family: var(--font-mono); font-size: var(--tag-size); letter-spacing: .04em; color: var(--fg-3); text-align: var(--align-center); margin-top: var(--sp-8); padding-top: var(--sp-5); border-top: 1px solid var(--border-1); }
+footer.shortcuts { font-family: var(--font-sans); font-size: var(--small-size); letter-spacing: 0; color: var(--fg-3); text-align: var(--align-center); margin-top: var(--sp-8); padding-top: var(--sp-5); border-top: 1px solid var(--border-1); }
 
 /* ─── Assumptions dialog ─── */
 dialog.assump { border: none; border-radius: var(--radius-card); padding: 0; width: min(980px, calc(100% - 32px)); max-height: calc(100vh - 48px);
@@ -342,7 +345,7 @@ progress#fileProgress { accent-color: var(--quantica-pink); }
 details.panel { background: var(--bg-1); border: 1px solid var(--border-1); border-radius: var(--radius-card); box-shadow: var(--shadow-card); margin-bottom: var(--sp-4); }
 details.panel > summary { cursor: pointer; list-style: none; padding: 16px 24px; font-family: var(--font-display); font-weight: 700; font-size: var(--h4); letter-spacing: -.01em; color: var(--fg-1); display: flex; align-items: center; gap: 10px; }
 details.panel > summary::-webkit-details-marker { display: none; }
-details.panel > summary::before { content: '›'; display: inline-grid; place-items: center; width: 18px; height: 18px; color: var(--fg-3); font-family: var(--font-sans); font-size: 18px; line-height: 1; flex: none; transition: transform .15s; }
+details.panel > summary::before { content: '›'; display: inline-grid; place-items: center; width: 18px; height: 18px; color: var(--fg-3); font-family: var(--font-sans); font-size: var(--chevron-size); line-height: 1; flex: none; transition: transform .15s; }
 details.panel[open] > summary::before { transform: rotate(90deg); }
 details.panel > :not(summary) { margin-left: 24px; margin-right: 24px; }
 details.panel[open] { padding-bottom: 20px; }
@@ -359,18 +362,17 @@ details.panel[open] { padding-bottom: 20px; }
 .settings-body .sec-row .sec-title { flex: 1 1 100%; }
 .settings-body #presets { display: flex; flex-wrap: wrap; gap: var(--sp-2); flex: 1 1 auto; }
 .settings-body #presets button { flex: 0 1 auto; }
-#presets button { font-family: var(--font-sans); font-weight: 700; font-size: 13px; padding: 8px 14px; border-radius: var(--radius-pill); border: 1.5px solid var(--border-1); background: var(--bg-1); color: var(--fg-1); cursor: pointer; transition: background-color .2s, color .2s, border-color .2s; }
+#presets button { font-family: var(--font-sans); font-weight: 700; font-size: var(--pill-sm-size); padding: 8px 14px; border-radius: var(--radius-pill); border: 1.5px solid var(--border-1); background: var(--bg-1); color: var(--fg-1); cursor: pointer; transition: background-color .2s, color .2s, border-color .2s; }
 #presets button:hover { border-color: var(--quantica-pink); color: var(--quantica-pink); }
 #presets button[aria-pressed="true"] { background: var(--quantica-pink); border-color: var(--quantica-pink); color: var(--white); box-shadow: var(--shadow-pink-soft); }
 #presets button:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.pill-sm { padding: 7px 12px; font-size: 13px; }
+.pill-sm { padding: 7px 12px; font-size: var(--pill-sm-size); }
 .settings-body #workloadDetails { border-top: 0; }
 .settings-body #workloadDetails > summary { padding-top: var(--sp-2); font-size: var(--body-sm); }
 .settings-body .card { padding: 0; border: 0; border-radius: 0; box-shadow: none; }
 .settings-body .fields-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2) var(--sp-3); }
 .settings-body .field { min-width: 0; margin-bottom: var(--sp-2); }
 .settings-body .field input, .settings-body .field select { font-size: var(--body-sm); padding: var(--sp-2) 10px; }
-.settings-body .field label { letter-spacing: .03em; }
 .settings-body .workload-foot { padding-top: var(--sp-3); }
 .settings-body .seg button { padding: 6px 10px; }
 .settings-body .adv-grid { grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); }
@@ -431,7 +433,7 @@ td.src a:hover { text-decoration: underline; }
   #options { grid-template-columns: repeat(2, 1fr) !important; }
   .opt-capacity, .option .opt-note { display: none; }
   .print-only { display: block; margin: 12px 0 20px; }
-  .print-only .line { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0; border-bottom: 1px dashed var(--border-1); font-size: 12px; }
+  .print-only .line { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0; border-bottom: 1px dashed var(--border-1); font-size: var(--tiny-size); }
   .card, .option { box-shadow: none; border: 1px solid var(--border-1); break-inside: avoid; }
   #options { grid-template-columns: repeat(2, 1fr); }
   .two-col { grid-template-columns: 1fr; }
@@ -683,8 +685,8 @@ td.src a:hover { text-decoration: underline; }
     </details>
     <section>
     <div id="printSummary" class="print-only"></div>
-    <p id="verdict" class="verdict" aria-live="polite"></p>
-    <div class="grid-4" id="options" aria-live="polite">
+    <p id="verdict" class="verdict"></p>
+    <div class="grid-4" id="options">
       <div class="card option" id="optApi" data-path="api">
         <div class="card-head"><span class="dot" style="background:var(--chart-api)"></span><h3 data-t="apiPath"></h3><span class="chip-slot"></span></div>
         <div class="opt-total"><span class="big"></span><span class="per" data-t="monthly"></span></div>
@@ -915,9 +917,10 @@ const T = {
     lYear: 'Rocznie', lFirstYear: 'Pierwszy rok (z zakupem)', lPerReq: 'Za zapytanie', lUtil: 'Wykorzystanie GPU',
     cheapest: 'Najtańsze', recommended: 'Rekomendowane', tierNote: 'Prompt powyżej {k}K tokenów: droższa stawka.', ctxOver: 'Prompt nie mieści się w oknie kontekstu modelu!',
     summaryTitle: 'Podsumowanie miesięczne', summarySub: 'Koszt każdej opcji przy bieżącym obciążeniu.',
-    verdictText: 'Przy {users} użytkownikach najtaniej wychodzi {winner}: {monthly} miesięcznie, {pct} taniej niż {runnerUp}.',
-    verdictSingle: 'Przy {users} użytkownikach do porównania zostaje tylko {winner}: {monthly} miesięcznie.',
-    verdictRecommended: 'Przy {users} użytkownikach najtaniej wychodzi {winner} ({monthly} miesięcznie), ale od {from} użytkowników rekomendujemy {recommended}: {recMonthly} miesięcznie.',
+    verdictText: 'Przy {users} {usersWord} najtaniej wychodzi {winner}: {monthly} miesięcznie, {pct} taniej niż {runnerUp}.',
+    verdictSingle: 'Przy {users} {usersWord} do porównania zostaje tylko {winner}: {monthly} miesięcznie.',
+    verdictTie: 'Przy {users} {usersWord} {winner} i {runnerUp} kosztują tyle samo: {monthly} miesięcznie.',
+    verdictRecommended: 'Przy {users} {usersWord} najtaniej wychodzi {winner} ({monthly} miesięcznie), ale od {from} użytkowników rekomendujemy {recommended}: {recMonthly} miesięcznie.',
     aApiVsCloud: 'API jest tańsze od chmury GPU do ok. {n}.', aApiVsOwn: 'API jest tańsze od własnego serwera do ok. {n}.',
     aApiVsSmall: 'API jest tańsze od Dell GB10 do ok. {n}.', aPaybackSmall: 'Dell GB10 zwraca się wobec chmury po {n}.',
     aPayback: 'Własny serwer zwraca się wobec chmury po {n}.', aMinute: 'Jedno zapytanie API kosztuje {cost}, czyli {pct} minuty pracy pracownika ({minute}).',
@@ -926,9 +929,10 @@ const T = {
     aApiVsOwnNever: 'API nie jest tańsze od własnego serwera nawet przy 1 osobie.', aApiVsOwnAlways: 'API jest tańsze od własnego serwera co najmniej do 20 000 użytkowników.',
     aPaybackNever: 'Własny serwer nie zwraca się wobec chmury w ciągu 10 lat.', aPaybackSmallNever: 'Dell GB10 nie zwraca się wobec chmury w ciągu 10 lat.',
     aUnavailable: 'Dell GB10 jest niedostępny przy tej liczbie użytkowników.', aApiUnavailable: 'Wybrany model API nie obsłuży tego zapytania.',
-    usersUnit: 'użytk.', monthsUnit: 'mies.', usersWord: 'użytkowników', monthsWord: 'miesiącach', never: 'nie w ciągu 10 lat', apiNever: 'nigdy (już 1 osoba)', apiAlways: 'co najmniej 20 000 użytkowników',
+    usersUnit: 'użytk.', monthsUnit: 'mies.', usersWord: 'użytkowników', monthsWord: 'miesiącach', usersOne: 'użytkowniku', usersMany: 'użytkownikach', monthsOne: 'miesiącu', monthsMany: 'miesiącach', never: 'nie w ciągu 10 lat', apiNever: 'nigdy (już 1 osoba)', apiAlways: 'co najmniej 20 000 użytkowników',
     chartTime: 'Koszt narastająco w czasie', chartTimeSub: 'Dell GB10 i własny serwer startują od ceny sprzętu i licencji Zagłoba RAG. Co okres wymiany sprzętu doliczamy kolejny zakup sprzętu; licencja jest jednorazowa.',
     showData: 'Pokaż dane', monthLabel: 'Miesiąc',
+    modelsNoteNoSoft: 'Kwoty miesięczne zawierają stałą infrastrukturę API, bez warstwy oprogramowania. Tokeny są szacowane dla rodziny tokenizera danego modelu.', chartTimeSubNoSoft: 'Dell GB10 i własny serwer startują od ceny sprzętu. Co okres wymiany sprzętu doliczamy kolejny zakup sprzętu.',
     secModels: 'Porównaj wszystkie modele API', modelsNote: 'Kwoty miesięczne zawierają Zagłoba RAG jako SaaS i stałą infrastrukturę API. Tokeny są szacowane dla rodziny modelu, nie liczone uruchomieniem tokenizerów. Kliknij wiersz, aby wybrać model.',
     thModel: 'Model', thTok: 'Tokeny we / wy', thIn: 'We $/1M', thOut: 'Wy $/1M', thReq: 'Zapytanie', thMonth: 'Miesięcznie', thVs: 'Na tle GPU', thChecked: 'Sprawdzono', sourceLink: 'źródło',
     vsCheaper: 'tańsze niż każda opcja GPU', vsDearer: 'droższe niż każda opcja GPU', vsMid: 'pomiędzy',
@@ -980,9 +984,10 @@ const T = {
     lYear: 'Per year', lFirstYear: 'First year (with purchase)', lPerReq: 'Per request', lUtil: 'GPU utilisation',
     cheapest: 'Cheapest', recommended: 'Recommended', tierNote: 'Prompt above {k}K tokens: higher rate.', ctxOver: 'Prompt does not fit the model context window!',
     summaryTitle: 'Monthly summary', summarySub: 'Cost of each option at the current workload.',
-    verdictText: 'With {users} users the cheapest option is {winner}: {monthly} per month, {pct} less than {runnerUp}.',
-    verdictSingle: 'With {users} users only {winner} remains in the comparison: {monthly} per month.',
-    verdictRecommended: 'With {users} users the cheapest option is {winner} ({monthly} per month), but from {from} users we recommend {recommended}: {recMonthly} per month.',
+    verdictText: 'With {users} {usersWord} the cheapest option is {winner}: {monthly} per month, {pct} less than {runnerUp}.',
+    verdictSingle: 'With {users} {usersWord} only {winner} remains in the comparison: {monthly} per month.',
+    verdictTie: 'With {users} {usersWord} {winner} and {runnerUp} cost the same: {monthly} per month.',
+    verdictRecommended: 'With {users} {usersWord} the cheapest option is {winner} ({monthly} per month), but from {from} users we recommend {recommended}: {recMonthly} per month.',
     aApiVsCloud: 'API is cheaper than cloud GPU up to about {n}.', aApiVsOwn: 'API is cheaper than an own server up to about {n}.',
     aApiVsSmall: 'API is cheaper than Dell GB10 up to about {n}.', aPaybackSmall: 'Dell GB10 pays back against cloud after {n}.',
     aPayback: 'An own server pays back against cloud after {n}.', aMinute: 'One API request costs {cost}, which is {pct} of a minute of staff time ({minute}).',
@@ -991,9 +996,10 @@ const T = {
     aApiVsOwnNever: 'API is not cheaper than an own server even for 1 user.', aApiVsOwnAlways: 'API stays cheaper than an own server up to at least 20,000 users.',
     aPaybackNever: 'An own server does not pay back against cloud within 10 years.', aPaybackSmallNever: 'Dell GB10 does not pay back against cloud within 10 years.',
     aUnavailable: 'Dell GB10 is unavailable at this number of users.', aApiUnavailable: 'The selected API model cannot serve this request.',
-    usersUnit: 'users', monthsUnit: 'mo.', usersWord: 'users', monthsWord: 'months', never: 'not within 10 years', apiNever: 'never (even 1 user)', apiAlways: 'at least 20,000 users',
+    usersUnit: 'users', monthsUnit: 'mo.', usersWord: 'users', monthsWord: 'months', usersOne: 'user', usersMany: 'users', monthsOne: 'month', monthsMany: 'months', never: 'not within 10 years', apiNever: 'never (even 1 user)', apiAlways: 'at least 20,000 users',
     chartTime: 'Cumulative cost over time', chartTimeSub: 'Dell GB10 and own server start at the hardware price plus the Zagłoba RAG licence. Hardware is bought again each replacement period; the licence is one-off.',
     showData: 'Show data', monthLabel: 'Month',
+    modelsNoteNoSoft: 'Monthly amounts include the fixed API infrastructure, without the software layer. Tokens are estimated for the model family tokenizer.', chartTimeSubNoSoft: 'Dell GB10 and own server start at the hardware price. Hardware is bought again each replacement period.',
     secModels: 'Compare all API models', modelsNote: 'Monthly amounts include Zagłoba RAG as SaaS and the fixed API infrastructure. Tokens are estimated for the model family, not measured by running each tokenizer. Click a row to select the model.',
     thModel: 'Model', thTok: 'Tokens in / out', thIn: 'In $/1M', thOut: 'Out $/1M', thReq: 'Request', thMonth: 'Monthly', thVs: 'Vs GPU', thChecked: 'Checked', sourceLink: 'source',
     vsCheaper: 'cheaper than every GPU option', vsDearer: 'dearer than every GPU option', vsMid: 'in between',
@@ -1585,7 +1591,13 @@ function crossovers(series) {
     const a = usable[i], b = usable[j], n = Math.min(a.ys.length, b.ys.length);
     for (let k = 1; k < n; k++) {
       const prev = Math.sign(a.ys[k - 1] - b.ys[k - 1]), cur = Math.sign(a.ys[k] - b.ys[k]);
-      if (prev !== 0 && cur !== 0 && prev !== cur) { out.push({ a: a.key, b: b.key, month: k, value: a.ys[k] }); break; }
+      if (prev !== 0 && cur !== 0 && prev !== cur) {
+        const d0 = a.ys[k - 1] - b.ys[k - 1], d1 = a.ys[k] - b.ys[k];
+        const f = d0 / (d0 - d1);
+        const month = Math.round((k - 1 + f) * 100) / 100;
+        const value = Math.round((a.ys[k - 1] + f * (a.ys[k] - a.ys[k - 1])) * 100) / 100;
+        out.push({ a: a.key, b: b.key, month, value }); break;
+      }
     }
   }
   return out;
@@ -1756,7 +1768,7 @@ function renderOption(node, { monthly, win, lines, extra, warn, note, eligible =
   slot.replaceChildren(); if (win) slot.append(el('span', { class: 'chip chip-win' }, t('cheapest'))); if (recommended) slot.append(el('span', { class: 'chip chip-rec' }, t('recommended')));
   node.querySelector('.opt-total .big').textContent = eligible ? money(monthly, 0) : t('unavailable');
   node.dataset.software = eligible ? software.toFixed(2) : ''; node.dataset.infra = eligible ? infra.toFixed(2) : '';
-  node.querySelector('.opt-stack').textContent = !eligible ? '' : state.softwareOn === false ? `${t('softwareOff')} · ${t('lInfra')} ${money(infra, 0)}` : `${t('lSoftware')} ${money(software, 0)} · ${t('lInfra')} ${money(infra, 0)}`;
+  node.querySelector('.opt-stack').textContent = !eligible ? '–' : state.softwareOn === false ? `${t('softwareOff')} · ${t('lInfra')} ${money(infra, 0)}` : `${t('lSoftware')} ${money(software, 0)} · ${t('lInfra')} ${money(infra, 0)}`;
   const box = node.querySelector('.opt-lines'); box.replaceChildren();
   const dash = '–';
   lines.forEach(([l, v]) => { const d = el('div', { class: 'line' }); d.append(el('span', {}, l), el('b', {}, eligible ? v : dash)); box.append(d); });
@@ -1872,14 +1884,17 @@ function render() {
   ]);
   const maxU = 20000;
   const beCloud = result.breakEvenCloud, beOwn = result.breakEvenOwn, beSmall = result.breakEvenSmall;
+  const usersPhrase = (n) => t(n === 1 ? 'usersOne' : 'usersMany');
+  const monthsPhrase = (n) => t(n === 1 ? 'monthsOne' : 'monthsMany');
   const beSentence = (key, n) => n === 0 ? t(key + 'Never') : n >= maxU ? t(key + 'Always') : t(key, { n: fmtNum(n) + ' ' + t('usersWord') });
-  const pbSentence = (key, m) => m == null ? t(key + 'Never') : t(key, { n: m + ' ' + t('monthsWord') });
+  const pbSentence = (key, m) => m == null ? t(key + 'Never') : t(key, { n: m + ' ' + monthsPhrase(m) });
   const pbCloud = result.payback, pbSmall = result.paybackSmall;
   const minuteRatio = api.perReq / MINUTE_OF_WORK;
   const v = verdict(result);
-  $('verdict').textContent = v.recommended
-    ? t('verdictRecommended', { users: fmtNum(s.users), winner: t(v.winner + 'Path'), monthly: money(v.monthly, 0), from: fmtNum(s.smallRecommendFrom), recommended: t(v.recommended + 'Path'), recMonthly: money(v.recommendedMonthly, 0) })
-    : t(v.runnerUp ? 'verdictText' : 'verdictSingle', { users: fmtNum(s.users), winner: t(v.winner + 'Path'), monthly: money(v.monthly, 0), pct: pct(v.savingsPct || 0), runnerUp: t((v.runnerUp || '') + 'Path') });
+  const verdictVars = { users: fmtNum(s.users), usersWord: usersPhrase(s.users), winner: t(v.winner + 'Path'), monthly: money(v.monthly, 0), pct: pct(v.savingsPct || 0), runnerUp: t((v.runnerUp || '') + 'Path'), from: fmtNum(s.smallRecommendFrom), recommended: t((v.recommended || '') + 'Path'), recMonthly: money(v.recommendedMonthly || 0, 0) };
+  $('verdict').textContent = t(v.recommended ? 'verdictRecommended' : !v.runnerUp ? 'verdictSingle' : v.savingsPct < 0.005 ? 'verdictTie' : 'verdictText', verdictVars);
+  document.querySelector('[data-t="modelsNote"]').textContent = t(s.softwareOn ? 'modelsNote' : 'modelsNoteNoSoft');
+  document.querySelector('[data-t="chartTimeSub"]').textContent = t(s.softwareOn ? 'chartTimeSub' : 'chartTimeSubNoSoft');
   const answers = [];
   if (!api.eligible) answers.push(t('aApiUnavailable'));
   else {
@@ -1958,8 +1973,8 @@ function renderCharts(m, api, cloud, own, small) {
   });
   renderLegend($('legendTime'), series);
   const cross = crossovers(series);
-  const seen = new Set();
-  const markers = cross.filter((c) => !seen.has(c.month) && seen.add(c.month)).map((c) => ({ month: c.month, value: c.value, label: t('crossAt', { m: c.month }) }));
+  const shortOf = (key) => (base.find((b) => b.key === key) || {}).short || key;
+  const markers = cross.map((c, i) => ({ month: c.month, value: c.value, flip: i % 2 === 1, label: `${shortOf(c.a)} × ${shortOf(c.b)} · ${t('crossAt', { m: Math.round(c.month) })}` }));
   appEl.dataset.crossovers = JSON.stringify(cross.map((c) => [c.a, c.b, c.month]));
   lineChart($('chartTime'), { xs: ms, series, xFmt: (v) => String(v), xHead: t('monthLabel'), markers });
   dataTable($('tableTime'), ms, series, t('monthLabel'), (v) => String(v));
@@ -2130,7 +2145,7 @@ function lineChart(wrap, { xs, series: allSeries, xFmt, xHead, height = 280, mar
   wrap.replaceChildren();
   const series = allSeries.filter((s) => s.ys && s.ys.length === xs.length);
   const W = Math.max(300, wrap.clientWidth || 500), H = height;
-  const pad = { l: 58, r: 96, t: 12, b: 30 };
+  const pad = { l: 58, r: 150, t: 12, b: 30 };
   const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
   const yMax = niceMax(Math.max(...series.flatMap((s) => s.ys)) * 1.05);
   const xMin = xs[0], xMax = xs[xs.length - 1];
@@ -2168,7 +2183,7 @@ function lineChart(wrap, { xs, series: allSeries, xFmt, xHead, height = 280, mar
   markers.forEach((m) => {
     const cx = X(m.month), cy = Y(m.value);
     svg.append(svgEl('circle', { cx, cy, r: 5, fill: COLORS.surface, stroke: COLORS.accent, 'stroke-width': 2, 'data-marker': m.month }));
-    const lab = svgEl('text', { x: cx, y: cy - 10, 'text-anchor': 'middle', 'font-size': CHART_TYPE.tickSize, fill: COLORS.accent, 'font-family': CHART_TYPE.mono, 'font-weight': 700 });
+    const lab = svgEl('text', { x: cx, y: m.flip ? cy + 18 : cy - 10, 'text-anchor': 'middle', 'font-size': CHART_TYPE.tickSize, fill: COLORS.accent, 'font-family': CHART_TYPE.mono, 'font-weight': 700 });
     lab.textContent = m.label; svg.append(lab);
   });
   // hover layer
@@ -2313,6 +2328,7 @@ function fromShareHash(hash, models = []) {
   if (Object.keys(validateState(values)).length) return null;
   if (!['pl', 'en'].includes(values.lang) || !['pl', 'en'].includes(values.docLang) || !['work', '247'].includes(values.cloudMode)) return null;
   if (Array.isArray(models) && models.length && !models.some((m) => m.name === values.model)) return null;
+  if (Array.isArray(models) && models.length) { try { computeResults(values, models); } catch (_) { return null; } }
   return { values };
 }
 function markDirty() {
@@ -2502,6 +2518,7 @@ function applyShareHash(hash) {
   return true;
 }
 window.addEventListener('hashchange', () => applyShareHash(location.hash));
+window.addEventListener('beforeprint', () => { if (App.results) render(); });
 settingsToggle.addEventListener('click', () => setSettingsOpen(!App.settingsOpen));
 $('settingsClose').addEventListener('click', () => setSettingsOpen(false));
 $('settingsBackdrop').addEventListener('click', () => setSettingsOpen(false));

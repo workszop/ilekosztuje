@@ -386,7 +386,7 @@ assert.ok(String(models[0].source).startsWith('https://'), 'source URL parsed fr
 for (const lang of ['pl', 'en']) { assert.equal(typeof run(`T.${lang}.thSource`), 'string'); assert.equal(typeof run(`T.${lang}.sourceLink`), 'string'); }
 
 // Task 12: crossover detection between cumulative series
-assert.equal(JSON.stringify(run('crossovers([{ key: "a", ys: [0, 10, 20, 30] }, { key: "b", ys: [25, 25, 25, 25] }])')), JSON.stringify([{ a: 'a', b: 'b', month: 3, value: 30 }]));
+assert.equal(JSON.stringify(run('crossovers([{ key: "a", ys: [0, 10, 20, 30] }, { key: "b", ys: [25, 25, 25, 25] }])')), JSON.stringify([{ a: 'a', b: 'b', month: 2.5, value: 25 }]), 'crossing point is interpolated');
 assert.equal(JSON.stringify(run('crossovers([{ key: "a", ys: [1, 2] }, { key: "b", ys: [] }])')), '[]', 'series without data are skipped');
 assert.equal(JSON.stringify(run('crossovers([{ key: "a", ys: [5, 6, 7] }, { key: "b", ys: [1, 2, 3] }])')), '[]', 'no crossing when one series stays above');
 assert.equal(run('crossovers([{ key: "a", ys: [0, 10, 20, 30, 40] }, { key: "b", ys: [25, 25, 25, 25, 25] }, { key: "c", ys: [15, 15, 15, 15, 15] }]).length'), 2, 'one crossover per crossing pair');
@@ -402,5 +402,10 @@ for (const lang of ['pl', 'en']) {
     assert.equal(typeof run(`T.${lang}.${key}`), 'string', `${lang}.${key}`);
   assert.ok(!/\{n\}/.test(run(`T.${lang}.aPaybackNever`)), 'never template has no placeholder');
 }
+
+// Deferred minors: singular/plural phrases, software-off copy, tie verdict
+for (const lang of ['pl', 'en']) for (const key of ['usersOne', 'usersMany', 'monthsOne', 'monthsMany', 'verdictTie', 'modelsNoteNoSoft', 'chartTimeSubNoSoft'])
+  assert.equal(typeof run(`T.${lang}.${key}`), 'string', `${lang}.${key}`);
+assert.equal(run('T.pl.usersOne'), 'użytkowniku');
 
 console.log('Core validation, CSV, cost-model, and regression checks passed');
