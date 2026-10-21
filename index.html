@@ -400,6 +400,13 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
   #options .card-head .chip-slot { margin-left: 0; }
 }
 @media (max-width: 1000px) { .fields-grid { grid-template-columns: repeat(3, 1fr); } .adv-grid { grid-template-columns: repeat(2, 1fr); } }
+.ticker { position: sticky; top: 0; z-index: 3; display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); background: var(--bg-1); border-bottom: 1px solid var(--border-1); padding: var(--sp-2) 0; margin: calc(-1 * var(--sp-6)) 0 var(--sp-4); font-size: var(--body-sm); color: var(--fg-3); }
+.ticker[hidden] { display: none; }
+.ticker span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.ticker span::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--dot, var(--fg-3)); }
+.ticker span[data-path="api"] { --dot: var(--chart-api); } .ticker span[data-path="cloud"] { --dot: var(--chart-cloud); }
+.ticker span[data-path="small"] { --dot: var(--chart-small); } .ticker span[data-path="own"] { --dot: var(--chart-own); }
+.ticker b { font-family: var(--font-mono); font-weight: 500; color: var(--fg-1); }
 .print-only { display: none; }
 @media print {
   .nav, #settingsPanel, #settingsBackdrop, .toolbar, details.cost-breakdown, canvas, .glossary-wrap, .shortcuts, #modelsPanel, #checksPanel, .hero-q, #validationStatus, #ticker { display: none !important; }
@@ -631,6 +638,9 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
     </div>
   </aside>
   <div id="resultsPanel" aria-labelledby="appTitle" tabindex="-1">
+    <div id="ticker" class="ticker" hidden aria-hidden="true">
+      <span data-path="api"></span><span data-path="cloud"></span><span data-path="small"></span><span data-path="own"></span>
+    </div>
     <div class="page-head">
       <canvas data-dots aria-hidden="true"></canvas>
       <div class="hero-q" aria-hidden="true"><img src="assets/quantica-q-mark-white.png" alt=""></div>
@@ -1651,6 +1661,13 @@ function syncShareHash() {
     if ((hash ? '#' + hash : '') !== location.hash) history.replaceState(null, '', next);
   });
 }
+function renderTicker(values) {
+  const box = $('ticker'); if (!box) return;
+  for (const [key, text] of Object.entries(values)) {
+    const span = box.querySelector(`[data-path="${key}"]`); if (!span) continue;
+    span.replaceChildren(document.createTextNode(t(key + 'Path') + ' '), el('b', {}, text));
+  }
+}
 function renderPrintSummary() {
   const box = $('printSummary'); if (!box) return;
   const s = state;
@@ -1852,6 +1869,7 @@ function render() {
     softwareLicense: String(s.softLicense), softwareSupportYear: String(s.softSupport),
     assumptionsOpen: String(dialogEl.open), softwareOn: String(s.softwareOn), verdictWinner: v.winner, verdictSavingsPct: v.savingsPct == null ? '' : v.savingsPct.toFixed(4),
   });
+  renderTicker({ api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable'), own: money(own.monthly, 0) });
   syncShareHash();
   $('live').textContent = t('live', { api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), own: money(own.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable') });
 }
@@ -2279,6 +2297,7 @@ function renderValidation() {
       }
     });
     $('modelsPanel').hidden = true;
+    $('ticker').querySelectorAll('[data-path]').forEach((n) => n.replaceChildren());
   } else { appEl.dataset.invalidFields = ''; $('modelsPanel').hidden = false; }
   return !invalid;
 }
@@ -2588,6 +2607,10 @@ function initDots(canvas) {
   if (restoreError) $('scenarioStatus').textContent = t('scenarioError', { error: 'local storage' });
   if (linkInvalid) $('scenarioStatus').textContent = t('linkInvalid');
   document.querySelectorAll('canvas[data-dots]').forEach(initDots);
+  if ('IntersectionObserver' in window) {
+    const ticker = $('ticker');
+    new IntersectionObserver((entries) => { const visible = entries.some((e) => e.isIntersecting); ticker.hidden = visible; ticker.setAttribute('aria-hidden', String(visible)); }, { root: $('resultsPanel'), threshold: 0 }).observe($('options'));
+  }
   if (new URLSearchParams(location.search).has('verify')) { $('checksPanel').open = true; showChecks(); }
 })();
 </script>

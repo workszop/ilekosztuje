@@ -180,4 +180,11 @@ const glossary = byId('glossary');
 assert.ok(glossary && glossary.tag === 'dl' && hasClass(glossary, 'glossary'), '#glossary is a <dl class="glossary">');
 assert.equal(descendants(glossary, (node) => node.tag === 'dt' && /^glossary\w+Term$/.test(node.attrs['data-t'] || '')).length, 5, 'glossary has five terms');
 
+// Task 9: sticky totals strip is the first child of the results panel
+const ticker = byId('ticker');
+assert.ok(ticker && hasClass(ticker, 'ticker'), '#ticker exists');
+const resultsChildren = resultsPanel.children.filter((node) => node.tag && node.tag !== '#text');
+assert.equal(resultsChildren[0], ticker, '#ticker is the first element in #resultsPanel');
+assert.equal(descendants(ticker, (node) => node.tag === 'span' && node.attrs['data-path']).length, 4, 'ticker has four path spans');
+
 console.log('Sidebar layout and keyboard contracts passed');
