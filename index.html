@@ -426,7 +426,10 @@ td.src a:hover { text-decoration: underline; }
   main { display: block; height: auto; }
   #resultsPanel { overflow: visible; height: auto; padding: 0; }
   .page-head { background: none; color: var(--fg-1); padding: 0 0 12px; border-radius: 0; border-bottom: 1px solid var(--border-1); }
-  .page-head .hero-tag, .page-head .lead, .page-head .stat span, .page-head .stat b { color: var(--fg-1); }
+  .page-head .hero-tag, .page-head .lead, .page-head .stat span, .page-head .stat b, .page-head .app-title, .page-head .hint, .page-head .app-title em { color: var(--fg-1); opacity: 1; }
+  .page-head .results-context { border-top-color: var(--border-1); }
+  #options { grid-template-columns: repeat(2, 1fr) !important; }
+  .opt-capacity, .option .opt-note { display: none; }
   .print-only { display: block; margin: 12px 0 20px; }
   .print-only .line { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0; border-bottom: 1px dashed var(--border-1); font-size: 12px; }
   .card, .option { box-shadow: none; border: 1px solid var(--border-1); break-inside: avoid; }
@@ -1911,6 +1914,7 @@ function render() {
     softwareLicense: String(s.softLicense), softwareSupportYear: String(s.softSupport),
     assumptionsOpen: String(dialogEl.open), softwareOn: String(s.softwareOn), verdictWinner: v.winner, verdictRecommended: v.recommended || '', verdictSavingsPct: v.savingsPct == null ? '' : v.savingsPct.toFixed(4),
   });
+  renderPrintSummary();
   renderTicker({ api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable'), own: money(own.monthly, 0) });
   syncShareHash();
   $('live').textContent = t('live', { api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), own: money(own.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable') });
