@@ -197,4 +197,12 @@ const resultsContext = descendants(documentRoot, (node) => hasClass(node, 'resul
 assert.ok(heroInner && resultsContext && contains(heroInner, resultsContext), 'stats strip sits inside the hero');
 assert.ok(descendants(documentRoot, (node) => node.tag === 'th' && node.attrs['data-t'] === 'thSource').length === 1, 'model table has a source column');
 
+// Task 11: every option card shares one structure
+const optionCards = descendants(resultsPanel, (node) => hasClass(node, 'option'));
+assert.equal(optionCards.length, 4, 'four option cards');
+for (const card of optionCards) {
+  assert.equal(card.children.filter((n) => hasClass(n, 'opt-capacity')).length, 1, `${card.attrs.id} has one .opt-capacity`);
+  assert.equal(card.children.filter((n) => n.tag === 'details' && hasClass(n, 'cost-breakdown')).length, 1, `${card.attrs.id} has one breakdown`);
+}
+
 console.log('Sidebar layout and keyboard contracts passed');

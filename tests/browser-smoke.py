@@ -115,6 +115,9 @@ CAPACITY_SMOKE_SCRIPT = r"""
     expect(bar && bar.dataset.unavailable === 'true', `${key}: unavailable bar row missing`);
     expect(bar.querySelector('.bar-fill') === null, `${key}: unavailable bar must not draw a fill`);
     expect(document.querySelector(`#legendTime [data-series="${key}"][data-unavailable="true"]`), `${key}: legend entry missing`);
+    // Task 11: the unavailable card keeps its structure and offers a way back.
+    expect(card.node.dataset.eligible === 'false' && card.node.querySelector('.opt-note button[data-focus="users"]'), `${key}: unavailable card lacks the change-users link`);
+    expect(card.node.querySelector('.opt-lines .line'), `${key}: unavailable card keeps its breakdown lines`);
     return card;
   };
   const assertInvalid = (key) => {

@@ -193,6 +193,9 @@ section { margin-bottom: var(--sp-8); }
 .chip-standard { background: var(--mist); color: var(--violet-primary); }
 .chip-frontier { background: var(--ink); color: var(--white); }
 .option { display: flex; flex-direction: column; }
+.option .cost-breakdown { margin-top: auto; padding-top: var(--sp-3); }
+.option[data-eligible="false"] { opacity: .75; border: 1.5px dashed var(--border-2); background: var(--bg-2); box-shadow: none; }
+.option[data-eligible="false"] .opt-total .big { color: var(--fg-3); font-size: calc(var(--total-size) * .7); }
 .option.winner { border: 1.5px solid var(--quantica-pink); background: var(--pink-tint-05); box-shadow: var(--shadow-pink-soft); }
 .option .card-head .chip-slot { margin-left: auto; }
 .opt-total { display: flex; align-items: baseline; gap: 6px; }
@@ -215,6 +218,7 @@ section { margin-bottom: var(--sp-8); }
 .warn-line { margin: 8px 0 2px; }
 .opt-settings { min-width: 0; }
 .cost-breakdown { margin-top: var(--sp-4); }
+.opt-capacity:empty { display: none; }
 .cost-breakdown > summary { cursor: pointer; font-family: var(--font-mono); font-size: var(--tiny-size); letter-spacing: .04em; color: var(--fg-3); padding: var(--sp-2) 0; }
 .cost-breakdown > summary:hover { color: var(--quantica-pink); }
 .results-context { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-2) var(--sp-6); margin-top: var(--sp-4); padding-top: var(--sp-3); border-top: 1px solid var(--white-20); }
@@ -680,6 +684,7 @@ td.src a:hover { text-decoration: underline; }
         <div class="opt-total"><span class="big"></span><span class="per" data-t="monthly"></span></div>
         <p class="opt-stack"></p>
         <p class="hint opt-note" hidden></p>
+        <div class="opt-capacity"></div>
         <details class="cost-breakdown"><summary data-t="costBreakdown"></summary><div class="opt-lines"></div></details>
       </div>
       <div class="card option" id="optCloud" data-path="cloud">
@@ -866,6 +871,7 @@ const SOURCES = {
 
 const T = {
   pl: {
+    apiCapacity: 'Skalowanie po stronie dostawcy – bez limitu użytkowników.', changeUsers: 'Zmień liczbę użytkowników',
     yes: 'tak', no: 'nie',
     shareLink: 'Kopiuj link', printBtn: 'Drukuj / PDF', linkCopied: 'Link skopiowany.', linkNoCsv: 'Link skopiowany. Nie zawiera własnego cennika CSV.', linkInvalid: 'Link zawierał nieprawidłowe wartości – pokazano domyślny scenariusz.', linkFailed: 'Nie udało się skopiować. Skopiuj adres z paska przeglądarki.', printTitle: 'Scenariusz',
     softwareOn: 'Licz oprogramowanie Zagłoba RAG', softwareOff: 'bez oprogramowania',
@@ -924,6 +930,7 @@ const T = {
     live: 'API {api}, chmura {cloud}, własny serwer {own}, Dell GB10 {small} miesięcznie.',
   },
   en: {
+    apiCapacity: 'Scales on the provider side – no user cap.', changeUsers: 'Change the number of users',
     yes: 'yes', no: 'no',
     shareLink: 'Copy link', printBtn: 'Print / PDF', linkCopied: 'Link copied.', linkNoCsv: 'Link copied. It does not carry the custom CSV price list.', linkInvalid: 'The link had invalid values – showing the default scenario.', linkFailed: 'Could not copy. Copy the address from the browser bar.', printTitle: 'Scenario',
     softwareOn: 'Include Zagłoba RAG software', softwareOff: 'software excluded',
@@ -1729,13 +1736,16 @@ function renderOption(node, { monthly, win, lines, extra, warn, note, eligible =
   node.dataset.software = eligible ? software.toFixed(2) : ''; node.dataset.infra = eligible ? infra.toFixed(2) : '';
   node.querySelector('.opt-stack').textContent = !eligible ? '' : state.softwareOn === false ? `${t('softwareOff')} · ${t('lInfra')} ${money(infra, 0)}` : `${t('lSoftware')} ${money(software, 0)} · ${t('lInfra')} ${money(infra, 0)}`;
   const box = node.querySelector('.opt-lines'); box.replaceChildren();
-  if (eligible) {
-    lines.forEach(([l, v]) => { const d = el('div', { class: 'line' }); d.append(el('span', {}, l), el('b', {}, v)); box.append(d); });
-    const sum = el('div', { class: 'line line-total' }); sum.append(el('span', {}, P('Razem miesięcznie', 'Total per month')), el('b', {}, money(monthly, 0))); box.append(sum);
-    extra.forEach(([l, v]) => { const d = el('div', { class: 'line line-muted' }); d.append(el('span', {}, l), el('b', {}, v)); box.append(d); });
-  }
-  if (warn) { const w = el('p', { class: 'hint warn-line' }); w.append(el('span', { class: 'chip chip-warn' }, '!'), document.createTextNode(' ' + warn)); box.append(w); }
-  const noteNode = node.querySelector('.opt-note'); noteNode.hidden = !note; noteNode.textContent = note || '';
+  const dash = '–';
+  lines.forEach(([l, v]) => { const d = el('div', { class: 'line' }); d.append(el('span', {}, l), el('b', {}, eligible ? v : dash)); box.append(d); });
+  const sum = el('div', { class: 'line line-total' }); sum.append(el('span', {}, P('Razem miesięcznie', 'Total per month')), el('b', {}, eligible ? money(monthly, 0) : dash)); box.append(sum);
+  extra.forEach(([l, v]) => { const d = el('div', { class: 'line line-muted' }); d.append(el('span', {}, l), el('b', {}, eligible ? v : dash)); box.append(d); });
+  if (warn && eligible) { const w = el('p', { class: 'hint warn-line' }); w.append(el('span', { class: 'chip chip-warn' }, '!'), document.createTextNode(' ' + warn)); box.append(w); }
+  const noteNode = node.querySelector('.opt-note'); noteNode.replaceChildren();
+  if (!eligible) {
+    noteNode.hidden = false;
+    noteNode.append(document.createTextNode((warn || t('unavailable')) + ' '), el('button', { type: 'button', class: 'link', 'data-focus': 'users' }, t('changeUsers')));
+  } else { noteNode.hidden = !note; if (note) noteNode.textContent = note; }
 }
 
 function renderCapacity(node, cost, path) {
@@ -1746,6 +1756,11 @@ function renderCapacity(node, cost, path) {
   }
   const box = node.querySelector('.opt-capacity');
   box.replaceChildren();
+  if (path === 'api') {
+    node.dataset.capacityStatus = eligible ? 'provider' : 'unavailable';
+    box.append(el('p', { class: 'hint', 'data-capacity-field': 'status' }, eligible ? t('apiCapacity') : t(cost.reason)));
+    return;
+  }
   if (!eligible) {
     box.append(el('p', { class: 'hint', 'data-capacity-field': 'status' }, t('smallTooMany', { n: fmtNum(state.smallMaxUsers) })));
     return;
@@ -1823,7 +1838,7 @@ function render() {
     warn: small.eligible ? null : t('smallTooMany', { n: fmtNum(s.smallMaxUsers) }),
     lines: [...hwSoftLines(small), [t('lAmort'), money(small.amort, 0)], [t('lEnergy'), money(small.energy, 0)], ...opsLine(s.smallOps)],
     extra: [[t('lYear'), money(small.monthly * 12, 0)], [t('lFirstYear'), money(cumulativeCost('small', small, 12), 0)], [t('lPerReq'), money(small.perReq, 4)]] });
-  for (const path of ['cloud', 'own', 'small']) renderCapacity($('opt' + path[0].toUpperCase() + path.slice(1)), result[path], path);
+  for (const path of ['api', 'cloud', 'own', 'small']) renderCapacity($('opt' + path[0].toUpperCase() + path.slice(1)), result[path], path);
 
   // summary
   renderBars([
