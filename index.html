@@ -914,7 +914,7 @@ const T = {
     aApiVsSmall: 'API jest tańsze od Dell GB10 do ok. {n}.', aPaybackSmall: 'Dell GB10 zwraca się wobec chmury po {n}.',
     aPayback: 'Własny serwer zwraca się wobec chmury po {n}.', aMinute: 'Jedno zapytanie API kosztuje {cost}, czyli {pct} minuty pracy pracownika ({minute}).',
     aUnavailable: 'Dell GB10 jest niedostępny przy tej liczbie użytkowników.', aApiUnavailable: 'Wybrany model API nie obsłuży tego zapytania.',
-    usersUnit: 'użytk.', monthsUnit: 'mies.', never: 'nie w ciągu 10 lat', apiNever: 'nigdy (już 1 osoba)', apiAlways: 'co najmniej 20 000 użytk.',
+    usersUnit: 'użytk.', monthsUnit: 'mies.', usersWord: 'użytkowników', monthsWord: 'miesiącach', never: 'nie w ciągu 10 lat', apiNever: 'nigdy (już 1 osoba)', apiAlways: 'co najmniej 20 000 użytkowników',
     chartTime: 'Koszt narastająco w czasie', chartTimeSub: 'Dell GB10 i własny serwer startują od ceny sprzętu i licencji Zagłoba RAG. Co okres wymiany sprzętu doliczamy kolejny zakup sprzętu; licencja jest jednorazowa.',
     showData: 'Pokaż dane', monthLabel: 'Miesiąc',
     secModels: 'Porównaj wszystkie modele API', modelsNote: 'Kwoty miesięczne zawierają Zagłoba RAG jako SaaS i stałą infrastrukturę API. Tokeny są szacowane dla rodziny modelu, nie liczone uruchomieniem tokenizerów. Kliknij wiersz, aby wybrać model.',
@@ -973,7 +973,7 @@ const T = {
     aApiVsSmall: 'API is cheaper than Dell GB10 up to about {n}.', aPaybackSmall: 'Dell GB10 pays back against cloud after {n}.',
     aPayback: 'An own server pays back against cloud after {n}.', aMinute: 'One API request costs {cost}, which is {pct} of a minute of staff time ({minute}).',
     aUnavailable: 'Dell GB10 is unavailable at this number of users.', aApiUnavailable: 'The selected API model cannot serve this request.',
-    usersUnit: 'users', monthsUnit: 'mo.', never: 'not within 10 years', apiNever: 'never (even 1 user)', apiAlways: 'at least 20,000 users',
+    usersUnit: 'users', monthsUnit: 'mo.', usersWord: 'users', monthsWord: 'months', never: 'not within 10 years', apiNever: 'never (even 1 user)', apiAlways: 'at least 20,000 users',
     chartTime: 'Cumulative cost over time', chartTimeSub: 'Dell GB10 and own server start at the hardware price plus the Zagłoba RAG licence. Hardware is bought again each replacement period; the licence is one-off.',
     showData: 'Show data', monthLabel: 'Month',
     secModels: 'Compare all API models', modelsNote: 'Monthly amounts include Zagłoba RAG as SaaS and the fixed API infrastructure. Tokens are estimated for the model family, not measured by running each tokenizer. Click a row to select the model.',
@@ -1744,7 +1744,7 @@ function renderOption(node, { monthly, win, lines, extra, warn, note, eligible =
   const noteNode = node.querySelector('.opt-note'); noteNode.replaceChildren();
   if (!eligible) {
     noteNode.hidden = false;
-    noteNode.append(document.createTextNode((warn || t('unavailable')) + ' '), el('button', { type: 'button', class: 'link', 'data-focus': 'users' }, t('changeUsers')));
+    noteNode.append(el('button', { type: 'button', class: 'link', 'data-focus': 'users' }, t('changeUsers')));
   } else { noteNode.hidden = !note; if (note) noteNode.textContent = note; }
 }
 
@@ -1849,7 +1849,7 @@ function render() {
   ]);
   const maxU = 20000;
   const beCloud = result.breakEvenCloud, beOwn = result.breakEvenOwn, beSmall = result.breakEvenSmall;
-  const beTxt = (n) => n === 0 ? t('apiNever') : n >= maxU ? t('apiAlways') : fmtNum(n) + ' ' + t('usersUnit');
+  const beTxt = (n) => n === 0 ? t('apiNever') : n >= maxU ? t('apiAlways') : fmtNum(n) + ' ' + t('usersWord');
   const pbCloud = result.payback, pbSmall = result.paybackSmall;
   const minuteRatio = api.perReq / MINUTE_OF_WORK;
   const v = verdict(result);
@@ -1861,8 +1861,8 @@ function render() {
     answers.push(small.eligible ? t('aApiVsSmall', { n: beTxt(beSmall) }) : t('aUnavailable'));
     answers.push(t('aApiVsOwn', { n: beTxt(beOwn) }));
   }
-  if (small.eligible) answers.push(t('aPaybackSmall', { n: pbSmall == null ? t('never') : pbSmall + ' ' + t('monthsUnit') }));
-  answers.push(t('aPayback', { n: pbCloud == null ? t('never') : pbCloud + ' ' + t('monthsUnit') }));
+  if (small.eligible) answers.push(t('aPaybackSmall', { n: pbSmall == null ? t('never') : pbSmall + ' ' + t('monthsWord') }));
+  answers.push(t('aPayback', { n: pbCloud == null ? t('never') : pbCloud + ' ' + t('monthsWord') }));
   if (api.eligible) answers.push(t('aMinute', { cost: money(api.perReq, 2), pct: minuteRatio < 0.01 ? '<1%' : pct(minuteRatio), minute: money(MINUTE_OF_WORK, 2) }));
   $('answers').replaceChildren(...answers.map((text) => el('li', {}, text)));
   $('answers').append(el('li', { class: 'hint' }, t('firstCrossNote')));
