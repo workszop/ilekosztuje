@@ -400,6 +400,20 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
   #options .card-head .chip-slot { margin-left: 0; }
 }
 @media (max-width: 1000px) { .fields-grid { grid-template-columns: repeat(3, 1fr); } .adv-grid { grid-template-columns: repeat(2, 1fr); } }
+.print-only { display: none; }
+@media print {
+  .nav, #settingsPanel, #settingsBackdrop, .toolbar, details.cost-breakdown, canvas, .glossary-wrap, .shortcuts, #modelsPanel, #checksPanel, .hero-q, #validationStatus, #ticker { display: none !important; }
+  main { display: block; height: auto; }
+  #resultsPanel { overflow: visible; height: auto; padding: 0; }
+  .page-head { background: none; color: var(--fg-1); padding: 0 0 12px; border-radius: 0; border-bottom: 1px solid var(--border-1); }
+  .page-head .hero-tag, .page-head .lead, .page-head .stat span, .page-head .stat b { color: var(--fg-1); }
+  .print-only { display: block; margin: 12px 0 20px; }
+  .print-only .line { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0; border-bottom: 1px dashed var(--border-1); font-size: 12px; }
+  .card, .option { box-shadow: none; border: 1px solid var(--border-1); break-inside: avoid; }
+  #options { grid-template-columns: repeat(2, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+  details#chartDetails, #tableTime { display: block; }
+}
 @media (max-width: 768px) {
   :root { --title-size: 1.7rem; --total-size: 30px; }
   main { display: block; padding: 0; }
@@ -607,6 +621,8 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
     <button class="pill pill-ghost" id="scenarioSave" type="button" data-t="scenarioSave"></button>
     <button class="pill pill-ghost" id="scenarioExport" type="button" data-t="scenarioExport"></button>
     <button class="pill pill-ghost" id="scenarioImport" type="button" data-t="scenarioImport"></button>
+    <button class="pill pill-ghost" id="shareLink" type="button" data-t="shareLink"></button>
+    <button class="pill pill-ghost" id="printBtn" type="button" data-t="printBtn"></button>
     <input id="scenarioFile" type="file" accept=".json,application/json" hidden>
     <span id="scenarioStatus" class="hint" role="status" aria-live="polite"></span>
     <progress id="fileProgress" hidden aria-label="Import" max="1"></progress>
@@ -641,6 +657,7 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
       </dl>
     </details>
     <section>
+    <div id="printSummary" class="print-only"></div>
     <p id="verdict" class="verdict" aria-live="polite"></p>
     <h2 class="sec-title" data-t="secOptions"></h2>
     <div class="grid-4" id="options" aria-live="polite">
@@ -835,6 +852,8 @@ const SOURCES = {
 
 const T = {
   pl: {
+    yes: 'tak', no: 'nie',
+    shareLink: 'Kopiuj link', printBtn: 'Drukuj / PDF', linkCopied: 'Link skopiowany.', linkNoCsv: 'Link skopiowany. Nie zawiera własnego cennika CSV.', linkInvalid: 'Link zawierał nieprawidłowe wartości – pokazano domyślny scenariusz.', linkFailed: 'Nie udało się skopiować. Skopiuj adres z paska przeglądarki.', printTitle: 'Scenariusz',
     softwareOn: 'Licz oprogramowanie Zagłoba RAG', softwareOff: 'bez oprogramowania',
     help_users: 'Osoby, które będą zadawać pytania asystentowi.',
     help_chunks: 'RAG dokleja do pytania fragmenty Twoich dokumentów. Tyle fragmentów trafia do jednego zapytania.',
@@ -891,6 +910,8 @@ const T = {
     live: 'API {api}, chmura {cloud}, własny serwer {own}, Dell GB10 {small} miesięcznie.',
   },
   en: {
+    yes: 'yes', no: 'no',
+    shareLink: 'Copy link', printBtn: 'Print / PDF', linkCopied: 'Link copied.', linkNoCsv: 'Link copied. It does not carry the custom CSV price list.', linkInvalid: 'The link had invalid values – showing the default scenario.', linkFailed: 'Could not copy. Copy the address from the browser bar.', printTitle: 'Scenario',
     softwareOn: 'Include Zagłoba RAG software', softwareOff: 'software excluded',
     help_users: 'People who will ask the assistant questions.',
     help_chunks: 'RAG attaches excerpts of your documents to each question. This many excerpts go into one request.',
@@ -1620,6 +1641,22 @@ function applyI18n() {
   $('settingsBackdrop').setAttribute('aria-label', t('settingsClose'));
   renderHelp();
 }
+let hashFrame = 0;
+function syncShareHash() {
+  if (hashFrame) return;
+  hashFrame = requestAnimationFrame(() => {
+    hashFrame = 0;
+    const hash = toShareHash(state);
+    const next = hash ? '#' + hash : location.pathname + location.search;
+    if ((hash ? '#' + hash : '') !== location.hash) history.replaceState(null, '', next);
+  });
+}
+function renderPrintSummary() {
+  const box = $('printSummary'); if (!box) return;
+  const s = state;
+  const rows = [[t('users'), fmtNum(s.users)], [t('reqPerDay'), fmtNum(s.reqPerDay)], [t('model'), s.model], [t('softwareOn'), s.softwareOn ? t('yes') : t('no')], [t('fx'), fmtNum(s.fx, 2)]];
+  box.replaceChildren(el('h2', {}, t('printTitle')), ...rows.map(([l, v]) => { const d = el('div', { class: 'line' }); d.append(el('span', {}, l), el('b', {}, v)); return d; }));
+}
 function renderHelp() {
   for (const [id, key] of Object.entries(FIELD_HELP)) {
     const input = $(id); if (!input) continue;
@@ -1815,6 +1852,7 @@ function render() {
     softwareLicense: String(s.softLicense), softwareSupportYear: String(s.softSupport),
     assumptionsOpen: String(dialogEl.open), softwareOn: String(s.softwareOn), verdictWinner: v.winner, verdictSavingsPct: v.savingsPct == null ? '' : v.savingsPct.toFixed(4),
   });
+  syncShareHash();
   $('live').textContent = t('live', { api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), own: money(own.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable') });
 }
 
@@ -2169,6 +2207,35 @@ function parseScenario(text) {
   return { values, models, csvText: parsed.csvText, csvSource: parsed.csvSource };
 }
 
+const SHARE_KEYS = [...Object.keys(DEFAULTS), 'lang'];
+const SHARE_BOOLEANS = ['thinking', 'offPeak', 'softwareOn'];
+function toShareHash(s) {
+  const params = new URLSearchParams();
+  const base = { ...DEFAULTS, lang: 'pl' };
+  for (const key of SHARE_KEYS) {
+    if (s[key] === base[key] || s[key] === undefined) continue;
+    params.set(key, SHARE_BOOLEANS.includes(key) ? (s[key] ? '1' : '0') : String(s[key]));
+  }
+  return params.toString();
+}
+function fromShareHash(hash, models = []) {
+  const raw = String(hash || '').replace(/^#/, '');
+  if (!raw) return null;
+  let params;
+  try { params = new URLSearchParams(raw); } catch (_) { return null; }
+  const values = { ...DEFAULTS, lang: 'pl' };
+  for (const [key, value] of params) {
+    if (!SHARE_KEYS.includes(key)) return null;
+    if (SHARE_BOOLEANS.includes(key)) { if (value !== '0' && value !== '1') return null; values[key] = value === '1'; }
+    else if (NUM_FIELDS.includes(key)) { const n = exactNumber(value); if (!Number.isFinite(n)) return null; values[key] = n; }
+    else if (TEXT_FIELDS.includes(key) || key === 'model') { if (value.length > 200) return null; values[key] = value; }
+    else values[key] = value;
+  }
+  if (Object.keys(validateState(values)).length) return null;
+  if (!['pl', 'en'].includes(values.lang) || !['pl', 'en'].includes(values.docLang) || !['work', '247'].includes(values.cloudMode)) return null;
+  if (Array.isArray(models) && models.length && !models.some((m) => m.name === values.model)) return null;
+  return { values };
+}
 function markDirty() {
   App.dirty = true;
   appEl.dataset.dirty = 'true';
@@ -2434,6 +2501,15 @@ $('scenarioExport').addEventListener('click', () => {
   } catch (error) { $('scenarioStatus').textContent = t('scenarioError', { error: error.message }); }
 });
 $('scenarioImport').addEventListener('click', () => $('scenarioFile').click());
+$('shareLink').addEventListener('click', async () => {
+  if (!renderValidation()) return;
+  const url = location.origin + location.pathname + (toShareHash(state) ? '#' + toShareHash(state) : '');
+  try {
+    await navigator.clipboard.writeText(url);
+    $('scenarioStatus').textContent = t(state.csvSource ? 'linkNoCsv' : 'linkCopied');
+  } catch (_) { $('scenarioStatus').textContent = t('linkFailed'); }
+});
+$('printBtn').addEventListener('click', () => { renderPrintSummary(); window.print(); });
 $('scenarioFile').addEventListener('change', (e) => {
   readLocalFile(e.target.files[0], (text) => applyScenario(parseScenario(text)), $('scenarioStatus'), (error) => t('scenarioError', { error: error.message }));
   e.target.value = '';
@@ -2493,18 +2569,24 @@ function initDots(canvas) {
   try { const l = localStorage.getItem(LS_LANG); if (l === 'pl' || l === 'en') preferredLang = l; } catch (_) {}
   state.csvText = $('csvData').textContent;
   state.models = modelsFromCsv(state.csvText);
-  let restoreError = false;
-  try {
-    const saved = localStorage.getItem(LS_SCENARIO);
-    if (saved) { const loaded = parseScenario(saved); Object.assign(state, loaded.values, { models: loaded.models, csvText: loaded.csvText, csvSource: loaded.csvSource }); }
-  } catch (_) { restoreError = true; }
-  if (preferredLang) state.lang = preferredLang;
+  let restoreError = false, linkInvalid = false;
+  const shared = location.hash.length > 1 ? fromShareHash(location.hash, state.models) : null;
+  if (shared) Object.assign(state, shared.values);
+  else {
+    if (location.hash.length > 1) linkInvalid = true;
+    try {
+      const saved = localStorage.getItem(LS_SCENARIO);
+      if (saved) { const loaded = parseScenario(saved); Object.assign(state, loaded.values, { models: loaded.models, csvText: loaded.csvText, csvSource: loaded.csvSource }); }
+    } catch (_) { restoreError = true; }
+    if (preferredLang) state.lang = preferredLang;
+  }
   applyI18n();
   renderModelSelect();
   syncInputs();
   syncSettingsPanel();
   render();
   if (restoreError) $('scenarioStatus').textContent = t('scenarioError', { error: 'local storage' });
+  if (linkInvalid) $('scenarioStatus').textContent = t('linkInvalid');
   document.querySelectorAll('canvas[data-dots]').forEach(initDots);
   if (new URLSearchParams(location.search).has('verify')) { $('checksPanel').open = true; showChecks(); }
 })();
