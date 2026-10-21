@@ -110,6 +110,11 @@ CAPACITY_SMOKE_SCRIPT = r"""
       expect(blank(card.dataset[name]), `${key}: unavailable ${name} dataset must be blank`);
     }
     expect(card.fields.status, `${key}: unavailable status text is empty`);
+    // Task 6: an unavailable option stays in the summary bars and the chart legend, marked as such.
+    const bar = document.querySelector(`#bars .bar-row[data-path="${key}"]`);
+    expect(bar && bar.dataset.unavailable === 'true', `${key}: unavailable bar row missing`);
+    expect(bar.querySelector('.bar-fill') === null, `${key}: unavailable bar must not draw a fill`);
+    expect(document.querySelector(`#legendTime [data-series="${key}"][data-unavailable="true"]`), `${key}: legend entry missing`);
     return card;
   };
   const assertInvalid = (key) => {
