@@ -246,6 +246,18 @@ CAPACITY_SMOKE_SCRIPT = r"""
     unitsField.textContent = oldUnitsText;
     expect(checkDomContract(document, App.results).every((check) => check.pass), 'DOM contract does not recover');
 
+    // Task 5: validation banner links jump to and focus the broken field.
+    setInput('users', 0);
+    const jump = document.querySelector('#validationStatus button[data-focus="users"]');
+    expect(jump, 'validation banner has a jump button for #users');
+    document.querySelector('#workloadDetails').open = false;
+    jump.click();
+    expect(document.activeElement && document.activeElement.id === 'users', 'jump button focuses #users');
+    expect(document.querySelector('#workloadDetails').open === true, 'jump button opens the enclosing details');
+    if (window.matchMedia('(max-width: 768px)').matches) expect(app.dataset.settings === 'open', 'jump button opens the mobile drawer');
+    setInput('users', 20);
+    expect(document.querySelector('#validationStatus').hidden === true, 'banner hides after recovery');
+
     expect(document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1, 'horizontal overflow');
     finish({ ok: true });
   } catch (error) {

@@ -308,6 +308,7 @@ dialog.assump[open] { animation: fadeIn .18s ease-out; }
 .csv-row .drop { flex: 1 1 320px; }
 
 /* ─── Validation ─── */
+button.link { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; font-weight: 700; }
 #validationStatus, #csvError { color: var(--deep-berry); background: var(--magenta-tint); border: 1px solid var(--quantica-pink); border-radius: var(--radius-md);
   padding: var(--sp-3) var(--sp-4); margin: 0 0 var(--sp-4); font-size: var(--body-sm); line-height: var(--line-height-tight); }
 #app[data-state="invalid"] .opt-total,
@@ -958,7 +959,7 @@ Object.assign(T.pl, {
   scenarioSave: 'Zapisz lokalnie', scenarioExport: 'Eksport JSON', scenarioImport: 'Import JSON', scenarioReset: 'Reset scenariusza',
   scenarioSaved: 'Scenariusz zapisany w tej przeglądarce.', scenarioLoaded: 'Scenariusz wczytany.', scenarioResetDone: 'Przywrócono ustawienia. Cennik zachowany.',
   scenarioUnsaved: 'Zmiany niezapisane.', storageError: 'Zapis lokalny niedostępny. Użyj eksportu JSON.', scenarioError: 'Nie można wczytać scenariusza: {error}',
-  invalidFields: 'Popraw pola: {fields}. Wyniki wstrzymane.', invalidNumber: 'Podaj liczbę z zakresu {min}–{max}.', invalidInteger: 'Podaj liczbę całkowitą z zakresu {min}–{max}.',
+  invalidFieldsLead: 'Popraw pola:', resultsPaused: 'Wyniki wstrzymane.', invalidNumber: 'Podaj liczbę z zakresu {min}–{max}.', invalidInteger: 'Podaj liczbę całkowitą z zakresu {min}–{max}.',
   unavailable: 'Niedostępne', outputOver: 'Odpowiedź z rozumowaniem przekracza limit wyjścia modelu.',
   forcedThinking: 'Ten model zawsze używa rozumowania. Mnożnik jest szacunkiem.',
   firstCrossNote: 'Pokazano koniec pierwszego przedziału przewagi API (do 20 000 osób). Kolejne GPU mogą odwrócić porównanie ponownie. Zwrot oznacza pierwsze przecięcie kosztów gotówkowych, nie trwałą przewagę.',
@@ -986,7 +987,7 @@ Object.assign(T.en, {
   scenarioSave: 'Save locally', scenarioExport: 'Export JSON', scenarioImport: 'Import JSON', scenarioReset: 'Reset scenario',
   scenarioSaved: 'Scenario saved in this browser.', scenarioLoaded: 'Scenario loaded.', scenarioResetDone: 'Settings reset. Price list retained.',
   scenarioUnsaved: 'Unsaved changes.', storageError: 'Local storage unavailable. Use JSON export.', scenarioError: 'Could not load scenario: {error}',
-  invalidFields: 'Correct these fields: {fields}. Results paused.', invalidNumber: 'Enter a number between {min} and {max}.', invalidInteger: 'Enter an integer between {min} and {max}.',
+  invalidFieldsLead: 'Correct these fields:', resultsPaused: 'Results paused.', invalidNumber: 'Enter a number between {min} and {max}.', invalidInteger: 'Enter an integer between {min} and {max}.',
   unavailable: 'Unavailable', outputOver: 'Answer plus reasoning exceeds the model output limit.',
   forcedThinking: 'This model always reasons. The multiplier is an estimate.',
   firstCrossNote: 'Shows the end of the first interval favouring API (up to 20,000 users). Additional GPUs may reverse the comparison again. Payback means the first cash-cost crossing, not a permanent advantage.',
@@ -2168,7 +2169,15 @@ function renderValidation() {
   });
   const invalid = errors.size > 0;
   const status = $('validationStatus'); status.hidden = !invalid;
-  status.textContent = invalid ? t('invalidFields', { fields: [...errors].map((id) => document.querySelector(`label[for="${id}"]`)?.textContent || id).join(', ') }) : '';
+  status.replaceChildren();
+  if (invalid) {
+    status.append(document.createTextNode(t('invalidFieldsLead') + ' '));
+    [...errors].forEach((id, i) => {
+      if (i) status.append(document.createTextNode(', '));
+      status.append(el('button', { type: 'button', class: 'link', 'data-focus': id }, document.querySelector(`label[for="${id}"]`)?.textContent || id));
+    });
+    status.append(document.createTextNode('. ' + t('resultsPaused')));
+  }
   $('scenarioSave').disabled = invalid || App.fileBusy;
   $('scenarioExport').disabled = invalid || App.fileBusy;
   if (invalid) {
@@ -2305,6 +2314,14 @@ function showChecks() {
 }
 
 // ─── Listeners ───
+function focusField(id) {
+  const node = $(id); if (!node) return;
+  if (mobileSettings.matches) setSettingsOpen(true, false);
+  for (let d = node.closest('details'); d; d = d.parentElement && d.parentElement.closest('details')) d.open = true;
+  node.scrollIntoView({ block: 'center' });
+  node.focus();
+}
+document.addEventListener('click', (e) => { const b = e.target.closest('[data-focus]'); if (b) focusField(b.dataset.focus); });
 settingsToggle.addEventListener('click', () => setSettingsOpen(!App.settingsOpen));
 $('settingsClose').addEventListener('click', () => setSettingsOpen(false));
 $('settingsBackdrop').addEventListener('click', () => setSettingsOpen(false));
