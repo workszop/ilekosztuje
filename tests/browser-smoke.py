@@ -285,6 +285,9 @@ CAPACITY_SMOKE_SCRIPT = r"""
     setInput('users', 300);
     expect(document.querySelector('#optSmall .opt-stack').textContent === '–', 'unavailable stack shows a dash');
     setInput('users', 20);
+    // Sidebar redesign: collapsed section summaries show the current setting.
+    expect(document.querySelector('[data-meta="apiSettings"]').textContent === state.model, 'API summary shows the model');
+    expect(/100/.test(document.querySelector('[data-meta="workloadDetails"]').textContent) === false && /20/.test(document.querySelector('[data-meta="workloadDetails"]').textContent), 'workload summary shows the user count');
 
     expect(document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1, 'horizontal overflow');
     finish({ ok: true });

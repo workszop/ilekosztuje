@@ -221,4 +221,15 @@ assert.equal(descendants(documentRoot, (node) => node.attrs['aria-live'] !== und
 assert.ok(/\.chip \{[^}]*font-family: var\(--font-sans\)/.test(css) && !/\.chip \{[^}]*uppercase/.test(css), 'chips are sans, not uppercase');
 assert.ok(!/\.settings-body \.field label \{[^}]*letter-spacing/.test(css), 'no leftover letter-spacing on sidebar labels');
 
+// Sidebar redesign: three labelled groups, option sections carry their path accent, summaries expose a meta slot
+const groups = descendants(settingsPanel, (node) => hasClass(node, 'settings-group'));
+assert.equal(groups.length, 3, 'sidebar has three groups');
+assert.ok(groups.every((g) => g.children.some((n) => hasClass(n, 'group-title') && n.attrs['data-t'])), 'each group has a translated title');
+for (const [id, path] of [['apiSettings', 'api'], ['cloudSettings', 'cloud'], ['smallSettings', 'small'], ['ownSettings', 'own']]) {
+  const sec = byId(id);
+  assert.equal(sec.attrs['data-accent'], path, `${id} carries data-accent=${path}`);
+  const summary = sec.children.find((n) => n.tag === 'summary');
+  assert.ok(summary && summary.children.some((n) => hasClass(n, 'sum-meta') && n.attrs['data-meta'] === id), `${id} summary has a meta slot`);
+}
+
 console.log('Sidebar layout and keyboard contracts passed');

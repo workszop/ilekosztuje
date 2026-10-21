@@ -171,7 +171,6 @@ section { margin-bottom: var(--sp-8); }
 .field select { cursor: pointer; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
 .hint { font-size: var(--small-size); color: var(--fg-3); margin: 0; line-height: var(--line-height-tight); }
-.check-software { padding: var(--sp-3) var(--sp-5) 0; margin-bottom: 0; font-weight: 600; }
 .check { display: flex; gap: 8px; align-items: center; font-size: var(--body-sm); color: var(--fg-1); margin-bottom: var(--sp-3); cursor: pointer; }
 .check input { accent-color: var(--quantica-pink); width: 16px; height: 16px; }
 
@@ -298,6 +297,39 @@ td.name { color: var(--fg-1); font-weight: 700; }
 .drop .src { font-family: var(--font-mono); font-size: var(--tiny-size); color: var(--fg-1); }
 footer.shortcuts { font-family: var(--font-sans); font-size: var(--small-size); letter-spacing: 0; color: var(--fg-3); text-align: var(--align-center); margin-top: var(--sp-8); padding-top: var(--sp-5); border-top: 1px solid var(--border-1); }
 
+/* ─── Sidebar structure ─── */
+.settings-group { margin-bottom: var(--sp-6); }
+.group-title { font-family: var(--font-sans); font-weight: 700; font-size: var(--label-size); color: var(--fg-3); margin: 0 0 var(--sp-2); padding: 0 2px; display: flex; align-items: center; gap: 8px; }
+.group-title::after { content: ''; flex: 1; height: 1px; background: var(--border-1); }
+.settings-body details.settings-section { border: 1px solid var(--border-1); border-radius: var(--radius-md); background: var(--bg-1); margin-bottom: var(--sp-2); box-shadow: none; padding: 0; overflow: hidden; }
+.settings-body details.settings-section > summary { padding: 10px 12px 10px 14px; font-size: var(--body-sm); font-weight: 700; display: flex; align-items: center; gap: 10px; position: relative; }
+.settings-body details.settings-section > summary::before { order: 3; margin-left: auto; width: 16px; height: 16px; color: var(--fg-3); }
+.settings-body details.settings-section > summary:hover { background: var(--bg-2); }
+.settings-body details.settings-section[open] > summary { background: var(--bg-2); border-bottom: 1px solid var(--border-1); }
+.settings-body details.settings-section[open] { padding-bottom: 0; }
+.settings-body details.settings-section > :not(summary) { margin: var(--sp-3) 14px 0; }
+.settings-body details.settings-section > :last-child:not(summary) { margin-bottom: var(--sp-4); }
+.settings-body details.settings-section > summary .sum-meta { display: block; flex: 1 1 100%; order: 4; font-weight: 500; font-size: var(--tiny-size); color: var(--fg-3); margin: 2px 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.settings-body details.settings-section > summary { flex-wrap: wrap; }
+.settings-body details.settings-section > summary > span:first-child { order: 1; }
+.settings-body details.settings-section[open] > summary .sum-meta { display: none; }
+.settings-body details[data-accent] { border-left: 4px solid var(--accent, var(--border-1)); }
+.settings-body details[data-accent="api"] { --accent: var(--chart-api); }
+.settings-body details[data-accent="cloud"] { --accent: var(--chart-cloud); }
+.settings-body details[data-accent="small"] { --accent: var(--chart-small); }
+.settings-body details[data-accent="own"] { --accent: var(--chart-own); }
+.settings-body details[data-accent][open] > summary { background: color-mix(in srgb, var(--accent) 7%, var(--bg-1)); }
+.settings-body #workloadDetails { border-top: 1px solid var(--border-1); margin-top: var(--sp-3); }
+.settings-body #workloadDetails > summary { padding-top: 10px; font-size: var(--body-sm); }
+.check-software { padding: 10px 12px; margin: 0 0 var(--sp-3); border: 1px solid var(--border-1); border-radius: var(--radius-md); background: var(--magenta-tint); font-weight: 600; font-size: var(--body-sm); }
+.check-software input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch-track { flex: none; width: 34px; height: 20px; border-radius: 999px; background: var(--border-2); position: relative; transition: background-color .2s; }
+.switch-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg-1); box-shadow: var(--shadow-card); transition: transform .2s; }
+.check-software input:checked + .switch-track { background: var(--quantica-pink); }
+.check-software input:checked + .switch-track::after { transform: translateX(14px); }
+.check-software input:focus-visible + .switch-track { box-shadow: var(--focus-ring); }
+.settings-body .sec-title { font-size: var(--body-sm); font-weight: 700; color: var(--fg-1); margin-bottom: 0; }
+
 /* ─── Assumptions dialog ─── */
 dialog.assump { border: none; border-radius: var(--radius-card); padding: 0; width: min(980px, calc(100% - 32px)); max-height: calc(100vh - 48px);
   background: var(--bg-1); color: var(--fg-1); box-shadow: var(--shadow-lg); }
@@ -357,7 +389,6 @@ details.panel[open] { padding-bottom: 20px; }
 .settings-head h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: var(--h4); letter-spacing: -.01em; text-transform: none; color: var(--fg-1); }
 .settings-body { padding: var(--sp-5) var(--sp-4) var(--sp-8); }
 .settings-body section { margin-bottom: var(--sp-5); }
-.settings-body .sec-title { font-size: var(--body); }
 .settings-body .sec-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); }
 .settings-body .sec-row .sec-title { flex: 1 1 100%; }
 .settings-body #presets { display: flex; flex-wrap: wrap; gap: var(--sp-2); flex: 1 1 auto; }
@@ -367,8 +398,6 @@ details.panel[open] { padding-bottom: 20px; }
 #presets button[aria-pressed="true"] { background: var(--quantica-pink); border-color: var(--quantica-pink); color: var(--white); box-shadow: var(--shadow-pink-soft); }
 #presets button:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .pill-sm { padding: 7px 12px; font-size: var(--pill-sm-size); }
-.settings-body #workloadDetails { border-top: 0; }
-.settings-body #workloadDetails > summary { padding-top: var(--sp-2); font-size: var(--body-sm); }
 .settings-body .card { padding: 0; border: 0; border-radius: 0; box-shadow: none; }
 .settings-body .fields-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2) var(--sp-3); }
 .settings-body .field { min-width: 0; margin-bottom: var(--sp-2); }
@@ -422,6 +451,9 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
 td.src { white-space: nowrap; color: var(--fg-3); font-size: var(--small-size); }
 td.src a { color: var(--quantica-pink); font-weight: 700; text-decoration: none; }
 td.src a:hover { text-decoration: underline; }
+.cross-list { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: var(--sp-2) 0 0; font-size: var(--small-size); color: var(--fg-3); }
+.cross-list .cross-lead { font-weight: 700; color: var(--fg-1); }
+.cross-list .cross-item::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; border: 2px solid var(--quantica-pink); margin-right: 5px; vertical-align: middle; }
 .print-only { display: none; }
 @media print {
   .nav, #settingsPanel, #settingsBackdrop, .toolbar, details.cost-breakdown, canvas, .glossary-wrap, .shortcuts, #modelsPanel, #checksPanel, #validationStatus, #ticker { display: none !important; }
@@ -490,14 +522,16 @@ td.src a:hover { text-decoration: underline; }
       <button type="button" class="pill pill-ghost" id="settingsClose" data-t="settingsDone"></button>
     </div>
     <div class="settings-body">
-      <label class="check check-software"><input type="checkbox" id="softwareOn"><span data-t="softwareOn"></span></label>
+      <div class="settings-group" data-group="scenario">
+      <h3 class="group-title" data-t="groupScenario"></h3>
+      <label class="check check-software"><input type="checkbox" id="softwareOn"><span class="switch-track" aria-hidden="true"></span><span data-t="softwareOn"></span></label>
       <section>
     <div class="sec-row">
       <h2 class="sec-title" id="workloadTitle" data-t="secWorkload"></h2>
       <div class="presets" id="presets" role="group" aria-labelledby="workloadTitle"></div>
     </div>
     <details class="panel settings-section" id="workloadDetails">
-    <summary data-t="workloadDetails"></summary>
+    <summary><span data-t="workloadDetails"></span><span class="sum-meta" data-meta="workloadDetails"></span></summary>
     <div class="card">
       <div class="fields-grid">
         <div class="field"><label for="users" data-t="users"></label><input id="users" type="number" min="1" step="1"></div>
@@ -518,31 +552,19 @@ td.src a:hover { text-decoration: underline; }
     </div>
     </details>
   </section>
-      <details class="panel settings-section" id="softwareSettings">
-        <summary data-t="softwareTitle"></summary>
-        <div class="opt-settings">
-          <p class="hint" data-t="softwareHint"></p>
-          <div class="field-row">
-            <div class="field"><label for="softApi" data-t="softApi"></label><input id="softApi" type="number" min="0" step="500"></div>
-            <div class="field"><label for="softCloud" data-t="softCloud"></label><input id="softCloud" type="number" min="0" step="500"></div>
-          </div>
-          <div class="field-row">
-            <div class="field"><label for="softLicense" data-t="softLicense"></label><input id="softLicense" type="number" min="0" step="10000"></div>
-            <div class="field"><label for="softSupport" data-t="softSupport"></label><input id="softSupport" type="number" min="0" step="1000"></div>
-          </div>
-          <div class="field"><label for="softAmort" data-t="softAmort"></label><input id="softAmort" type="number" min="1" step="6"></div>
-        </div>
-      </details>
-      <details class="panel settings-section" id="apiSettings" open>
-        <summary data-t="apiPath"></summary>
+      </div>
+      <div class="settings-group" data-group="options">
+      <h3 class="group-title" data-t="groupOptions"></h3>
+      <details class="panel settings-section" id="apiSettings" data-accent="api" open>
+        <summary><span data-t="apiPath"></span><span class="sum-meta" data-meta="apiSettings"></span></summary>
         <div class="opt-settings">
           <div class="field"><label for="model" data-t="model"></label><select id="model"></select></div>
           <p class="hint" id="modelNote"></p>
           <div class="field"><label for="apiOps" data-t="apiOps"></label><input id="apiOps" type="number" min="0" step="100"></div>
         </div>
       </details>
-      <details class="panel settings-section" id="cloudSettings">
-        <summary data-t="cloudPath"></summary>
+      <details class="panel settings-section" id="cloudSettings" data-accent="cloud">
+        <summary><span data-t="cloudPath"></span><span class="sum-meta" data-meta="cloudSettings"></span></summary>
         <div class="opt-settings">
           <div class="field"><label for="cloudGpu" data-t="gpu"></label><input id="cloudGpu" type="text"></div>
           <div class="field"><label for="cloudPrice" data-t="cloudPrice"></label><input id="cloudPrice" type="number" min="0" step="500"></div>
@@ -555,8 +577,8 @@ td.src a:hover { text-decoration: underline; }
           </div>
         </div>
       </details>
-      <details class="panel settings-section" id="smallSettings">
-        <summary data-t="smallPath"></summary>
+      <details class="panel settings-section" id="smallSettings" data-accent="small">
+        <summary><span data-t="smallPath"></span><span class="sum-meta" data-meta="smallSettings"></span></summary>
         <div class="opt-settings">
           <div class="field"><label for="smallGpu" data-t="smallGpu"></label><input id="smallGpu" type="text"></div>
           <div class="field-row">
@@ -570,8 +592,8 @@ td.src a:hover { text-decoration: underline; }
           <div class="field"><label for="smallRecommendFrom" data-t="smallRecommendFrom"></label><input id="smallRecommendFrom" type="number" min="1" step="1"></div>
         </div>
       </details>
-      <details class="panel settings-section" id="ownSettings">
-        <summary data-t="ownPath"></summary>
+      <details class="panel settings-section" id="ownSettings" data-accent="own">
+        <summary><span data-t="ownPath"></span><span class="sum-meta" data-meta="ownSettings"></span></summary>
         <div class="opt-settings">
           <div class="field"><label for="ownGpu" data-t="gpu"></label><input id="ownGpu" type="text"></div>
           <div class="field-row">
@@ -584,8 +606,26 @@ td.src a:hover { text-decoration: underline; }
           </div>
         </div>
       </details>
+      </div>
+      <div class="settings-group" data-group="more">
+      <h3 class="group-title" data-t="groupMore"></h3>
+      <details class="panel settings-section" id="softwareSettings">
+        <summary><span data-t="softwareTitle"></span><span class="sum-meta" data-meta="softwareSettings"></span></summary>
+        <div class="opt-settings">
+          <p class="hint" data-t="softwareHint"></p>
+          <div class="field-row">
+            <div class="field"><label for="softApi" data-t="softApi"></label><input id="softApi" type="number" min="0" step="500"></div>
+            <div class="field"><label for="softCloud" data-t="softCloud"></label><input id="softCloud" type="number" min="0" step="500"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="softLicense" data-t="softLicense"></label><input id="softLicense" type="number" min="0" step="10000"></div>
+            <div class="field"><label for="softSupport" data-t="softSupport"></label><input id="softSupport" type="number" min="0" step="1000"></div>
+          </div>
+          <div class="field"><label for="softAmort" data-t="softAmort"></label><input id="softAmort" type="number" min="1" step="6"></div>
+        </div>
+      </details>
       <details class="panel settings-section" id="advancedPanel">
-    <summary><span data-t="secAdvanced"></span></summary>
+    <summary><span data-t="secAdvanced"></span><span class="sum-meta" data-meta="advancedPanel"></span></summary>
     <div class="adv-grid">
       <div>
         <h4 data-t="advApi"></h4>
@@ -641,7 +681,7 @@ td.src a:hover { text-decoration: underline; }
     </div>
   </details>
       <details class="panel settings-section" id="scenarioPanel">
-        <summary data-t="scenarioTitle"></summary>
+        <summary><span data-t="scenarioTitle"></span><span class="sum-meta" data-meta="scenarioPanel"></span></summary>
         <div class="toolbar" role="group" aria-label="Scenariusz / Scenario">
     <button class="pill pill-ghost" id="scenarioSave" type="button" data-t="scenarioSave"></button>
     <button class="pill pill-ghost" id="scenarioExport" type="button" data-t="scenarioExport"></button>
@@ -653,6 +693,7 @@ td.src a:hover { text-decoration: underline; }
     <progress id="fileProgress" hidden aria-label="Import" max="1"></progress>
   </div>
       </details>
+      </div>
     </div>
   </aside>
   <div id="resultsPanel" aria-labelledby="appTitle" tabindex="-1">
@@ -733,6 +774,7 @@ td.src a:hover { text-decoration: underline; }
       <p class="chart-sub" data-t="chartTimeSub"></p>
       <div class="legend" id="legendTime"></div>
       <div class="chart-wrap" id="chartTime"></div>
+      <p class="cross-list" id="crossList"></p>
       <details class="data-table"><summary data-t="showData"></summary><div class="table-wrap" id="tableTime"></div></details>
     </div>
   </section>
@@ -879,6 +921,8 @@ const SOURCES = {
 
 const T = {
   pl: {
+    crossLead: 'Przecięcia kosztów:',
+    groupScenario: 'Scenariusz', groupOptions: 'Opcje kosztowe', groupMore: 'Więcej', metaOff: 'wyłączone', metaPerDay: '/dzień',
     crossAt: 'm. {m}',
     apiCapacity: 'Skalowanie po stronie dostawcy – bez limitu użytkowników.', changeUsers: 'Zmień liczbę użytkowników',
     yes: 'tak', no: 'nie',
@@ -946,6 +990,8 @@ const T = {
     live: 'API {api}, chmura {cloud}, własny serwer {own}, Dell GB10 {small} miesięcznie.',
   },
   en: {
+    crossLead: 'Cost crossings:',
+    groupScenario: 'Scenario', groupOptions: 'Cost options', groupMore: 'More', metaOff: 'off', metaPerDay: '/day',
     crossAt: 'mo {m}',
     apiCapacity: 'Scales on the provider side – no user cap.', changeUsers: 'Change the number of users',
     yes: 'yes', no: 'no',
@@ -1706,6 +1752,20 @@ function applyI18n() {
   $('settingsBackdrop').setAttribute('aria-label', t('settingsClose'));
   renderHelp();
 }
+function renderSectionMeta() {
+  const s = state;
+  const metas = {
+    workloadDetails: `${fmtNum(s.users)} ${t('usersWord')} · ${fmtNum(s.reqPerDay)}${t('metaPerDay')} · ${t('docLang')}: ${s.docLang.toUpperCase()}`,
+    apiSettings: s.model,
+    cloudSettings: `${s.cloudGpu} · ${money(s.cloudPrice, 0)}${P('/mies.', '/mo')}`,
+    smallSettings: `${s.smallGpu} · ${money(s.smallCapex, 0)}`,
+    ownSettings: `${s.ownGpu} · ${money(s.ownCapex, 0)}`,
+    softwareSettings: s.softwareOn ? `SaaS ${money(s.softApi, 0)}${P('/mies.', '/mo')} · ${P('licencja', 'licence')} ${money(s.softLicense, 0)}` : t('metaOff'),
+    advancedPanel: `${t('fx')} ${fmtNum(s.fx, 2)} · ${t('peak')} ×${fmtNum(s.peak, 1)} · ${fmtNum(s.maxUtilization)}%`,
+    scenarioPanel: s.csvSource ? `CSV: ${s.csvSource}` : '',
+  };
+  for (const [id, text] of Object.entries(metas)) { const n = document.querySelector(`[data-meta="${id}"]`); if (n) n.textContent = text; }
+}
 function renderTicker(values) {
   const box = $('ticker'); if (!box) return;
   for (const [key, text] of Object.entries(values)) {
@@ -1930,6 +1990,7 @@ function render() {
     assumptionsOpen: String(dialogEl.open), softwareOn: String(s.softwareOn), verdictWinner: v.winner, verdictRecommended: v.recommended || '', verdictSavingsPct: v.savingsPct == null ? '' : v.savingsPct.toFixed(4),
   });
   renderPrintSummary();
+  renderSectionMeta();
   renderTicker({ api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable'), own: money(own.monthly, 0) });
   $('live').textContent = t('live', { api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), own: money(own.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable') });
 }
@@ -1974,7 +2035,9 @@ function renderCharts(m, api, cloud, own, small) {
   renderLegend($('legendTime'), series);
   const cross = crossovers(series);
   const shortOf = (key) => (base.find((b) => b.key === key) || {}).short || key;
-  const markers = cross.map((c, i) => ({ month: c.month, value: c.value, flip: i % 2 === 1, label: `${shortOf(c.a)} × ${shortOf(c.b)} · ${t('crossAt', { m: Math.round(c.month) })}` }));
+  const markers = cross.map((c, i) => ({ month: c.month, value: c.value, flip: i % 2 === 1, label: t('crossAt', { m: Math.round(c.month) }) }));
+  const list = $('crossList');
+  if (list) list.replaceChildren(...(cross.length ? [el('span', { class: 'cross-lead' }, t('crossLead'))] : []), ...cross.map((c) => el('span', { class: 'cross-item' }, `${shortOf(c.a)} × ${shortOf(c.b)} · ${t('crossAt', { m: Math.round(c.month) })}`)));
   appEl.dataset.crossovers = JSON.stringify(cross.map((c) => [c.a, c.b, c.month]));
   lineChart($('chartTime'), { xs: ms, series, xFmt: (v) => String(v), xHead: t('monthLabel'), markers });
   dataTable($('tableTime'), ms, series, t('monthLabel'), (v) => String(v));
