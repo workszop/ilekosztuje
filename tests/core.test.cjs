@@ -344,4 +344,11 @@ const regression = run('runRegressionChecks()');
 assert.ok(Array.isArray(regression) && regression.length > 0, 'regression checks exposed');
 assert.ok(regression.every((check) => check.pass === true), JSON.stringify(regression));
 
+// Task 1: Polish-only PL copy and thousands grouping
+assert.equal(run('T.pl.navTag'), 'Kalkulator kosztów AI');
+assert.equal(run('T.pl.heroTag'), 'Quantica Lab · RAG · inferencja');
+assert.equal(run('T.pl.thinking'), 'Tryb myślenia (rozumowanie)');
+assert.equal(new Intl.NumberFormat('pl-PL', { useGrouping: 'always', maximumFractionDigits: 0 }).format(6839).replace(/\s/g, ' '), '6 839', 'always-grouping groups four-digit numbers in Polish');
+assert.ok(/function fmtNum\([^)]*\)[^\n]*useGrouping: 'always'/.test(js), 'fmtNum groups thousands always');
+
 console.log('Core validation, CSV, cost-model, and regression checks passed');

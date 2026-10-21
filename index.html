@@ -412,7 +412,7 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
 <body>
 <header class="nav" aria-label="Nawigacja"><div class="nav-inner">
   <a class="nav-logo" href="https://quanticalab.ai" target="_blank" rel="noopener"><img src="assets/quantica-logo-color.png" alt="Quantica Lab" width="72" height="30"></a>
-  <span class="nav-tag">AI cost calculator</span>
+  <span class="nav-tag" data-t="navTag"></span>
   <span class="header-spacer"></span>
   <button type="button" class="pill pill-ghost" id="settingsToggle" aria-controls="settingsPanel" aria-expanded="false" data-t="settingsTitle"></button>
   <button type="button" class="pill pill-solid js-assump" data-t="assumpBtn"></button>
@@ -598,7 +598,7 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
       <canvas data-dots aria-hidden="true"></canvas>
       <div class="hero-q" aria-hidden="true"><img src="assets/quantica-q-mark-white.png" alt=""></div>
       <div class="hero-inner">
-        <div class="hero-tag">Quantica Lab · RAG · inference</div>
+        <div class="hero-tag" data-t="heroTag"></div>
         <h1 id="appTitle" class="app-title"><span data-t="titleA"></span> <em data-t="titleB"></em></h1>
         <p class="lead" data-t="dashboardLead"></p>
       </div>
@@ -802,6 +802,7 @@ const SOURCES = {
 
 const T = {
   pl: {
+    navTag: 'Kalkulator kosztów AI', heroTag: 'Quantica Lab · RAG · inferencja',
     title: 'Ile kosztuje AI w firmie?', titleA: 'Ile kosztuje', titleB: 'AI w firmie?',
     lead: 'Asystent RAG odpowiada na podstawie firmowych dokumentów. Porównaj miesięczny koszt czterech opcji: płatne API modelu, GPU w chmurze, własny serwer i małe wdrożenie na Dell GB10.',
     assumpBtn: 'Założenia i źródła', assumpTitle: 'Założenia kalkulatora', close: 'Zamknij',
@@ -830,7 +831,7 @@ const T = {
     thModel: 'Model', thTok: 'Tokeny we / wy', thIn: 'We $/1M', thOut: 'Wy $/1M', thReq: 'Zapytanie', thMonth: 'Miesięcznie', thVs: 'Na tle GPU',
     vsCheaper: 'tańsze niż każda opcja GPU', vsDearer: 'droższe niż każda opcja GPU', vsMid: 'pomiędzy',
     secAdvanced: 'Ustawienia zaawansowane', advApi: 'API', advTime: 'Czas i obciążenie', advGpu: 'Przepustowość GPU (tok/s)',
-    fx: 'Kurs USD → PLN', thinking: 'Tryb myślenia (reasoning)', thinkMult: 'Mnożnik wyjścia przy myśleniu', offPeak: 'DeepSeek poza szczytem',
+    fx: 'Kurs USD → PLN', thinking: 'Tryb myślenia (rozumowanie)', thinkMult: 'Mnożnik wyjścia przy myśleniu', offPeak: 'DeepSeek poza szczytem',
     workDays: 'Dni robocze / rok', workHours: 'Godziny pracy / dzień', peak: 'Mnożnik szczytu', horizon: 'Horyzont wykresu (mies.)', power: 'Moc serwera (W)',
     cloudPrefill: 'Chmura: wejście', cloudDecode: 'Chmura: wyjście', ownPrefill: 'Serwer: wejście', ownDecode: 'Serwer: wyjście',
     csvTitle: 'Cennik modeli', csvSource: 'Źródło:', csvLoad: 'Wczytaj CSV', csvReset: 'Cennik wbudowany',
@@ -839,6 +840,7 @@ const T = {
     live: 'API {api}, chmura {cloud}, własny serwer {own}, Dell GB10 {small} miesięcznie.',
   },
   en: {
+    navTag: 'AI cost calculator', heroTag: 'Quantica Lab · RAG · inference',
     title: 'What does AI cost a business?', titleA: 'What does', titleB: 'AI cost a business?',
     lead: 'A RAG assistant answers from company documents. Compare the monthly cost of four options: a paid model API, a cloud GPU, your own server and a small deployment on a Dell GB10.',
     assumpBtn: 'Assumptions and sources', assumpTitle: 'Calculator assumptions', close: 'Close',
@@ -959,7 +961,7 @@ function t(key, vars) {
 }
 const P = (pl, en) => state.lang === 'pl' ? pl : en;
 const locale = () => state.lang === 'pl' ? 'pl-PL' : 'en-GB';
-function fmtNum(v, d = 0) { return new Intl.NumberFormat(locale(), { minimumFractionDigits: d, maximumFractionDigits: d }).format(v); }
+function fmtNum(v, d = 0) { return new Intl.NumberFormat(locale(), { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: 'always' }).format(v); }
 function money(v, digits) { return fmtNum(v, digits ?? (Math.abs(v) < 10 ? 2 : 0)) + ' ' + CURRENCY; }
 function moneyShort(v) {
   const a = Math.abs(v);

@@ -1,4 +1,4 @@
-# aicalc-q – kalkulator kosztów AI (Quantica Lab)
+# ilekosztuje – kalkulator kosztów AI (Quantica Lab)
 
 Jednoplikowy kalkulator porównujący miesięczny koszt asystenta RAG w czterech
 wariantach:
@@ -30,7 +30,7 @@ Projekt nie ma buildu ani zależności npm. Otwórz
 uruchom opcjonalny serwer:
 
 ```bash
-cd /home/andrzey/git-claude/aicalc-q
+cd /home/andrzey/git-claude/ilekosztuje
 python3 -m http.server 8000
 ```
 
@@ -172,7 +172,7 @@ instaluje.
 
 ## English quick note
 
-`aicalc-q` is the Quantica-styled fork of `aicalc`: a dependency-free,
+`ilekosztuje` is the Quantica-styled fork of `aicalc`: a dependency-free,
 single-file estimator of RAG inference costs across model API, cloud GPU,
 a small Dell Pro Max GB10 deployment priced at PLN 35,000, and own server,
 plus a Zagłoba RAG software layer (SaaS 5,000 PLN per month
