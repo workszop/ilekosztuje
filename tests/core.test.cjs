@@ -374,4 +374,9 @@ assert.notEqual(verdict300.winner, 'small', 'ineligible Dell never winner');
 for (const key of ['verdictText', 'verdictSingle', 'aApiVsCloud', 'aApiVsSmall', 'aApiVsOwn', 'aPaybackSmall', 'aPayback', 'aMinute'])
   for (const lang of ['pl', 'en']) assert.ok(/\{(n|cost|pct|minute|users|winner|monthly|runnerUp)\}/.test(run(`T.${lang}.${key}`)), `${lang}.${key} is a sentence template`);
 
+// Task 10: price-check metadata is exposed per model
+assert.equal(models[0].checkedAt, '2026-09-13', 'checkedAt parsed from CSV');
+assert.ok(String(models[0].source).startsWith('https://'), 'source URL parsed from CSV');
+for (const lang of ['pl', 'en']) { assert.equal(typeof run(`T.${lang}.thSource`), 'string'); assert.equal(typeof run(`T.${lang}.sourceLink`), 'string'); }
+
 console.log('Core validation, CSV, cost-model, and regression checks passed');

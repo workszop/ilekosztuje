@@ -57,11 +57,12 @@
 
   /* ─── Translucent surfaces (the only rgba() outside canvas/SVG) ─── */
   --nav-bg:           rgba(255, 255, 255, 0.88);
-  --dialog-backdrop:  rgba(10, 31, 44, 0.55);
+  --dialog-backdrop:  rgba(10, 31, 44, 0.7);
   --pink-tint-03:     rgba(210, 7, 87, 0.03);
   --pink-tint-05:     rgba(210, 7, 87, 0.05);
   --pink-tint-45:     rgba(210, 7, 87, 0.45);
   --white-92:         rgba(255, 255, 255, 0.92);
+  --white-20:         rgba(255, 255, 255, 0.2);
   --white-16:         rgba(255, 255, 255, 0.16);
   --focus-ring:       0 0 0 3px rgba(210, 7, 87, 0.28);
 
@@ -76,8 +77,9 @@
   --chart-x-align: middle;
 
   /* ─── Component type scale ─── */
-  --tag-size: 11px;
-  --label-size: 11px;
+  --tag-size: 12px;
+  --label-size: 12px;
+  --field-label-size: 13px;
   --small-size: 12.5px;
   --tiny-size: 12px;
   --body-sm: 14px;
@@ -128,13 +130,11 @@ section { margin-bottom: var(--sp-8); }
 
 /* ─── Hero panel (ink, dots, ghosted Q) ─── */
 .page-head { position: relative; overflow: hidden; background: var(--ink); color: var(--white); border-radius: var(--radius-card);
-  padding: 34px 36px 30px; margin-bottom: var(--sp-5); text-align: var(--align-start); }
+  padding: 20px 24px 18px; margin-bottom: var(--sp-5); text-align: var(--align-start); }
 .page-head canvas[data-dots] { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.hero-q { position: absolute; right: -4%; top: 50%; transform: translateY(-50%); width: min(30vw, 300px); opacity: .14; pointer-events: none; }
-.hero-q img { width: 100%; display: block; }
 .hero-inner { position: relative; z-index: 2; }
 .hero-tag { font-family: var(--font-mono); font-weight: 500; font-size: var(--tag-size); letter-spacing: .12em; text-transform: uppercase; color: var(--rose-pink); margin-bottom: var(--sp-3); }
-.app-title { font-family: var(--font-display); font-weight: 700; font-size: var(--title-size); letter-spacing: -.03em; line-height: 1; color: var(--white); margin: 0 0 var(--sp-3); }
+.app-title { font-family: var(--font-display); font-weight: 700; font-size: calc(var(--title-size) * .8); letter-spacing: -.03em; line-height: 1; color: var(--white); margin: 0 0 var(--sp-3); }
 .app-title em { font-style: normal; color: var(--rose-pink); }
 .lead { font-size: var(--body); color: var(--white-92); margin: 0; max-width: 62ch; }
 
@@ -146,7 +146,7 @@ section { margin-bottom: var(--sp-8); }
 .seg button.active { background: var(--quantica-pink); color: var(--white); box-shadow: var(--shadow-pink-soft); }
 .seg button:focus-visible, .pill:focus-visible, input:focus-visible, select:focus-visible, tr:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-5); }
-.toolbar .label { font-family: var(--font-mono); font-size: var(--tag-size); letter-spacing: .12em; text-transform: uppercase; color: var(--fg-3); }
+.toolbar .label { font-family: var(--font-sans); font-weight: 600; font-size: var(--label-size); letter-spacing: 0; text-transform: none; color: var(--fg-3); }
 
 .pill { font-family: var(--font-sans); font-weight: 700; font-size: 14px; text-decoration: none; padding: 10px 20px; border-radius: var(--radius-pill);
   display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid transparent; cursor: pointer; line-height: 1.2;
@@ -160,7 +160,7 @@ section { margin-bottom: var(--sp-8); }
 .pill .icon { width: 16px; height: 16px; }
 
 .field { display: flex; flex-direction: column; justify-content: flex-end; gap: 5px; margin-bottom: var(--sp-3); }
-.field label { font-family: var(--font-mono); font-weight: 500; font-size: var(--label-size); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); }
+.field label { font-family: var(--font-sans); font-weight: 600; font-size: var(--field-label-size); letter-spacing: 0; text-transform: none; color: var(--fg-1); }
 .field input, .field select { font-family: var(--font-sans); font-size: var(--body); color: var(--fg-1); background: var(--bg-1);
   border: 1px solid var(--border-2); border-radius: var(--radius-md); padding: 9px 12px; width: 100%; transition: border-color .2s; }
 .field input:hover, .field select:hover { border-color: var(--fg-3); }
@@ -177,7 +177,7 @@ section { margin-bottom: var(--sp-8); }
   transition: border-color .25s, background-color .25s; }
 .card:hover { border-color: var(--pink-tint-45); }
 .card-head { display: flex; align-items: center; gap: 10px; margin-bottom: var(--sp-4); }
-.card-head h3 { font-family: var(--font-mono); font-weight: 500; font-size: var(--tag-size); letter-spacing: .12em; text-transform: uppercase; margin: 0; color: var(--quantica-pink); }
+.card-head h3 { font-family: var(--font-sans); font-weight: 700; font-size: var(--body-sm); letter-spacing: 0; text-transform: none; margin: 0; color: var(--fg-1); }
 .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .grid-4 > * { min-width: 0; }
@@ -217,9 +217,10 @@ section { margin-bottom: var(--sp-8); }
 .cost-breakdown { margin-top: var(--sp-4); }
 .cost-breakdown > summary { cursor: pointer; font-family: var(--font-mono); font-size: var(--tiny-size); letter-spacing: .04em; color: var(--fg-3); padding: var(--sp-2) 0; }
 .cost-breakdown > summary:hover { color: var(--quantica-pink); }
-.results-context { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-4) var(--sp-6); padding: var(--sp-3) var(--sp-4); margin-bottom: var(--sp-5); background: var(--bg-2); border: 1px solid var(--border-1); border-radius: var(--radius-md); }
-.results-context .hint { flex: 1 1 200px; }
-.results-context .stat b { font-size: var(--body-lg); }
+.results-context { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-2) var(--sp-6); margin-top: var(--sp-4); padding-top: var(--sp-3); border-top: 1px solid var(--white-20); }
+.results-context .stat span { color: var(--white-92); opacity: .8; }
+.results-context .stat b { font-size: var(--body-lg); color: var(--white); }
+.results-context .hint { flex: 1 1 200px; color: var(--white-92); opacity: .8; margin: 0; }
 .field-help { font-size: var(--body-sm); color: var(--fg-3); margin: 2px 0 0; line-height: 1.35; }
 .glossary-wrap { margin-bottom: var(--sp-5); }
 .glossary-wrap > summary { cursor: pointer; list-style: none; font-weight: 600; color: var(--fg-3); font-size: var(--body-sm); margin-bottom: var(--sp-2); }
@@ -230,7 +231,7 @@ section { margin-bottom: var(--sp-8); }
 .glossary dt { font-weight: 700; color: var(--fg-1); font-size: var(--body-sm); }
 .glossary dd { margin: 2px 0 0; color: var(--fg-3); font-size: var(--body-sm); line-height: 1.4; }
 .stat { display: flex; flex-direction: column; gap: 4px; }
-.stat span { font-family: var(--font-mono); font-size: var(--label-size); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); }
+.stat span { font-family: var(--font-sans); font-weight: 600; font-size: var(--label-size); letter-spacing: 0; text-transform: none; color: var(--fg-3); }
 .stat b { font-family: var(--font-display); font-weight: 700; font-size: var(--stat-size); letter-spacing: -.01em; color: var(--fg-1); }
 
 .bars { display: flex; flex-direction: column; gap: var(--sp-3); margin: var(--sp-3) 0 var(--sp-5); }
@@ -262,13 +263,13 @@ section { margin-bottom: var(--sp-8); }
 .tip .row { display: flex; align-items: center; gap: 8px; padding: 1px 0; }
 .tip .row b { color: var(--fg-1); font-weight: 600; font-family: var(--font-mono); margin-left: auto; padding-left: 10px; }
 details.data-table { margin-top: 6px; font-size: var(--small-size); color: var(--fg-3); }
-details.data-table summary { cursor: pointer; color: var(--fg-3); font-family: var(--font-mono); font-size: var(--label-size); letter-spacing: .08em; text-transform: uppercase; }
+details.data-table summary { cursor: pointer; color: var(--fg-3); font-family: var(--font-sans); font-weight: 600; font-size: var(--label-size); letter-spacing: 0; text-transform: none; }
 details.data-table summary:hover { color: var(--quantica-pink); }
 
 /* ─── Tables ─── */
 .table-wrap { overflow-x: auto; border: 1px solid var(--border-1); border-radius: var(--radius-lg); background: var(--bg-1); }
 table { width: 100%; border-collapse: collapse; font-size: var(--body-sm); }
-th { font-family: var(--font-mono); font-weight: 500; font-size: var(--label-size); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3);
+th { font-family: var(--font-sans); font-weight: 600; font-size: var(--label-size); letter-spacing: 0; text-transform: none; color: var(--fg-3);
   text-align: var(--align-start); padding: 12px 14px; border-bottom: 1px solid var(--border-1); background: var(--bg-2); white-space: nowrap; }
 td { padding: 10px 14px; border-bottom: 1px solid var(--border-1); color: var(--fg-3); white-space: nowrap; }
 td.num, th.num { text-align: var(--align-end); font-family: var(--font-mono); }
@@ -298,7 +299,9 @@ dialog.assump[open] { animation: fadeIn .18s ease-out; }
 .assump-head h2 { font-family: var(--font-display); font-weight: 700; font-size: var(--h3); margin: 0; flex: 1; letter-spacing: -.02em; }
 .assump-body { padding: 8px 26px 26px; }
 .assump-body > p { color: var(--fg-3); font-size: var(--body-sm); margin: 12px 0 4px; }
-.assump-sec h3 { font-family: var(--font-mono); font-weight: 500; font-size: var(--tag-size); letter-spacing: .12em; text-transform: uppercase; color: var(--quantica-pink); margin: 26px 0 10px; }
+.assump-sec h3 { font-family: var(--font-display); font-weight: 700; font-size: var(--h4); letter-spacing: -.01em; text-transform: none; color: var(--fg-1); margin: 0 0 10px; }
+.assump-sec { padding: 18px 0 8px; border-top: 1px solid var(--border-1); margin-top: 10px; }
+.assump-sec:first-of-type { border-top: 0; margin-top: 0; }
 .assump-table td { white-space: normal; vertical-align: top; }
 .assump-table td.name { width: 22%; }
 .assump-table td.val { width: 26%; font-family: var(--font-mono); font-size: var(--small-size); color: var(--fg-1); }
@@ -332,16 +335,16 @@ progress#fileProgress { accent-color: var(--quantica-pink); }
 details.panel { background: var(--bg-1); border: 1px solid var(--border-1); border-radius: var(--radius-card); box-shadow: var(--shadow-card); margin-bottom: var(--sp-4); }
 details.panel > summary { cursor: pointer; list-style: none; padding: 16px 24px; font-family: var(--font-display); font-weight: 700; font-size: var(--h4); letter-spacing: -.01em; color: var(--fg-1); display: flex; align-items: center; gap: 10px; }
 details.panel > summary::-webkit-details-marker { display: none; }
-details.panel > summary::before { content: '+'; display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--magenta-tint); color: var(--quantica-pink); font-family: var(--font-mono); font-size: var(--disclosure-size); flex: none; }
-details.panel[open] > summary::before { content: '–'; }
+details.panel > summary::before { content: '›'; display: inline-grid; place-items: center; width: 18px; height: 18px; color: var(--fg-3); font-family: var(--font-sans); font-size: 18px; line-height: 1; flex: none; transition: transform .15s; }
+details.panel[open] > summary::before { transform: rotate(90deg); }
 details.panel > :not(summary) { margin-left: 24px; margin-right: 24px; }
 details.panel[open] { padding-bottom: 20px; }
 .adv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); }
-.adv-grid h4 { font-family: var(--font-mono); font-weight: 500; font-size: var(--tag-size); letter-spacing: .12em; text-transform: uppercase; color: var(--quantica-pink); margin: 4px 0 var(--sp-3); }
+.adv-grid h4 { font-family: var(--font-sans); font-weight: 700; font-size: var(--body-sm); letter-spacing: 0; text-transform: none; color: var(--fg-1); margin: 4px 0 var(--sp-3); }
 
 #settingsPanel { min-height: 0; overflow-y: auto; overscroll-behavior: contain; border-right: 1px solid var(--border-1); background: var(--bg-1); scrollbar-gutter: stable; }
 .settings-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); padding: var(--sp-4) var(--sp-5); background: var(--nav-bg); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-1); }
-.settings-head h2 { margin: 0; font-family: var(--font-mono); font-weight: 500; font-size: var(--tag-size); letter-spacing: .12em; text-transform: uppercase; color: var(--quantica-pink); }
+.settings-head h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: var(--h4); letter-spacing: -.01em; text-transform: none; color: var(--fg-1); }
 .settings-body { padding: var(--sp-5) var(--sp-4) var(--sp-8); }
 .settings-body section { margin-bottom: var(--sp-5); }
 .settings-body .sec-title { font-size: var(--body); }
@@ -407,9 +410,12 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
 .ticker span[data-path="api"] { --dot: var(--chart-api); } .ticker span[data-path="cloud"] { --dot: var(--chart-cloud); }
 .ticker span[data-path="small"] { --dot: var(--chart-small); } .ticker span[data-path="own"] { --dot: var(--chart-own); }
 .ticker b { font-family: var(--font-mono); font-weight: 500; color: var(--fg-1); }
+td.src { white-space: nowrap; color: var(--fg-3); font-size: var(--small-size); }
+td.src a { color: var(--quantica-pink); font-weight: 700; text-decoration: none; }
+td.src a:hover { text-decoration: underline; }
 .print-only { display: none; }
 @media print {
-  .nav, #settingsPanel, #settingsBackdrop, .toolbar, details.cost-breakdown, canvas, .glossary-wrap, .shortcuts, #modelsPanel, #checksPanel, .hero-q, #validationStatus, #ticker { display: none !important; }
+  .nav, #settingsPanel, #settingsBackdrop, .toolbar, details.cost-breakdown, canvas, .glossary-wrap, .shortcuts, #modelsPanel, #checksPanel, #validationStatus, #ticker { display: none !important; }
   main { display: block; height: auto; }
   #resultsPanel { overflow: visible; height: auto; padding: 0; }
   .page-head { background: none; color: var(--fg-1); padding: 0 0 12px; border-radius: 0; border-bottom: 1px solid var(--border-1); }
@@ -436,7 +442,6 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
   #resultsPanel { height: 100%; padding: var(--sp-4) var(--sp-4) var(--sp-8); }
   #resultsPanel .two-col, #options, .fields-grid, .adv-grid { grid-template-columns: minmax(0, 1fr); }
   .page-head { padding: 26px 22px 22px; }
-  .hero-q { width: 60vw; right: -20%; opacity: .1; }
   .bar-row { grid-template-columns: 1fr auto; }
   .bar-track { grid-column: 1 / -1; grid-row: 2; }
   .results-context { gap: var(--sp-3); }
@@ -612,7 +617,7 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
         <h4 data-t="csvTitle"></h4>
         <div class="drop" id="drop"><span data-t="csvSource"></span> <span class="src" id="csvSrc"></span></div>
         <div class="csv-row" style="margin-top:var(--sp-3)">
-          <button class="pill pill-solid" type="button" id="csvBtn" data-t="csvLoad"></button>
+          <button class="pill pill-ghost" type="button" id="csvBtn" data-t="csvLoad"></button>
           <input type="file" id="csvFile" accept=".csv,text/csv" hidden>
           <button class="pill pill-ghost" id="csvReset" type="button" data-t="csvReset"></button>
           <button class="pill pill-ghost" id="csvTemplate" type="button" data-t="csvTemplate"></button>
@@ -643,19 +648,18 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
     </div>
     <div class="page-head">
       <canvas data-dots aria-hidden="true"></canvas>
-      <div class="hero-q" aria-hidden="true"><img src="assets/quantica-q-mark-white.png" alt=""></div>
       <div class="hero-inner">
         <div class="hero-tag" data-t="heroTag"></div>
         <h1 id="appTitle" class="app-title"><span data-t="titleA"></span> <em data-t="titleB"></em></h1>
         <p class="lead" data-t="dashboardLead"></p>
+        <div class="results-context">
+          <div class="stat"><span data-t="kvTokens"></span><b id="kvTokens"></b></div>
+          <div class="stat"><span data-t="kvReqMonth"></span><b id="kvReqMonth"></b></div>
+          <p class="hint" data-t="estimateNotice"></p>
+        </div>
       </div>
     </div>
     <p id="validationStatus" role="alert" hidden></p>
-    <div class="results-context">
-      <div class="stat"><span data-t="kvTokens"></span><b id="kvTokens"></b></div>
-      <div class="stat"><span data-t="kvReqMonth"></span><b id="kvReqMonth"></b></div>
-      <p class="hint" data-t="estimateNotice"></p>
-    </div>
     <details class="glossary-wrap" id="glossaryWrap" open>
       <summary data-t="glossaryTitle"></summary>
       <dl class="glossary" id="glossary">
@@ -726,7 +730,7 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
       <table id="modelTable">
         <thead><tr>
           <th data-t="thModel"></th><th class="num" data-t="thTok"></th><th class="num" data-t="thIn"></th><th class="num" data-t="thOut"></th>
-          <th class="num" data-t="thReq"></th><th class="num" data-t="thMonth"></th><th data-t="thVs"></th>
+          <th class="num" data-t="thReq"></th><th class="num" data-t="thMonth"></th><th data-t="thVs"></th><th data-t="thSource"></th>
         </tr></thead>
         <tbody></tbody>
       </table>
@@ -908,7 +912,7 @@ const T = {
     chartTime: 'Koszt narastająco w czasie', chartTimeSub: 'Dell GB10 i własny serwer startują od ceny sprzętu i licencji Zagłoba RAG. Co okres wymiany sprzętu doliczamy kolejny zakup sprzętu; licencja jest jednorazowa.',
     showData: 'Pokaż dane', monthLabel: 'Miesiąc',
     secModels: 'Porównaj wszystkie modele API', modelsNote: 'Kwoty miesięczne zawierają Zagłoba RAG jako SaaS i stałą infrastrukturę API. Tokeny są szacowane dla rodziny modelu, nie liczone uruchomieniem tokenizerów. Kliknij wiersz, aby wybrać model.',
-    thModel: 'Model', thTok: 'Tokeny we / wy', thIn: 'We $/1M', thOut: 'Wy $/1M', thReq: 'Zapytanie', thMonth: 'Miesięcznie', thVs: 'Na tle GPU',
+    thModel: 'Model', thTok: 'Tokeny we / wy', thIn: 'We $/1M', thOut: 'Wy $/1M', thReq: 'Zapytanie', thMonth: 'Miesięcznie', thVs: 'Na tle GPU', thSource: 'Sprawdzono', sourceLink: 'źródło',
     vsCheaper: 'tańsze niż każda opcja GPU', vsDearer: 'droższe niż każda opcja GPU', vsMid: 'pomiędzy',
     secAdvanced: 'Ustawienia zaawansowane', advApi: 'API', advTime: 'Czas i obciążenie', advGpu: 'Przepustowość GPU (tok/s)',
     fx: 'Kurs USD → PLN', thinking: 'Tryb myślenia (rozumowanie)', thinkMult: 'Mnożnik wyjścia przy myśleniu', offPeak: 'DeepSeek poza szczytem',
@@ -966,7 +970,7 @@ const T = {
     chartTime: 'Cumulative cost over time', chartTimeSub: 'Dell GB10 and own server start at the hardware price plus the Zagłoba RAG licence. Hardware is bought again each replacement period; the licence is one-off.',
     showData: 'Show data', monthLabel: 'Month',
     secModels: 'Compare all API models', modelsNote: 'Monthly amounts include Zagłoba RAG as SaaS and the fixed API infrastructure. Tokens are estimated for the model family, not measured by running each tokenizer. Click a row to select the model.',
-    thModel: 'Model', thTok: 'Tokens in / out', thIn: 'In $/1M', thOut: 'Out $/1M', thReq: 'Request', thMonth: 'Monthly', thVs: 'Vs GPU',
+    thModel: 'Model', thTok: 'Tokens in / out', thIn: 'In $/1M', thOut: 'Out $/1M', thReq: 'Request', thMonth: 'Monthly', thVs: 'Vs GPU', thSource: 'Checked', sourceLink: 'source',
     vsCheaper: 'cheaper than every GPU option', vsDearer: 'dearer than every GPU option', vsMid: 'in between',
     secAdvanced: 'Advanced settings', advApi: 'API', advTime: 'Time and load', advGpu: 'GPU throughput (tok/s)',
     fx: 'USD → PLN rate', thinking: 'Thinking mode (reasoning)', thinkMult: 'Output multiplier when thinking', offPeak: 'DeepSeek off-peak',
@@ -1889,6 +1893,9 @@ function renderModelTable(rows, cloudM, ownM, smallM) {
     tr.append(el('td', { class: 'name' }, m.name), el('td', { class: 'num' }, pair(c.inTok, c.outTok)),
       el('td', { class: 'num' }, fmtNum(c.pin, 2)), el('td', { class: 'num' }, fmtNum(c.pout, 2)),
       el('td', { class: 'num' }, c.eligible ? money(c.perReq, 4) : t('unavailable')), el('td', { class: 'num' }, c.eligible ? money(c.monthly, 0) : t('unavailable')), tdVs);
+    const tdSrc = el('td', { class: 'src' }, m.checkedAt ? m.checkedAt + ' ' : '');
+    if (m.source && /^https:\/\//.test(m.source)) tdSrc.append(el('a', { href: m.source, target: '_blank', rel: 'noopener' }, t('sourceLink')));
+    tr.append(tdSrc);
     return tr;
   }));
 }

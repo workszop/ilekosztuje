@@ -187,4 +187,14 @@ const resultsChildren = resultsPanel.children.filter((node) => node.tag && node.
 assert.equal(resultsChildren[0], ticker, '#ticker is the first element in #resultsPanel');
 assert.equal(descendants(ticker, (node) => node.tag === 'span' && node.attrs['data-path']).length, 4, 'ticker has four path spans');
 
+// Task 10: typography tokens, compact hero with stats, one primary button, source column
+assert.ok(/--label-size:\s*12px;/.test(html) && /--tag-size:\s*12px;/.test(html), 'label and tag tokens are 12px');
+assert.ok(/--field-label-size:\s*13px;/.test(html), 'field label token exists');
+assert.equal(descendants(documentRoot, (node) => hasClass(node, 'pill-solid')).length, 0, 'no solid pill in static markup');
+assert.equal(descendants(documentRoot, (node) => hasClass(node, 'hero-q')).length, 0, 'ghosted Q mark removed from the hero');
+const heroInner = descendants(documentRoot, (node) => hasClass(node, 'hero-inner'))[0];
+const resultsContext = descendants(documentRoot, (node) => hasClass(node, 'results-context'))[0];
+assert.ok(heroInner && resultsContext && contains(heroInner, resultsContext), 'stats strip sits inside the hero');
+assert.ok(descendants(documentRoot, (node) => node.tag === 'th' && node.attrs['data-t'] === 'thSource').length === 1, 'model table has a source column');
+
 console.log('Sidebar layout and keyboard contracts passed');
