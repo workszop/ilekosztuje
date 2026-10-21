@@ -357,4 +357,10 @@ for (const key of ['help_users', 'help_chunks', 'help_chunkTok', 'help_peak', 'h
   for (const lang of ['pl', 'en']) assert.equal(typeof run(`T.${lang}.${key}`), 'string', `${lang}.${key}`);
 assert.deepEqual(Object.keys(run('FIELD_HELP')), ['users', 'chunks', 'chunkTok', 'peak', 'maxUtilization', 'smallMaxUsers', 'softApi', 'softLicense']);
 
+// Task 3: software toggle
+assert.equal(run('DEFAULTS.softwareOn'), true, 'software counted by default');
+assert.equal(JSON.stringify(run('softwareCost("api", { ...DEFAULTS, softwareOn: false })')), JSON.stringify({ saas: 0, licenseAmort: 0, support: 0, oneOff: 0, monthly: 0 }));
+assert.equal(run('totalCost("own", { ...DEFAULTS, softwareOn: false }).oneOff'), 0, 'no licence when software is off');
+assert.ok(run('totalCost("cloud", { ...DEFAULTS, softwareOn: false }).monthly') < run('totalCost("cloud", DEFAULTS).monthly'), 'cloud drops the SaaS fee');
+
 console.log('Core validation, CSV, cost-model, and regression checks passed');

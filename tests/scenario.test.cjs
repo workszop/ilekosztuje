@@ -22,6 +22,11 @@ vm.runInContext(`
   function mustReject(value) { let rejected = false; try { parseScenario(JSON.stringify(value)); } catch (_) { rejected = true; } if (!rejected) throw Error('accepted invalid scenario'); }
   const legacyScenario = { ...saved, values: { ...saved.values } }; delete legacyScenario.values.smallRecommendFrom;
   if (parseScenario(JSON.stringify(legacyScenario)).values.smallRecommendFrom !== DEFAULTS.smallRecommendFrom) throw Error('smallRecommendFrom backfill');
+  // Task 3: parseScenario back-compat for softwareOn
+  const noSoftwareKey = { ...saved, values: { ...saved.values } }; delete noSoftwareKey.values.softwareOn;
+  if (parseScenario(JSON.stringify(noSoftwareKey)).values.softwareOn !== true) throw Error('softwareOn backfill');
+  if (parseScenario(JSON.stringify({ ...saved, values: { ...saved.values, softwareOn: false } })).values.softwareOn !== false) throw Error('softwareOn false round trip');
+  mustReject({ ...saved, values: { ...saved.values, softwareOn: 'yes' } });
   mustReject({ ...saved, version: 999 });
   mustReject({ ...saved, values: { ...saved.values, ownAmort: 0 } });
   mustReject({ ...saved, values: { ...saved.values, users: '20' } });

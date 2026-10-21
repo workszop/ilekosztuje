@@ -168,6 +168,7 @@ section { margin-bottom: var(--sp-8); }
 .field select { cursor: pointer; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
 .hint { font-size: var(--small-size); color: var(--fg-3); margin: 0; line-height: var(--line-height-tight); }
+.check-software { padding: var(--sp-3) var(--sp-5) 0; margin-bottom: 0; font-weight: 600; }
 .check { display: flex; gap: 8px; align-items: center; font-size: var(--body-sm); color: var(--fg-1); margin-bottom: var(--sp-3); cursor: pointer; }
 .check input { accent-color: var(--quantica-pink); width: 16px; height: 16px; }
 
@@ -439,6 +440,7 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
       <button type="button" class="pill pill-ghost" id="settingsClose" data-t="settingsDone"></button>
     </div>
     <div class="settings-body">
+      <label class="check check-software"><input type="checkbox" id="softwareOn"><span data-t="softwareOn"></span></label>
       <section>
     <div class="sec-row">
       <h2 class="sec-title" id="workloadTitle" data-t="secWorkload"></h2>
@@ -753,7 +755,7 @@ const FIELD_HELP = { users: 'help_users', chunks: 'help_chunks', chunkTok: 'help
 const SMALL_BASELINE = 1147.3262222222222; // Dell GB10 at scenario S1: 35 000 / 36 + 240 W × 24 h × 30.4 d × 1 PLN/kWh
 const DEFAULTS = {
   ...PRESETS.S1, chunks: 5, chunkTok: 2000, promptTok: 500, outTok: 500, docLang: 'pl', workDays: 250, workHours: 8,
-  model: 'OpenAI GPT-5.6 Terra', apiOps: 1000, fx: 3.73, offPeak: false, thinking: false, thinkMult: 3,
+  model: 'OpenAI GPT-5.6 Terra', apiOps: 1000, fx: 3.73, offPeak: false, thinking: false, softwareOn: true, thinkMult: 3,
   cloudGpu: '1× NVIDIA H100 80GB', cloudPrice: 10000, cloudOps: 0, cloudMode: '247', cloudPrefill: 10000, cloudDecode: 1500,
   ownGpu: '1× RTX PRO 6000 96GB', ownCapex: 250000, ownAmort: 36, ownReplace: 36, ownOps: 0, ownPower: 900, kwh: 1.0, ownPrefill: 10000, ownDecode: 1500,
   smallGpu: 'Dell Pro Max GB10 (128 GB)', smallCapex: 35000, smallAmort: 36, smallReplace: 36, smallOps: 0, smallPower: 240, smallPrefill: 3000, smallDecode: 250, smallMaxUsers: 100, smallRecommendFrom: 50,
@@ -822,6 +824,7 @@ const SOURCES = {
 
 const T = {
   pl: {
+    softwareOn: 'Licz oprogramowanie Zagłoba RAG', softwareOff: 'bez oprogramowania',
     help_users: 'Osoby, które będą zadawać pytania asystentowi.',
     help_chunks: 'RAG dokleja do pytania fragmenty Twoich dokumentów. Tyle fragmentów trafia do jednego zapytania.',
     help_chunkTok: 'Długość jednego fragmentu. 2000 tokenów to ok. 1500 słów.',
@@ -874,6 +877,7 @@ const T = {
     live: 'API {api}, chmura {cloud}, własny serwer {own}, Dell GB10 {small} miesięcznie.',
   },
   en: {
+    softwareOn: 'Include Zagłoba RAG software', softwareOff: 'software excluded',
     help_users: 'People who will ask the assistant questions.',
     help_chunks: 'RAG attaches excerpts of your documents to each question. This many excerpts go into one request.',
     help_chunkTok: 'Length of one excerpt. 2000 tokens is about 1500 words.',
@@ -1372,6 +1376,7 @@ function cumulativeCost(path, cost, month) {
 
 // Software layer: Zagłoba RAG as SaaS (API, cloud) or as a licence + yearly support (GB10, own server).
 function softwareCost(path, s) {
+  if (s.softwareOn === false) return { saas: 0, licenseAmort: 0, support: 0, oneOff: 0, monthly: 0 };
   if (path === 'api') return { saas: s.softApi, licenseAmort: 0, support: 0, oneOff: 0, monthly: s.softApi };
   if (path === 'cloud') return { saas: s.softCloud, licenseAmort: 0, support: 0, oneOff: 0, monthly: s.softCloud };
   if (!SERVER_PATHS.includes(path)) throw new Error(`Unknown cost path: ${path}`);
@@ -1427,6 +1432,7 @@ function calculationStateError(s) {
   if (!s || (s.cloudMode !== '247' && s.cloudMode !== 'work')) errors.cloudMode = 'range';
   if (!s || typeof s.thinking !== 'boolean') errors.thinking = 'range';
   if (!s || typeof s.offPeak !== 'boolean') errors.offPeak = 'range';
+  if (!s || typeof s.softwareOn !== 'boolean') errors.softwareOn = 'range';
   return errors;
 }
 function computeResults(s, models) {
@@ -1619,6 +1625,7 @@ function syncInputs(force = false) {
   [...NUM_FIELDS, ...TEXT_FIELDS].forEach((f) => { const n = $(f); if (!App.invalidFields.has(f) && (force || document.activeElement !== n)) n.value = state[f]; });
   $('offPeak').checked = state.offPeak;
   $('thinking').checked = state.thinking;
+  $('softwareOn').checked = state.softwareOn;
   modelSel.value = state.model;
 }
 function syncSegs() {
@@ -1634,7 +1641,7 @@ function renderOption(node, { monthly, win, lines, extra, warn, note, eligible =
   slot.replaceChildren(); if (win) slot.append(el('span', { class: 'chip chip-win' }, t('cheapest'))); if (recommended) slot.append(el('span', { class: 'chip chip-rec' }, t('recommended')));
   node.querySelector('.opt-total .big').textContent = eligible ? money(monthly, 0) : t('unavailable');
   node.dataset.software = eligible ? software.toFixed(2) : ''; node.dataset.infra = eligible ? infra.toFixed(2) : '';
-  node.querySelector('.opt-stack').textContent = eligible ? `${t('lSoftware')} ${money(software, 0)} · ${t('lInfra')} ${money(infra, 0)}` : '';
+  node.querySelector('.opt-stack').textContent = !eligible ? '' : state.softwareOn === false ? `${t('softwareOff')} · ${t('lInfra')} ${money(infra, 0)}` : `${t('lSoftware')} ${money(software, 0)} · ${t('lInfra')} ${money(infra, 0)}`;
   const box = node.querySelector('.opt-lines'); box.replaceChildren();
   if (eligible) {
     lines.forEach(([l, v]) => { const d = el('div', { class: 'line' }); d.append(el('span', {}, l), el('b', {}, v)); box.append(d); });
@@ -1768,7 +1775,7 @@ function render() {
     smallReplacementMonths: String(s.smallReplace), smallFirstYear: cumulativeCost('small', small, 12).toFixed(2), smallCapex: String(s.smallCapex),
     apiSoftware: api.software.monthly.toFixed(2), cloudSoftware: cloud.software.monthly.toFixed(2), smallSoftware: small.software.monthly.toFixed(2), ownSoftware: own.software.monthly.toFixed(2),
     softwareLicense: String(s.softLicense), softwareSupportYear: String(s.softSupport),
-    assumptionsOpen: String(dialogEl.open),
+    assumptionsOpen: String(dialogEl.open), softwareOn: String(s.softwareOn),
   });
   $('live').textContent = t('live', { api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), own: money(own.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable') });
 }
@@ -2105,10 +2112,11 @@ function parseScenario(text) {
   const values = Object.fromEntries([...Object.keys(DEFAULTS), 'lang'].map((key) => [key, parsed.values[key]]));
   if (!Object.prototype.hasOwnProperty.call(parsed.values, 'maxUtilization')) values.maxUtilization = DEFAULTS.maxUtilization;
   if (!Object.prototype.hasOwnProperty.call(parsed.values, 'smallRecommendFrom')) values.smallRecommendFrom = DEFAULTS.smallRecommendFrom;
+  if (!Object.prototype.hasOwnProperty.call(parsed.values, 'softwareOn')) values.softwareOn = DEFAULTS.softwareOn;
   if (NUM_FIELDS.some((key) => typeof values[key] !== 'number')) throw new Error('numeric settings');
   if (Object.keys(validateState(values)).length) throw new Error('invalid settings');
   if (!['pl', 'en'].includes(values.lang) || !['pl', 'en'].includes(values.docLang) || !['work', '247'].includes(values.cloudMode)) throw new Error('language / mode');
-  if (typeof values.thinking !== 'boolean' || typeof values.offPeak !== 'boolean') throw new Error('boolean');
+  if (typeof values.thinking !== 'boolean' || typeof values.offPeak !== 'boolean' || typeof values.softwareOn !== 'boolean') throw new Error('boolean');
   if (TEXT_FIELDS.some((key) => typeof values[key] !== 'string' || values[key].length > 200)) throw new Error('GPU label');
   if (typeof parsed.csvText !== 'string') throw new Error('CSV');
   const models = modelsFromCsv(parsed.csvText);
@@ -2291,7 +2299,7 @@ function onInput(e) {
     else { App.invalidFields.delete(id); state[id] = checked.value; }
   }
   else if (TEXT_FIELDS.includes(id)) state[id] = e.target.value.slice(0, 200);
-  else if (id === 'offPeak' || id === 'thinking') state[id] = e.target.checked;
+  else if (id === 'offPeak' || id === 'thinking' || id === 'softwareOn') state[id] = e.target.checked;
   else if (id === 'model') state.model = e.target.value;
   else return;
   markDirty(); render();
