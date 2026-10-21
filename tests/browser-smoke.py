@@ -266,6 +266,16 @@ CAPACITY_SMOKE_SCRIPT = r"""
     setInput('users', 20);
     expect(document.querySelector('#validationStatus').hidden === true, 'banner hides after recovery');
 
+    // Review fix C1/I5: rendering never writes the hash; applying a hash consumes it and keeps the custom model list.
+    expect(location.hash === '', 'render must not write the URL hash');
+    const keptModels = state.models.length;
+    expect(applyShareHash('#users=77') === true, 'applyShareHash accepts a valid hash');
+    expect(state.users === 77 && document.querySelector('#users').value === '77', 'hash values applied');
+    expect(location.hash === '' && state.models.length === keptModels, 'hash consumed, models untouched');
+    expect(applyShareHash('#users=0') === false && state.users === 77, 'invalid hash ignored');
+    click('[data-preset="S1"]');
+    expect(location.hash === '', 'preset change leaves the URL alone');
+
     expect(document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1, 'horizontal overflow');
     finish({ ok: true });
   } catch (error) {

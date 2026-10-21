@@ -391,4 +391,16 @@ assert.equal(JSON.stringify(run('crossovers([{ key: "a", ys: [1, 2] }, { key: "b
 assert.equal(JSON.stringify(run('crossovers([{ key: "a", ys: [5, 6, 7] }, { key: "b", ys: [1, 2, 3] }])')), '[]', 'no crossing when one series stays above');
 assert.equal(run('crossovers([{ key: "a", ys: [0, 10, 20, 30, 40] }, { key: "b", ys: [25, 25, 25, 25, 25] }, { key: "c", ys: [15, 15, 15, 15, 15] }]).length'), 2, 'one crossover per crossing pair');
 
+// Review fixes: no duplicate keys inside T.pl / T.en; edge-case insight templates exist
+const tSource = js.slice(js.indexOf('const T = {'), js.indexOf('};', js.indexOf('const T = {')));
+for (const lang of ['pl', 'en']) {
+  const block = tSource.slice(tSource.indexOf(`  ${lang}: {`), tSource.indexOf('\n  }', tSource.indexOf(`  ${lang}: {`)));
+  const keys = [...block.matchAll(/(?:^|[{,]\s*)([A-Za-z_][\w]*):\s/g)].map((m) => m[1]);
+  const dupes = keys.filter((k, i) => keys.indexOf(k) !== i);
+  assert.deepEqual(dupes, [], `duplicate T.${lang} keys: ${dupes.join(', ')}`);
+  for (const key of ['thChecked', 'aApiVsCloudNever', 'aApiVsCloudAlways', 'aApiVsSmallNever', 'aApiVsSmallAlways', 'aApiVsOwnNever', 'aApiVsOwnAlways', 'aPaybackNever', 'aPaybackSmallNever', 'linkIgnored'])
+    assert.equal(typeof run(`T.${lang}.${key}`), 'string', `${lang}.${key}`);
+  assert.ok(!/\{n\}/.test(run(`T.${lang}.aPaybackNever`)), 'never template has no placeholder');
+}
+
 console.log('Core validation, CSV, cost-model, and regression checks passed');

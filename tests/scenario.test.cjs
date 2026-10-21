@@ -37,6 +37,10 @@ vm.runInContext(`
   if (!fromHash || fromHash.values.softwareOn !== false || fromHash.values.users !== 100 || fromHash.values.lang !== 'en') throw Error('hash values not applied');
   if ('csvText' in fromHash.values || 'models' in fromHash.values) throw Error('hash must not carry csv');
   if (fromShareHash('') !== null) throw Error('empty hash yields null');
+  // Review fix I4: a model that only exists in a custom CSV is dropped from the link
+  const customHash = toShareHash({ ...DEFAULTS, lang: 'pl', users: 100, model: 'My private model' }, modelsFromCsv(csv));
+  if (customHash !== 'users=100') throw Error('custom-only model must be dropped from the hash: ' + customHash);
+  if (toShareHash({ ...DEFAULTS, lang: 'pl', model: 'OpenAI GPT-5.6 Luna' }, modelsFromCsv(csv)) !== 'model=OpenAI+GPT-5.6+Luna') throw Error('built-in model stays in the hash');
   mustReject({ ...saved, version: 999 });
   mustReject({ ...saved, values: { ...saved.values, ownAmort: 0 } });
   mustReject({ ...saved, values: { ...saved.values, users: '20' } });

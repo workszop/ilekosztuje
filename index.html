@@ -741,7 +741,7 @@ td.src a:hover { text-decoration: underline; }
       <table id="modelTable">
         <thead><tr>
           <th data-t="thModel"></th><th class="num" data-t="thTok"></th><th class="num" data-t="thIn"></th><th class="num" data-t="thOut"></th>
-          <th class="num" data-t="thReq"></th><th class="num" data-t="thMonth"></th><th data-t="thVs"></th><th data-t="thSource"></th>
+          <th class="num" data-t="thReq"></th><th class="num" data-t="thMonth"></th><th data-t="thVs"></th><th data-t="thChecked"></th>
         </tr></thead>
         <tbody></tbody>
       </table>
@@ -880,14 +880,14 @@ const T = {
     crossAt: 'm. {m}',
     apiCapacity: 'Skalowanie po stronie dostawcy – bez limitu użytkowników.', changeUsers: 'Zmień liczbę użytkowników',
     yes: 'tak', no: 'nie',
-    shareLink: 'Kopiuj link', printBtn: 'Drukuj / PDF', linkCopied: 'Link skopiowany.', linkNoCsv: 'Link skopiowany. Nie zawiera własnego cennika CSV.', linkInvalid: 'Link zawierał nieprawidłowe wartości – pokazano domyślny scenariusz.', linkFailed: 'Nie udało się skopiować. Skopiuj adres z paska przeglądarki.', printTitle: 'Scenariusz',
-    softwareOn: 'Licz oprogramowanie Zagłoba RAG', softwareOff: 'bez oprogramowania',
+    shareLink: 'Kopiuj link', printBtn: 'Drukuj / PDF', linkCopied: 'Link skopiowany.', linkNoCsv: 'Link skopiowany. Nie zawiera własnego cennika CSV.', linkIgnored: 'Link zawierał nieprawidłowe wartości – zignorowano.', linkNeedsValid: 'Popraw pola, zanim skopiujesz link.', linkFailed: 'Nie udało się skopiować. Skopiuj adres z paska przeglądarki.', printTitle: 'Scenariusz',
+    softwareOn: 'Uwzględnij koszt oprogramowania AI', softwareOff: 'bez oprogramowania',
     help_users: 'Osoby, które będą zadawać pytania asystentowi.',
     help_chunks: 'RAG dokleja do pytania fragmenty Twoich dokumentów. Tyle fragmentów trafia do jednego zapytania.',
     help_chunkTok: 'Długość jednego fragmentu. 2000 tokenów to ok. 1500 słów.',
     help_peak: 'Ile razy ruch w najgorętszej godzinie przekracza średnią. Decyduje o liczbie GPU.',
     help_maxUtilization: 'Sprzęt liczymy tak, by w szczycie nie był obciążony powyżej tego procentu.',
-    help_smallMaxUsers: 'Powyżej tej liczby osób jedna stacja Dell GB10 nie wystarcza – opcja znika z porównania.',
+    help_smallMaxUsers: 'Powyżej tej liczby osób jedna stacja Dell GB10 nie wystarcza – opcja jest oznaczana jako niedostępna.',
     help_softApi: 'Abonament Zagłoba RAG (warstwa oprogramowania) przy API i chmurze. Wyłącz go przełącznikiem u góry.',
     help_softLicense: 'Jednorazowa licencja Zagłoba RAG przy własnym sprzęcie, rozłożona na miesiące amortyzacji.',
     glossaryTitle: 'Słowniczek',
@@ -921,12 +921,16 @@ const T = {
     aApiVsCloud: 'API jest tańsze od chmury GPU do ok. {n}.', aApiVsOwn: 'API jest tańsze od własnego serwera do ok. {n}.',
     aApiVsSmall: 'API jest tańsze od Dell GB10 do ok. {n}.', aPaybackSmall: 'Dell GB10 zwraca się wobec chmury po {n}.',
     aPayback: 'Własny serwer zwraca się wobec chmury po {n}.', aMinute: 'Jedno zapytanie API kosztuje {cost}, czyli {pct} minuty pracy pracownika ({minute}).',
+    aApiVsCloudNever: 'API nie jest tańsze od chmury GPU nawet przy 1 osobie.', aApiVsCloudAlways: 'API jest tańsze od chmury GPU co najmniej do 20 000 użytkowników.',
+    aApiVsSmallNever: 'API nie jest tańsze od Dell GB10 nawet przy 1 osobie.', aApiVsSmallAlways: 'API jest tańsze od Dell GB10 co najmniej do 20 000 użytkowników.',
+    aApiVsOwnNever: 'API nie jest tańsze od własnego serwera nawet przy 1 osobie.', aApiVsOwnAlways: 'API jest tańsze od własnego serwera co najmniej do 20 000 użytkowników.',
+    aPaybackNever: 'Własny serwer nie zwraca się wobec chmury w ciągu 10 lat.', aPaybackSmallNever: 'Dell GB10 nie zwraca się wobec chmury w ciągu 10 lat.',
     aUnavailable: 'Dell GB10 jest niedostępny przy tej liczbie użytkowników.', aApiUnavailable: 'Wybrany model API nie obsłuży tego zapytania.',
     usersUnit: 'użytk.', monthsUnit: 'mies.', usersWord: 'użytkowników', monthsWord: 'miesiącach', never: 'nie w ciągu 10 lat', apiNever: 'nigdy (już 1 osoba)', apiAlways: 'co najmniej 20 000 użytkowników',
     chartTime: 'Koszt narastająco w czasie', chartTimeSub: 'Dell GB10 i własny serwer startują od ceny sprzętu i licencji Zagłoba RAG. Co okres wymiany sprzętu doliczamy kolejny zakup sprzętu; licencja jest jednorazowa.',
     showData: 'Pokaż dane', monthLabel: 'Miesiąc',
     secModels: 'Porównaj wszystkie modele API', modelsNote: 'Kwoty miesięczne zawierają Zagłoba RAG jako SaaS i stałą infrastrukturę API. Tokeny są szacowane dla rodziny modelu, nie liczone uruchomieniem tokenizerów. Kliknij wiersz, aby wybrać model.',
-    thModel: 'Model', thTok: 'Tokeny we / wy', thIn: 'We $/1M', thOut: 'Wy $/1M', thReq: 'Zapytanie', thMonth: 'Miesięcznie', thVs: 'Na tle GPU', thSource: 'Sprawdzono', sourceLink: 'źródło',
+    thModel: 'Model', thTok: 'Tokeny we / wy', thIn: 'We $/1M', thOut: 'Wy $/1M', thReq: 'Zapytanie', thMonth: 'Miesięcznie', thVs: 'Na tle GPU', thChecked: 'Sprawdzono', sourceLink: 'źródło',
     vsCheaper: 'tańsze niż każda opcja GPU', vsDearer: 'droższe niż każda opcja GPU', vsMid: 'pomiędzy',
     secAdvanced: 'Ustawienia zaawansowane', advApi: 'API', advTime: 'Czas i obciążenie', advGpu: 'Przepustowość GPU (tok/s)',
     fx: 'Kurs USD → PLN', thinking: 'Tryb myślenia (rozumowanie)', thinkMult: 'Mnożnik wyjścia przy myśleniu', offPeak: 'DeepSeek poza szczytem',
@@ -941,14 +945,14 @@ const T = {
     crossAt: 'mo {m}',
     apiCapacity: 'Scales on the provider side – no user cap.', changeUsers: 'Change the number of users',
     yes: 'yes', no: 'no',
-    shareLink: 'Copy link', printBtn: 'Print / PDF', linkCopied: 'Link copied.', linkNoCsv: 'Link copied. It does not carry the custom CSV price list.', linkInvalid: 'The link had invalid values – showing the default scenario.', linkFailed: 'Could not copy. Copy the address from the browser bar.', printTitle: 'Scenario',
-    softwareOn: 'Include Zagłoba RAG software', softwareOff: 'software excluded',
+    shareLink: 'Copy link', printBtn: 'Print / PDF', linkCopied: 'Link copied.', linkNoCsv: 'Link copied. It does not carry the custom CSV price list.', linkIgnored: 'The link had invalid values – ignored.', linkNeedsValid: 'Fix the fields before copying a link.', linkFailed: 'Could not copy. Copy the address from the browser bar.', printTitle: 'Scenario',
+    softwareOn: 'Include AI software cost', softwareOff: 'software excluded',
     help_users: 'People who will ask the assistant questions.',
     help_chunks: 'RAG attaches excerpts of your documents to each question. This many excerpts go into one request.',
     help_chunkTok: 'Length of one excerpt. 2000 tokens is about 1500 words.',
     help_peak: 'How many times the busiest hour exceeds the average. Drives the number of GPUs.',
     help_maxUtilization: 'Hardware is sized so the peak never loads it above this percentage.',
-    help_smallMaxUsers: 'Above this many people one Dell GB10 station is not enough – the option leaves the comparison.',
+    help_smallMaxUsers: 'Above this many people one Dell GB10 station is not enough – the option is marked unavailable.',
     help_softApi: 'Zagłoba RAG subscription (the software layer) with API and cloud. Switch it off with the toggle at the top.',
     help_softLicense: 'One-off Zagłoba RAG licence with your own hardware, spread over the amortisation months.',
     glossaryTitle: 'Glossary',
@@ -982,12 +986,16 @@ const T = {
     aApiVsCloud: 'API is cheaper than cloud GPU up to about {n}.', aApiVsOwn: 'API is cheaper than an own server up to about {n}.',
     aApiVsSmall: 'API is cheaper than Dell GB10 up to about {n}.', aPaybackSmall: 'Dell GB10 pays back against cloud after {n}.',
     aPayback: 'An own server pays back against cloud after {n}.', aMinute: 'One API request costs {cost}, which is {pct} of a minute of staff time ({minute}).',
+    aApiVsCloudNever: 'API is not cheaper than cloud GPU even for 1 user.', aApiVsCloudAlways: 'API stays cheaper than cloud GPU up to at least 20,000 users.',
+    aApiVsSmallNever: 'API is not cheaper than Dell GB10 even for 1 user.', aApiVsSmallAlways: 'API stays cheaper than Dell GB10 up to at least 20,000 users.',
+    aApiVsOwnNever: 'API is not cheaper than an own server even for 1 user.', aApiVsOwnAlways: 'API stays cheaper than an own server up to at least 20,000 users.',
+    aPaybackNever: 'An own server does not pay back against cloud within 10 years.', aPaybackSmallNever: 'Dell GB10 does not pay back against cloud within 10 years.',
     aUnavailable: 'Dell GB10 is unavailable at this number of users.', aApiUnavailable: 'The selected API model cannot serve this request.',
     usersUnit: 'users', monthsUnit: 'mo.', usersWord: 'users', monthsWord: 'months', never: 'not within 10 years', apiNever: 'never (even 1 user)', apiAlways: 'at least 20,000 users',
     chartTime: 'Cumulative cost over time', chartTimeSub: 'Dell GB10 and own server start at the hardware price plus the Zagłoba RAG licence. Hardware is bought again each replacement period; the licence is one-off.',
     showData: 'Show data', monthLabel: 'Month',
     secModels: 'Compare all API models', modelsNote: 'Monthly amounts include Zagłoba RAG as SaaS and the fixed API infrastructure. Tokens are estimated for the model family, not measured by running each tokenizer. Click a row to select the model.',
-    thModel: 'Model', thTok: 'Tokens in / out', thIn: 'In $/1M', thOut: 'Out $/1M', thReq: 'Request', thMonth: 'Monthly', thVs: 'Vs GPU', thSource: 'Checked', sourceLink: 'source',
+    thModel: 'Model', thTok: 'Tokens in / out', thIn: 'In $/1M', thOut: 'Out $/1M', thReq: 'Request', thMonth: 'Monthly', thVs: 'Vs GPU', thChecked: 'Checked', sourceLink: 'source',
     vsCheaper: 'cheaper than every GPU option', vsDearer: 'dearer than every GPU option', vsMid: 'in between',
     secAdvanced: 'Advanced settings', advApi: 'API', advTime: 'Time and load', advGpu: 'GPU throughput (tok/s)',
     fx: 'USD → PLN rate', thinking: 'Thinking mode (reasoning)', thinkMult: 'Output multiplier when thinking', offPeak: 'DeepSeek off-peak',
@@ -1686,16 +1694,6 @@ function applyI18n() {
   $('settingsBackdrop').setAttribute('aria-label', t('settingsClose'));
   renderHelp();
 }
-let hashFrame = 0;
-function syncShareHash() {
-  if (hashFrame) return;
-  hashFrame = requestAnimationFrame(() => {
-    hashFrame = 0;
-    const hash = toShareHash(state);
-    const next = hash ? '#' + hash : location.pathname + location.search;
-    if ((hash ? '#' + hash : '') !== location.hash) history.replaceState(null, '', next);
-  });
-}
 function renderTicker(values) {
   const box = $('ticker'); if (!box) return;
   for (const [key, text] of Object.entries(values)) {
@@ -1768,7 +1766,8 @@ function renderOption(node, { monthly, win, lines, extra, warn, note, eligible =
   const noteNode = node.querySelector('.opt-note'); noteNode.replaceChildren();
   if (!eligible) {
     noteNode.hidden = false;
-    noteNode.append(el('button', { type: 'button', class: 'link', 'data-focus': 'users' }, t('changeUsers')));
+    if (node.dataset.path === 'small') noteNode.append(el('button', { type: 'button', class: 'link', 'data-focus': 'users' }, t('changeUsers')));
+    else noteNode.append(document.createTextNode(warn || t('unavailable')));
   } else { noteNode.hidden = !note; if (note) noteNode.textContent = note; }
 }
 
@@ -1873,7 +1872,8 @@ function render() {
   ]);
   const maxU = 20000;
   const beCloud = result.breakEvenCloud, beOwn = result.breakEvenOwn, beSmall = result.breakEvenSmall;
-  const beTxt = (n) => n === 0 ? t('apiNever') : n >= maxU ? t('apiAlways') : fmtNum(n) + ' ' + t('usersWord');
+  const beSentence = (key, n) => n === 0 ? t(key + 'Never') : n >= maxU ? t(key + 'Always') : t(key, { n: fmtNum(n) + ' ' + t('usersWord') });
+  const pbSentence = (key, m) => m == null ? t(key + 'Never') : t(key, { n: m + ' ' + t('monthsWord') });
   const pbCloud = result.payback, pbSmall = result.paybackSmall;
   const minuteRatio = api.perReq / MINUTE_OF_WORK;
   const v = verdict(result);
@@ -1883,12 +1883,12 @@ function render() {
   const answers = [];
   if (!api.eligible) answers.push(t('aApiUnavailable'));
   else {
-    answers.push(t('aApiVsCloud', { n: beTxt(beCloud) }));
-    answers.push(small.eligible ? t('aApiVsSmall', { n: beTxt(beSmall) }) : t('aUnavailable'));
-    answers.push(t('aApiVsOwn', { n: beTxt(beOwn) }));
+    answers.push(beSentence('aApiVsCloud', beCloud));
+    answers.push(small.eligible ? beSentence('aApiVsSmall', beSmall) : t('aUnavailable'));
+    answers.push(beSentence('aApiVsOwn', beOwn));
   }
-  if (small.eligible) answers.push(t('aPaybackSmall', { n: pbSmall == null ? t('never') : pbSmall + ' ' + t('monthsWord') }));
-  answers.push(t('aPayback', { n: pbCloud == null ? t('never') : pbCloud + ' ' + t('monthsWord') }));
+  if (small.eligible) answers.push(pbSentence('aPaybackSmall', pbSmall));
+  answers.push(pbSentence('aPayback', pbCloud));
   if (api.eligible) answers.push(t('aMinute', { cost: money(api.perReq, 2), pct: minuteRatio < 0.01 ? '<1%' : pct(minuteRatio), minute: money(MINUTE_OF_WORK, 2) }));
   $('answers').replaceChildren(...answers.map((text, i) => el('li', { class: i === 0 ? 'key' : '' }, text)));
   $('answers').append(el('li', { class: 'hint' }, t('firstCrossNote')));
@@ -1916,7 +1916,6 @@ function render() {
   });
   renderPrintSummary();
   renderTicker({ api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable'), own: money(own.monthly, 0) });
-  syncShareHash();
   $('live').textContent = t('live', { api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), own: money(own.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable') });
 }
 
@@ -2049,7 +2048,7 @@ function buildAssumptions() {
     { title: P('Małe wdrożenie: Dell GB10', 'Small deployment: Dell GB10'), rows: [
       [P('Sprzęt', 'Hardware'), now(s.smallGpu),
         P('Stacja Dell Pro Max z układem NVIDIA GB10 Grace Blackwell: 128 GB pamięci zunifikowanej, pobór mocy stacji do ok. 240 W. Jedna maszyna obsługuje jeden model klasy 30–70B w kwantyzacji; kalkulator liczy kolejne sztuki, gdy szczyt przekracza przepustowość.', 'A Dell Pro Max workstation with the NVIDIA GB10 Grace Blackwell superchip: 128 GB unified memory, system power draw around 240 W. One box serves one quantised 30–70B-class model; the calculator adds units when the peak exceeds throughput.'), 'gb10'],
-      [P('Limit użytkowników', 'User limit'), now(fmtNum(s.smallMaxUsers) + ' ' + t('usersUnit')), P('Do tej liczby użytkowników włącznie opcja Dell GB10 bierze udział w porównaniu. Powyżej jest oznaczana jako niedostępna i pomijana na kartach, paskach i wykresie.', 'Up to and including this number of users the Dell GB10 option takes part in the comparison. Above it, it is marked unavailable and left out of the cards, bars and chart.')],
+      [P('Limit użytkowników', 'User limit'), now(fmtNum(s.smallMaxUsers) + ' ' + t('usersUnit')), P('Do tej liczby użytkowników włącznie opcja Dell GB10 bierze udział w porównaniu. Powyżej jest oznaczana jako niedostępna i oznaczana jako niedostępna na karcie, paskach i wykresie.', 'Up to and including this number of users the Dell GB10 option takes part in the comparison. Above it, it is marked unavailable and left out of the cards, bars and chart.')],
       [P('Rekomendacja innej opcji', 'Recommending another option'), now(P('od ', 'from ') + fmtNum(s.smallRecommendFrom) + ' ' + t('usersUnit')), P('Gdy Dell GB10 jest najtańszy przy tej liczbie użytkowników lub większej, karta GB10 zachowuje etykietę „Najtańsze”, a kolejna najtańsza opcja dostaje etykietę „Rekomendowane”. Poniżej progu rekomendacja nie jest pokazywana.', 'When Dell GB10 is the cheapest at this number of users or more, the GB10 card keeps the “Cheapest” label and the next cheapest option gets the “Recommended” label. Below the threshold no recommendation is shown.')],
       [P('Zakup', 'Purchase'), now(money(s.smallCapex, 0)),
         P('Cena pakietu małego wdrożenia (sprzęt Dell GB10 z konfiguracją) za jedną stację. Jest edytowalną wartością scenariusza; nie obejmuje licencji Zagłoba RAG (liczona osobno) ani utrzymania.', 'Price of the small deployment package (Dell GB10 hardware with setup) per unit. It is an editable scenario value; it excludes the Zagłoba RAG licence (counted separately) and operations.')],
@@ -2288,11 +2287,12 @@ function parseScenario(text) {
 
 const SHARE_KEYS = [...Object.keys(DEFAULTS), 'lang'];
 const SHARE_BOOLEANS = ['thinking', 'offPeak', 'softwareOn'];
-function toShareHash(s) {
+function toShareHash(s, builtinModels = []) {
   const params = new URLSearchParams();
   const base = { ...DEFAULTS, lang: 'pl' };
   for (const key of SHARE_KEYS) {
     if (s[key] === base[key] || s[key] === undefined) continue;
+    if (key === 'model' && builtinModels.length && !builtinModels.some((m) => m.name === s[key])) continue;
     params.set(key, SHARE_BOOLEANS.includes(key) ? (s[key] ? '1' : '0') : String(s[key]));
   }
   return params.toString();
@@ -2488,6 +2488,20 @@ function focusField(id) {
   node.focus();
 }
 document.addEventListener('click', (e) => { const b = e.target.closest('[data-focus]'); if (b) focusField(b.dataset.focus); });
+let builtinModelCache = null;
+function builtinModels() { return builtinModelCache || (builtinModelCache = modelsFromCsv($('csvData').textContent)); }
+// Apply a shared link's values over the current scenario (keeps the loaded model list) and consume the hash.
+function applyShareHash(hash) {
+  const shared = fromShareHash(hash, state.models);
+  const clean = location.pathname + location.search;
+  if (!shared) { if (String(hash || '').length > 1) { history.replaceState(null, '', clean); $('scenarioStatus').textContent = t('linkIgnored'); } return false; }
+  Object.assign(state, shared.values);
+  App.invalidFields.clear();
+  history.replaceState(null, '', clean);
+  applyI18n(); renderModelSelect(); syncInputs(true); render(); markDirty();
+  return true;
+}
+window.addEventListener('hashchange', () => applyShareHash(location.hash));
 settingsToggle.addEventListener('click', () => setSettingsOpen(!App.settingsOpen));
 $('settingsClose').addEventListener('click', () => setSettingsOpen(false));
 $('settingsBackdrop').addEventListener('click', () => setSettingsOpen(false));
@@ -2582,8 +2596,9 @@ $('scenarioExport').addEventListener('click', () => {
 });
 $('scenarioImport').addEventListener('click', () => $('scenarioFile').click());
 $('shareLink').addEventListener('click', async () => {
-  if (!renderValidation()) return;
-  const url = location.origin + location.pathname + (toShareHash(state) ? '#' + toShareHash(state) : '');
+  if (!renderValidation()) { $('scenarioStatus').textContent = t('linkNeedsValid'); return; }
+  const hash = toShareHash(state, builtinModels());
+  const url = location.href.split('#')[0] + (hash ? '#' + hash : '');
   try {
     await navigator.clipboard.writeText(url);
     $('scenarioStatus').textContent = t(state.csvSource ? 'linkNoCsv' : 'linkCopied');
@@ -2650,15 +2665,16 @@ function initDots(canvas) {
   state.csvText = $('csvData').textContent;
   state.models = modelsFromCsv(state.csvText);
   let restoreError = false, linkInvalid = false;
-  const shared = location.hash.length > 1 ? fromShareHash(location.hash, state.models) : null;
-  if (shared) Object.assign(state, shared.values);
-  else {
-    if (location.hash.length > 1) linkInvalid = true;
-    try {
-      const saved = localStorage.getItem(LS_SCENARIO);
-      if (saved) { const loaded = parseScenario(saved); Object.assign(state, loaded.values, { models: loaded.models, csvText: loaded.csvText, csvSource: loaded.csvSource }); }
-    } catch (_) { restoreError = true; }
-    if (preferredLang) state.lang = preferredLang;
+  try {
+    const saved = localStorage.getItem(LS_SCENARIO);
+    if (saved) { const loaded = parseScenario(saved); Object.assign(state, loaded.values, { models: loaded.models, csvText: loaded.csvText, csvSource: loaded.csvSource }); }
+  } catch (_) { restoreError = true; }
+  if (preferredLang) state.lang = preferredLang;
+  if (location.hash.length > 1) {
+    const shared = fromShareHash(location.hash, state.models);
+    if (shared) { const sharedLang = new URLSearchParams(location.hash.slice(1)).has('lang'); Object.assign(state, shared.values, sharedLang || !preferredLang ? {} : { lang: preferredLang }); }
+    else linkInvalid = true;
+    history.replaceState(null, '', location.pathname + location.search);
   }
   applyI18n();
   renderModelSelect();
@@ -2666,7 +2682,7 @@ function initDots(canvas) {
   syncSettingsPanel();
   render();
   if (restoreError) $('scenarioStatus').textContent = t('scenarioError', { error: 'local storage' });
-  if (linkInvalid) $('scenarioStatus').textContent = t('linkInvalid');
+  if (linkInvalid) $('scenarioStatus').textContent = t('linkIgnored');
   document.querySelectorAll('canvas[data-dots]').forEach(initDots);
   if ('IntersectionObserver' in window) {
     const ticker = $('ticker');

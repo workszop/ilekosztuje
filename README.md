@@ -23,6 +23,24 @@ Quantica jako jedyny kolor wiodący, Satoshi + Geist Mono, karty bento, pigułki
 To **szacunek kosztu inferencji**, a nie oferta, wycena wdrożenia ani gwarancja
 jakości lub przepustowości. Wszystkie kwoty są netto, bez VAT.
 
+## Funkcje dodane 2026-10-21
+
+- Przełącznik **„Uwzględnij koszt oprogramowania AI”** (`softwareOn`, domyślnie
+  włączony) wyłącza warstwę Zagłoba RAG we wszystkich opcjach; wartość jest
+  częścią scenariusza (JSON, link) i kontraktu DOM (`data-software-on`).
+- **Werdykt** jednym zdaniem nad kartami (`#verdict`, `data-verdict-winner`,
+  `data-verdict-recommended`, `data-verdict-savings-pct`) oraz wnioski zapisane
+  jako zdania.
+- **Link do scenariusza** („Kopiuj link”): wartości różne od domyślnych trafiają
+  do `#hash` adresu. Link nie przenosi własnego cennika CSV ani modelu spoza
+  wbudowanej listy. Otwarcie linku nakłada wartości na zapisany lokalnie
+  scenariusz (zachowując wczytany cennik) i czyści hash; sam adres nie zmienia
+  się podczas pracy.
+- **Drukuj / PDF** z arkuszem `@media print` i blokiem „Scenariusz”.
+- Pomoc pod polami, słowniczek, pasek bieżących sum przy przewijaniu, skok z
+  komunikatu walidacji do pola, kolumna „Sprawdzono” ze źródłem cen w tabeli
+  modeli, znaczniki przecięć kosztów na wykresie (`data-crossovers`).
+
 ## Uruchomienie
 
 Projekt nie ma buildu ani zależności npm. Otwórz
@@ -58,9 +76,9 @@ stała infrastruktura `apiOps` 1 000 PLN / mies. Koszty obsługi sprzętu
 (`cloudOps`, `ownOps`, `smallOps`) domyślnie wynoszą 0.
 
 Opcja jest przeznaczona dla małych wdrożeń: do **100 użytkowników** włącznie
-(`smallMaxUsers` = 100) GB10 bierze udział w porównaniu; od 101 karta pokazuje
-„Opcja niedostępna” i GB10 nie bierze udziału w porównaniu, paskach ani
-wykresie. Poniżej limitu, gdy szczyt przekracza zadany limit wykorzystania,
+(`smallMaxUsers` = 100) GB10 bierze udział w porównaniu; od 101 karta, pasek
+w podsumowaniu i legenda wykresu oznaczają GB10 jako „Niedostępne” (karta
+zostaje, bez kwoty, z linkiem do zmiany liczby użytkowników). Poniżej limitu, gdy szczyt przekracza zadany limit wykorzystania,
 kalkulator dolicza kolejne sztuki GB10. Wartości przepustowości trzeba
 zmierzyć na własnym modelu przed decyzją.
 

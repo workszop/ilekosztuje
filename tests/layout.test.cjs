@@ -195,7 +195,7 @@ assert.equal(descendants(documentRoot, (node) => hasClass(node, 'hero-q')).lengt
 const heroInner = descendants(documentRoot, (node) => hasClass(node, 'hero-inner'))[0];
 const resultsContext = descendants(documentRoot, (node) => hasClass(node, 'results-context'))[0];
 assert.ok(heroInner && resultsContext && contains(heroInner, resultsContext), 'stats strip sits inside the hero');
-assert.ok(descendants(documentRoot, (node) => node.tag === 'th' && node.attrs['data-t'] === 'thSource').length === 1, 'model table has a source column');
+assert.ok(descendants(documentRoot, (node) => node.tag === 'th' && node.attrs['data-t'] === 'thChecked').length === 1, 'model table has a source column');
 
 // Task 11: every option card shares one structure
 const optionCards = descendants(resultsPanel, (node) => hasClass(node, 'option'));
