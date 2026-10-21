@@ -365,7 +365,13 @@ assert.ok(run('totalCost("cloud", { ...DEFAULTS, softwareOn: false }).monthly') 
 
 // Task 4: verdict
 const verdict20 = run('(() => { const r = computeResults({ ...DEFAULTS, lang: "en" }, models); return { v: verdict(r), r }; })()');
-assert.equal(verdict20.v.winner, verdict20.r.recommended || verdict20.r.winner, 'verdict follows the recommended/winner path');
+assert.equal(verdict20.v.winner, verdict20.r.winner, 'verdict winner is the cheapest eligible path');
+const verdict100 = run('(() => { const r = computeResults({ ...DEFAULTS, users: 100 }, models); return { v: verdict(r), r }; })()');
+assert.equal(verdict100.r.recommended, 'api', 'fixture: API recommended at 100 users');
+assert.equal(verdict100.v.winner, 'small', 'cheapest stays the winner');
+assert.equal(verdict100.v.recommended, 'api', 'verdict carries the recommendation');
+assert.ok(verdict100.v.savingsPct >= 0, 'savings never negative');
+assert.ok(verdict100.v.recommendedMonthly > verdict100.v.monthly, 'recommended monthly reported');
 assert.ok(verdict20.v.savingsPct > 0 && verdict20.v.savingsPct < 1, `savings fraction ${verdict20.v.savingsPct}`);
 assert.ok(verdict20.v.runnerUp && verdict20.v.runnerUp !== verdict20.v.winner, 'runner-up differs from winner');
 const verdict300 = run('verdict(computeResults({ ...DEFAULTS, users: 300 }, models))');
@@ -378,5 +384,11 @@ for (const key of ['verdictText', 'verdictSingle', 'aApiVsCloud', 'aApiVsSmall',
 assert.equal(models[0].checkedAt, '2026-09-13', 'checkedAt parsed from CSV');
 assert.ok(String(models[0].source).startsWith('https://'), 'source URL parsed from CSV');
 for (const lang of ['pl', 'en']) { assert.equal(typeof run(`T.${lang}.thSource`), 'string'); assert.equal(typeof run(`T.${lang}.sourceLink`), 'string'); }
+
+// Task 12: crossover detection between cumulative series
+assert.equal(JSON.stringify(run('crossovers([{ key: "a", ys: [0, 10, 20, 30] }, { key: "b", ys: [25, 25, 25, 25] }])')), JSON.stringify([{ a: 'a', b: 'b', month: 3, value: 30 }]));
+assert.equal(JSON.stringify(run('crossovers([{ key: "a", ys: [1, 2] }, { key: "b", ys: [] }])')), '[]', 'series without data are skipped');
+assert.equal(JSON.stringify(run('crossovers([{ key: "a", ys: [5, 6, 7] }, { key: "b", ys: [1, 2, 3] }])')), '[]', 'no crossing when one series stays above');
+assert.equal(run('crossovers([{ key: "a", ys: [0, 10, 20, 30, 40] }, { key: "b", ys: [25, 25, 25, 25, 25] }, { key: "c", ys: [15, 15, 15, 15, 15] }]).length'), 2, 'one crossover per crossing pair');
 
 console.log('Core validation, CSV, cost-model, and regression checks passed');

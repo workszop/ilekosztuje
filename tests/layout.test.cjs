@@ -205,4 +205,9 @@ for (const card of optionCards) {
   assert.equal(card.children.filter((n) => n.tag === 'details' && hasClass(n, 'cost-breakdown')).length, 1, `${card.attrs.id} has one breakdown`);
 }
 
+// Task 12: summary, chart and model cards are visually secondary
+const twoCol = descendants(resultsPanel, (node) => hasClass(node, 'two-col'))[0];
+assert.ok(twoCol, 'summary/chart section exists');
+assert.ok(twoCol.children.filter((n) => hasClass(n, 'card')).every((n) => hasClass(n, 'secondary')), 'summary and chart cards carry .secondary');
+
 console.log('Sidebar layout and keyboard contracts passed');
