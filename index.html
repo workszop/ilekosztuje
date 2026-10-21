@@ -322,6 +322,7 @@ footer.shortcuts { font-family: var(--font-sans); font-size: var(--small-size); 
 .settings-body #workloadDetails { border-top: 1px solid var(--border-1); margin-top: var(--sp-3); }
 .settings-body #workloadDetails > summary { padding-top: 10px; font-size: var(--body-sm); }
 .check-software { padding: 10px 12px; margin: 0 0 var(--sp-3); border: 1px solid var(--border-1); border-radius: var(--radius-md); background: var(--magenta-tint); font-weight: 600; font-size: var(--body-sm); }
+.check-software > span:last-child { white-space: pre-line; line-height: 1.3; }
 .check-software input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .switch-track { flex: none; width: 34px; height: 20px; border-radius: 999px; background: var(--border-2); position: relative; transition: background-color .2s; }
 .switch-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg-1); box-shadow: var(--shadow-card); transition: transform .2s; }
@@ -927,7 +928,7 @@ const T = {
     apiCapacity: 'Skalowanie po stronie dostawcy – bez limitu użytkowników.', changeUsers: 'Zmień liczbę użytkowników',
     yes: 'tak', no: 'nie',
     shareLink: 'Kopiuj link', printBtn: 'Drukuj / PDF', linkCopied: 'Link skopiowany.', linkNoCsv: 'Link skopiowany. Nie zawiera własnego cennika CSV.', linkIgnored: 'Link zawierał nieprawidłowe wartości – zignorowano.', linkNeedsValid: 'Popraw pola, zanim skopiujesz link.', linkFailed: 'Nie udało się skopiować. Skopiuj adres z paska przeglądarki.', printTitle: 'Scenariusz',
-    softwareOn: 'Uwzględnij koszt oprogramowania AI', softwareOff: 'bez oprogramowania',
+    softwareOn: 'Uwzględnij koszt\noprogramowania AI', softwareOff: 'bez oprogramowania',
     help_users: 'Osoby, które będą zadawać pytania asystentowi.',
     help_chunks: 'RAG dokleja do pytania fragmenty Twoich dokumentów. Tyle fragmentów trafia do jednego zapytania.',
     help_chunkTok: 'Długość jednego fragmentu. 2000 tokenów to ok. 1500 słów.',
@@ -996,7 +997,7 @@ const T = {
     apiCapacity: 'Scales on the provider side – no user cap.', changeUsers: 'Change the number of users',
     yes: 'yes', no: 'no',
     shareLink: 'Copy link', printBtn: 'Print / PDF', linkCopied: 'Link copied.', linkNoCsv: 'Link copied. It does not carry the custom CSV price list.', linkIgnored: 'The link had invalid values – ignored.', linkNeedsValid: 'Fix the fields before copying a link.', linkFailed: 'Could not copy. Copy the address from the browser bar.', printTitle: 'Scenario',
-    softwareOn: 'Include AI software cost', softwareOff: 'software excluded',
+    softwareOn: 'Include\nAI software cost', softwareOff: 'software excluded',
     help_users: 'People who will ask the assistant questions.',
     help_chunks: 'RAG attaches excerpts of your documents to each question. This many excerpts go into one request.',
     help_chunkTok: 'Length of one excerpt. 2000 tokens is about 1500 words.',
@@ -1776,7 +1777,7 @@ function renderTicker(values) {
 function renderPrintSummary() {
   const box = $('printSummary'); if (!box) return;
   const s = state;
-  const rows = [[t('users'), fmtNum(s.users)], [t('reqPerDay'), fmtNum(s.reqPerDay)], [t('model'), s.model], [t('softwareOn'), s.softwareOn ? t('yes') : t('no')], [t('fx'), fmtNum(s.fx, 2)]];
+  const rows = [[t('users'), fmtNum(s.users)], [t('reqPerDay'), fmtNum(s.reqPerDay)], [t('model'), s.model], [t('softwareOn').replace('\n', ' '), s.softwareOn ? t('yes') : t('no')], [t('fx'), fmtNum(s.fx, 2)]];
   box.replaceChildren(el('h2', {}, t('printTitle')), ...rows.map(([l, v]) => { const d = el('div', { class: 'line' }); d.append(el('span', {}, l), el('b', {}, v)); return d; }));
 }
 function renderHelp() {
