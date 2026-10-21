@@ -351,4 +351,10 @@ assert.equal(run('T.pl.thinking'), 'Tryb myślenia (rozumowanie)');
 assert.equal(new Intl.NumberFormat('pl-PL', { useGrouping: 'always', maximumFractionDigits: 0 }).format(6839).replace(/\s/g, ' '), '6 839', 'always-grouping groups four-digit numbers in Polish');
 assert.ok(/function fmtNum\([^)]*\)[^\n]*useGrouping: 'always'/.test(js), 'fmtNum groups thousands always');
 
+// Task 2: field help and glossary copy exist in both languages
+for (const key of ['help_users', 'help_chunks', 'help_chunkTok', 'help_peak', 'help_maxUtilization', 'help_smallMaxUsers', 'help_softApi', 'help_softLicense',
+  'glossaryRagTerm', 'glossaryRag', 'glossaryGb10Term', 'glossaryGb10', 'glossaryTokensTerm', 'glossaryTokens', 'glossaryPeakTerm', 'glossaryPeak', 'glossaryHeadroomTerm', 'glossaryHeadroom'])
+  for (const lang of ['pl', 'en']) assert.equal(typeof run(`T.${lang}.${key}`), 'string', `${lang}.${key}`);
+assert.deepEqual(Object.keys(run('FIELD_HELP')), ['users', 'chunks', 'chunkTok', 'peak', 'maxUtilization', 'smallMaxUsers', 'softApi', 'softLicense']);
+
 console.log('Core validation, CSV, cost-model, and regression checks passed');

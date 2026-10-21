@@ -219,6 +219,15 @@ section { margin-bottom: var(--sp-8); }
 .results-context { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-4) var(--sp-6); padding: var(--sp-3) var(--sp-4); margin-bottom: var(--sp-5); background: var(--bg-2); border: 1px solid var(--border-1); border-radius: var(--radius-md); }
 .results-context .hint { flex: 1 1 200px; }
 .results-context .stat b { font-size: var(--body-lg); }
+.field-help { font-size: var(--body-sm); color: var(--fg-3); margin: 2px 0 0; line-height: 1.35; }
+.glossary-wrap { margin-bottom: var(--sp-5); }
+.glossary-wrap > summary { cursor: pointer; list-style: none; font-weight: 600; color: var(--fg-3); font-size: var(--body-sm); margin-bottom: var(--sp-2); }
+.glossary-wrap > summary::-webkit-details-marker { display: none; }
+.glossary-wrap > summary::before { content: '›'; display: inline-block; margin-right: 6px; transition: transform .15s; }
+.glossary-wrap[open] > summary::before { transform: rotate(90deg); }
+.glossary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--sp-3); margin: 0; }
+.glossary dt { font-weight: 700; color: var(--fg-1); font-size: var(--body-sm); }
+.glossary dd { margin: 2px 0 0; color: var(--fg-3); font-size: var(--body-sm); line-height: 1.4; }
 .stat { display: flex; flex-direction: column; gap: 4px; }
 .stat span { font-family: var(--font-mono); font-size: var(--label-size); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); }
 .stat b { font-family: var(--font-display); font-weight: 700; font-size: var(--stat-size); letter-spacing: -.01em; color: var(--fg-1); }
@@ -609,6 +618,16 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
       <div class="stat"><span data-t="kvReqMonth"></span><b id="kvReqMonth"></b></div>
       <p class="hint" data-t="estimateNotice"></p>
     </div>
+    <details class="glossary-wrap" id="glossaryWrap" open>
+      <summary data-t="glossaryTitle"></summary>
+      <dl class="glossary" id="glossary">
+        <div><dt data-t="glossaryRagTerm"></dt><dd data-t="glossaryRag"></dd></div>
+        <div><dt data-t="glossaryGb10Term"></dt><dd data-t="glossaryGb10"></dd></div>
+        <div><dt data-t="glossaryTokensTerm"></dt><dd data-t="glossaryTokens"></dd></div>
+        <div><dt data-t="glossaryPeakTerm"></dt><dd data-t="glossaryPeak"></dd></div>
+        <div><dt data-t="glossaryHeadroomTerm"></dt><dd data-t="glossaryHeadroom"></dd></div>
+      </dl>
+    </details>
     <section>
     <h2 class="sec-title" data-t="secOptions"></h2>
     <div class="grid-4" id="options" aria-live="polite">
@@ -730,6 +749,7 @@ const PRESETS = {
   S3: { users: 300, reqPerDay: 20 },
 };
 const PRESET_FIELDS = Object.keys(PRESETS.S1);
+const FIELD_HELP = { users: 'help_users', chunks: 'help_chunks', chunkTok: 'help_chunkTok', peak: 'help_peak', maxUtilization: 'help_maxUtilization', smallMaxUsers: 'help_smallMaxUsers', softApi: 'help_softApi', softLicense: 'help_softLicense' };
 const SMALL_BASELINE = 1147.3262222222222; // Dell GB10 at scenario S1: 35 000 / 36 + 240 W × 24 h × 30.4 d × 1 PLN/kWh
 const DEFAULTS = {
   ...PRESETS.S1, chunks: 5, chunkTok: 2000, promptTok: 500, outTok: 500, docLang: 'pl', workDays: 250, workHours: 8,
@@ -802,6 +822,20 @@ const SOURCES = {
 
 const T = {
   pl: {
+    help_users: 'Osoby, które będą zadawać pytania asystentowi.',
+    help_chunks: 'RAG dokleja do pytania fragmenty Twoich dokumentów. Tyle fragmentów trafia do jednego zapytania.',
+    help_chunkTok: 'Długość jednego fragmentu. 2000 tokenów to ok. 1500 słów.',
+    help_peak: 'Ile razy ruch w najgorętszej godzinie przekracza średnią. Decyduje o liczbie GPU.',
+    help_maxUtilization: 'Sprzęt liczymy tak, by w szczycie nie był obciążony powyżej tego procentu.',
+    help_smallMaxUsers: 'Powyżej tej liczby osób jedna stacja Dell GB10 nie wystarcza – opcja znika z porównania.',
+    help_softApi: 'Abonament Zagłoba RAG (warstwa oprogramowania) przy API i chmurze. Wyłącz go przełącznikiem u góry.',
+    help_softLicense: 'Jednorazowa licencja Zagłoba RAG przy własnym sprzęcie, rozłożona na miesiące amortyzacji.',
+    glossaryTitle: 'Słowniczek',
+    glossaryRagTerm: 'RAG', glossaryRag: 'Asystent, który przed odpowiedzią wyszukuje fragmenty Twoich dokumentów i dokleja je do pytania. Dlatego każde zapytanie jest dłuższe niż samo pytanie.',
+    glossaryGb10Term: 'Dell GB10', glossaryGb10: 'Mała stacja robocza z GPU (Dell Pro Max GB10, 128 GB) do uruchomienia modelu u siebie, bez serwerowni.',
+    glossaryTokensTerm: 'Tokeny', glossaryTokens: 'Jednostka rozliczeniowa modeli: ok. 0,75 słowa po angielsku, mniej po polsku. Płacisz za tokeny wejścia i wyjścia.',
+    glossaryPeakTerm: 'Szczyt / limit', glossaryPeak: 'Obciążenie sprzętu w najgorętszej godzinie wobec limitu, powyżej którego nie chcemy go używać.',
+    glossaryHeadroomTerm: 'Zapas użytkowników', glossaryHeadroom: 'Ile osób można jeszcze dodać, zanim sprzęt przekroczy ten limit.',
     navTag: 'Kalkulator kosztów AI', heroTag: 'Quantica Lab · RAG · inferencja',
     title: 'Ile kosztuje AI w firmie?', titleA: 'Ile kosztuje', titleB: 'AI w firmie?',
     lead: 'Asystent RAG odpowiada na podstawie firmowych dokumentów. Porównaj miesięczny koszt czterech opcji: płatne API modelu, GPU w chmurze, własny serwer i małe wdrożenie na Dell GB10.',
@@ -840,6 +874,20 @@ const T = {
     live: 'API {api}, chmura {cloud}, własny serwer {own}, Dell GB10 {small} miesięcznie.',
   },
   en: {
+    help_users: 'People who will ask the assistant questions.',
+    help_chunks: 'RAG attaches excerpts of your documents to each question. This many excerpts go into one request.',
+    help_chunkTok: 'Length of one excerpt. 2000 tokens is about 1500 words.',
+    help_peak: 'How many times the busiest hour exceeds the average. Drives the number of GPUs.',
+    help_maxUtilization: 'Hardware is sized so the peak never loads it above this percentage.',
+    help_smallMaxUsers: 'Above this many people one Dell GB10 station is not enough – the option leaves the comparison.',
+    help_softApi: 'Zagłoba RAG subscription (the software layer) with API and cloud. Switch it off with the toggle at the top.',
+    help_softLicense: 'One-off Zagłoba RAG licence with your own hardware, spread over the amortisation months.',
+    glossaryTitle: 'Glossary',
+    glossaryRagTerm: 'RAG', glossaryRag: 'An assistant that looks up excerpts of your documents before answering and attaches them to the question. That is why every request is longer than the question itself.',
+    glossaryGb10Term: 'Dell GB10', glossaryGb10: 'A small GPU workstation (Dell Pro Max GB10, 128 GB) for running the model on site, no server room needed.',
+    glossaryTokensTerm: 'Tokens', glossaryTokens: 'The billing unit of language models: about 0.75 of an English word, less in Polish. You pay for input and output tokens.',
+    glossaryPeakTerm: 'Peak / limit', glossaryPeak: 'Hardware load in the busiest hour against the limit above which we do not want to run it.',
+    glossaryHeadroomTerm: 'User headroom', glossaryHeadroom: 'How many more people can be added before the hardware exceeds that limit.',
     navTag: 'AI cost calculator', heroTag: 'Quantica Lab · RAG · inference',
     title: 'What does AI cost a business?', titleA: 'What does', titleB: 'AI cost a business?',
     lead: 'A RAG assistant answers from company documents. Compare the monthly cost of four options: a paid model API, a cloud GPU, your own server and a small deployment on a Dell GB10.',
@@ -1536,6 +1584,20 @@ function applyI18n() {
   document.querySelectorAll('[data-lang]').forEach((b) => { const active = b.dataset.lang === state.lang; b.classList.toggle('active', active); b.setAttribute('aria-pressed', String(active)); });
   document.title = state.lang === 'pl' ? 'Kalkulator kosztów AI – API, chmura, własny serwer, Dell GB10' : 'AI cost calculator – API, cloud, own server, Dell GB10';
   $('settingsBackdrop').setAttribute('aria-label', t('settingsClose'));
+  renderHelp();
+}
+function renderHelp() {
+  for (const [id, key] of Object.entries(FIELD_HELP)) {
+    const input = $(id); if (!input) continue;
+    let help = $(id + 'Help');
+    if (!help) {
+      help = el('p', { class: 'field-help', id: id + 'Help' });
+      input.after(help);
+      const described = (input.getAttribute('aria-describedby') || '').split(' ').filter(Boolean);
+      if (!described.includes(help.id)) input.setAttribute('aria-describedby', [...described, help.id].join(' '));
+    }
+    help.textContent = t(key);
+  }
 }
 function renderPresets() {
   const box = $('presets'); box.replaceChildren();
@@ -2070,7 +2132,7 @@ function renderValidation() {
     n.setAttribute('aria-invalid', String(invalid));
     n.setCustomValidity(invalid ? msg : '');
     let hint = $(id + 'Error');
-    if (!hint) { hint = el('span', { id: id + 'Error', class: 'hint' }); n.after(hint); n.setAttribute('aria-describedby', hint.id); }
+    if (!hint) { hint = el('span', { id: id + 'Error', class: 'hint' }); n.after(hint); const described = (n.getAttribute('aria-describedby') || '').split(' ').filter(Boolean); n.setAttribute('aria-describedby', [...described, hint.id].join(' ')); }
     hint.hidden = !invalid; hint.textContent = invalid ? msg : '';
   });
   const invalid = errors.size > 0;

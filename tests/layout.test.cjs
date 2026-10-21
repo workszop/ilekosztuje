@@ -169,4 +169,9 @@ assert.equal(focusDoc.activeElement, lastSummary, 'backward Tab excludes control
 vm.runInContext("onSettingsKeydown({ key: 'Tab', shiftKey: false, preventDefault() {} })", drawerContext);
 assert.equal(focusDoc.activeElement, closeButton, 'forward Tab wraps to the drawer close button');
 
+// Task 2: glossary with five terms inside the results panel
+const glossary = byId('glossary');
+assert.ok(glossary && glossary.tag === 'dl' && hasClass(glossary, 'glossary'), '#glossary is a <dl class="glossary">');
+assert.equal(descendants(glossary, (node) => node.tag === 'dt' && /^glossary\w+Term$/.test(node.attrs['data-t'] || '')).length, 5, 'glossary has five terms');
+
 console.log('Sidebar layout and keyboard contracts passed');
