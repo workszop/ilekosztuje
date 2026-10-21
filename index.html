@@ -345,11 +345,17 @@ details.panel[open] { padding-bottom: 20px; }
 .settings-body { padding: var(--sp-5) var(--sp-4) var(--sp-8); }
 .settings-body section { margin-bottom: var(--sp-5); }
 .settings-body .sec-title { font-size: var(--body); }
-.settings-body .sec-row { display: block; }
-.settings-body #presets { display: flex; flex-wrap: wrap; border-radius: var(--radius-md); margin-top: var(--sp-3); margin-bottom: var(--sp-3); }
+.settings-body .sec-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3); }
+.settings-body .sec-row .sec-title { flex: 1 1 100%; }
+.settings-body #presets { display: flex; flex-wrap: wrap; gap: var(--sp-2); flex: 1 1 auto; }
+.settings-body #presets button { flex: 0 1 auto; }
+#presets button { font-family: var(--font-sans); font-weight: 700; font-size: 13px; padding: 8px 14px; border-radius: var(--radius-pill); border: 1.5px solid var(--border-1); background: var(--bg-1); color: var(--fg-1); cursor: pointer; transition: background-color .2s, color .2s, border-color .2s; }
+#presets button:hover { border-color: var(--quantica-pink); color: var(--quantica-pink); }
+#presets button[aria-pressed="true"] { background: var(--quantica-pink); border-color: var(--quantica-pink); color: var(--white); box-shadow: var(--shadow-pink-soft); }
+#presets button:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.pill-sm { padding: 7px 12px; font-size: 13px; }
 .settings-body #workloadDetails { border-top: 0; }
 .settings-body #workloadDetails > summary { padding-top: var(--sp-2); font-size: var(--body-sm); }
-.settings-body #presets button { flex: 1 1 100%; text-align: var(--align-start); padding: var(--sp-2) var(--sp-3); }
 .settings-body .card { padding: 0; border: 0; border-radius: 0; box-shadow: none; }
 .settings-body .fields-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2) var(--sp-3); }
 .settings-body .field { min-width: 0; margin-bottom: var(--sp-2); }
@@ -429,7 +435,7 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
   <span class="nav-tag" data-t="navTag"></span>
   <span class="header-spacer"></span>
   <button type="button" class="pill pill-ghost" id="settingsToggle" aria-controls="settingsPanel" aria-expanded="false" data-t="settingsTitle"></button>
-  <button type="button" class="pill pill-solid js-assump" data-t="assumpBtn"></button>
+  <button type="button" class="pill pill-ghost js-assump" data-t="assumpBtn"></button>
   <div class="seg" role="group" aria-label="Język / Language">
     <button type="button" data-lang="pl">PL</button>
     <button type="button" data-lang="en">EN</button>
@@ -448,7 +454,8 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
       <section>
     <div class="sec-row">
       <h2 class="sec-title" id="workloadTitle" data-t="secWorkload"></h2>
-      <div class="seg" id="presets" role="group" aria-labelledby="workloadTitle"></div>
+      <div class="presets" id="presets" role="group" aria-labelledby="workloadTitle"></div>
+      <button class="pill pill-ghost pill-sm" id="scenarioReset" type="button" data-t="scenarioReset"></button>
     </div>
     <details class="panel settings-section" id="workloadDetails">
     <summary data-t="workloadDetails"></summary>
@@ -600,7 +607,6 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
     <button class="pill pill-ghost" id="scenarioSave" type="button" data-t="scenarioSave"></button>
     <button class="pill pill-ghost" id="scenarioExport" type="button" data-t="scenarioExport"></button>
     <button class="pill pill-ghost" id="scenarioImport" type="button" data-t="scenarioImport"></button>
-    <button class="pill pill-ghost" id="scenarioReset" type="button" data-t="scenarioReset"></button>
     <input id="scenarioFile" type="file" accept=".json,application/json" hidden>
     <span id="scenarioStatus" class="hint" role="status" aria-live="polite"></span>
     <progress id="fileProgress" hidden aria-label="Import" max="1"></progress>

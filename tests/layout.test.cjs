@@ -111,7 +111,13 @@ for (const node of descendants(options, (candidate) => candidate.tag === 'input'
 assert.ok(descendants(settingsPanel, (node) => node.attrs.id === 'presets').length, '#presets must be in #settingsPanel');
 assert.ok(descendants(settingsPanel, (node) => node.attrs.id === 'advancedPanel').length, '#advancedPanel must be in #settingsPanel');
 
-const scenarioButtonIds = ['scenarioSave', 'scenarioExport', 'scenarioImport', 'scenarioReset'];
+// Task 7: reset sits next to the presets; assumptions is not a solid button.
+const resetButton = byId('scenarioReset');
+assert.ok(resetButton && resetButton.parent && hasClass(resetButton.parent, 'sec-row'), '#scenarioReset lives in the workload .sec-row');
+const assumpButton = descendants(documentRoot, (node) => hasClass(node, 'js-assump'))[0];
+assert.ok(assumpButton && !hasClass(assumpButton, 'pill-solid'), 'assumptions button is outlined, not solid');
+
+const scenarioButtonIds = ['scenarioSave', 'scenarioExport', 'scenarioImport'];
 const scenarioButtons = scenarioButtonIds.map(byId);
 function commonAncestor(nodes) {
   let candidate = nodes[0].parent;
