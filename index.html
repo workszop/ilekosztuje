@@ -239,8 +239,9 @@ section { margin-bottom: var(--sp-8); }
 .bar-track { height: 12px; background: var(--bg-2); border-radius: var(--radius-sm); overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; transition: width .25s ease-out; }
 .bar-value { font-family: var(--font-mono); font-weight: 500; color: var(--fg-1); white-space: nowrap; }
+.verdict { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--fg-1); margin: 0 0 var(--sp-4); line-height: 1.35; }
 .answers { list-style: none; margin: 0; padding: 0; }
-.answers li { display: flex; justify-content: space-between; gap: var(--sp-4); padding: 9px 0; border-top: 1px dashed var(--border-1); font-size: var(--body-sm); color: var(--fg-3); }
+.answers li { display: block; padding: 9px 0; border-top: 1px dashed var(--border-1); font-size: var(--body-sm); color: var(--fg-3); }
 .answers li b { font-family: var(--font-display); font-weight: 700; color: var(--fg-1); text-align: var(--align-end); }
 .answers li.hint { display: block; border-top: none; padding-top: var(--sp-2); font-size: var(--small-size); line-height: var(--line-height-tight); color: var(--fg-3); }
 
@@ -631,6 +632,7 @@ summary:focus-visible, #resultsPanel:focus-visible { outline: 2px solid var(--qu
       </dl>
     </details>
     <section>
+    <p id="verdict" class="verdict" aria-live="polite"></p>
     <h2 class="sec-title" data-t="secOptions"></h2>
     <div class="grid-4" id="options" aria-live="polite">
       <div class="card option" id="optApi" data-path="api">
@@ -858,10 +860,13 @@ const T = {
     lYear: 'Rocznie', lFirstYear: 'Pierwszy rok (z zakupem)', lPerReq: 'Za zapytanie', lUtil: 'Wykorzystanie GPU',
     cheapest: 'Najtańsze', recommended: 'Rekomendowane', tierNote: 'Prompt powyżej {k}K tokenów: droższa stawka.', ctxOver: 'Prompt nie mieści się w oknie kontekstu modelu!',
     summaryTitle: 'Podsumowanie miesięczne', summarySub: 'Koszt każdej opcji przy bieżącym obciążeniu.',
-    aApiVsCloud: 'Pierwszy zakres przewagi API nad chmurą kończy się przy', aApiVsOwn: 'Pierwszy zakres przewagi API nad własnym serwerem kończy się przy',
-    aApiVsSmall: 'Pierwszy zakres przewagi API nad Dell GB10 kończy się przy', aPaybackSmall: 'Pierwsze przecięcie kosztów gotówkowych Dell GB10 z chmurą po',
-    aPayback: 'Pierwsze przecięcie kosztów gotówkowych serwera z chmurą po', aMinute: 'Zapytanie API a minuta pracy (1,49 zł)',
-    usersUnit: 'użytk.', monthsUnit: 'mies.', never: 'nie w ciągu 10 lat', apiNever: 'nigdy (już 1 osoba)',
+    verdictText: 'Przy {users} użytkownikach najtaniej wychodzi {winner}: {monthly} miesięcznie, {pct} taniej niż {runnerUp}.',
+    verdictSingle: 'Przy {users} użytkownikach do porównania zostaje tylko {winner}: {monthly} miesięcznie.',
+    aApiVsCloud: 'API jest tańsze od chmury GPU do ok. {n}.', aApiVsOwn: 'API jest tańsze od własnego serwera do ok. {n}.',
+    aApiVsSmall: 'API jest tańsze od Dell GB10 do ok. {n}.', aPaybackSmall: 'Dell GB10 zwraca się wobec chmury po {n}.',
+    aPayback: 'Własny serwer zwraca się wobec chmury po {n}.', aMinute: 'Jedno zapytanie API kosztuje {cost}, czyli {pct} minuty pracy pracownika ({minute}).',
+    aUnavailable: 'Dell GB10 jest niedostępny przy tej liczbie użytkowników.', aApiUnavailable: 'Wybrany model API nie obsłuży tego zapytania.',
+    usersUnit: 'użytk.', monthsUnit: 'mies.', never: 'nie w ciągu 10 lat', apiNever: 'nigdy (już 1 osoba)', apiAlways: 'co najmniej 20 000 użytk.',
     chartTime: 'Koszt narastająco w czasie', chartTimeSub: 'Dell GB10 i własny serwer startują od ceny sprzętu i licencji Zagłoba RAG. Co okres wymiany sprzętu doliczamy kolejny zakup sprzętu; licencja jest jednorazowa.',
     showData: 'Pokaż dane', monthLabel: 'Miesiąc',
     secModels: 'Porównaj wszystkie modele API', modelsNote: 'Kwoty miesięczne zawierają Zagłoba RAG jako SaaS i stałą infrastrukturę API. Tokeny są szacowane dla rodziny modelu, nie liczone uruchomieniem tokenizerów. Kliknij wiersz, aby wybrać model.',
@@ -911,10 +916,13 @@ const T = {
     lYear: 'Per year', lFirstYear: 'First year (with purchase)', lPerReq: 'Per request', lUtil: 'GPU utilisation',
     cheapest: 'Cheapest', recommended: 'Recommended', tierNote: 'Prompt above {k}K tokens: higher rate.', ctxOver: 'Prompt does not fit the model context window!',
     summaryTitle: 'Monthly summary', summarySub: 'Cost of each option at the current workload.',
-    aApiVsCloud: 'First API-over-cloud advantage interval ends at', aApiVsOwn: 'First API-over-own-server advantage interval ends at',
-    aApiVsSmall: 'First API-over-Dell-GB10 advantage interval ends at', aPaybackSmall: 'First cash-cost crossing of Dell GB10 and cloud after',
-    aPayback: 'First cash-cost crossing of server and cloud after', aMinute: 'API request vs a minute of work (1.49 PLN)',
-    usersUnit: 'users', monthsUnit: 'mo.', never: 'not within 10 years', apiNever: 'never (even 1 user)',
+    verdictText: 'With {users} users the cheapest option is {winner}: {monthly} per month, {pct} less than {runnerUp}.',
+    verdictSingle: 'With {users} users only {winner} remains in the comparison: {monthly} per month.',
+    aApiVsCloud: 'API is cheaper than cloud GPU up to about {n}.', aApiVsOwn: 'API is cheaper than an own server up to about {n}.',
+    aApiVsSmall: 'API is cheaper than Dell GB10 up to about {n}.', aPaybackSmall: 'Dell GB10 pays back against cloud after {n}.',
+    aPayback: 'An own server pays back against cloud after {n}.', aMinute: 'One API request costs {cost}, which is {pct} of a minute of staff time ({minute}).',
+    aUnavailable: 'Dell GB10 is unavailable at this number of users.', aApiUnavailable: 'The selected API model cannot serve this request.',
+    usersUnit: 'users', monthsUnit: 'mo.', never: 'not within 10 years', apiNever: 'never (even 1 user)', apiAlways: 'at least 20,000 users',
     chartTime: 'Cumulative cost over time', chartTimeSub: 'Dell GB10 and own server start at the hardware price plus the Zagłoba RAG licence. Hardware is bought again each replacement period; the licence is one-off.',
     showData: 'Show data', monthLabel: 'Month',
     secModels: 'Compare all API models', modelsNote: 'Monthly amounts include Zagłoba RAG as SaaS and the fixed API infrastructure. Tokens are estimated for the model family, not measured by running each tokenizer. Click a row to select the model.',
@@ -1489,6 +1497,17 @@ function computeResults(s, models) {
   };
 }
 
+function verdict(result) {
+  const paths = ['api', 'cloud', 'small', 'own'];
+  const monthlyOf = (key) => { const c = result[key]; return c && c.eligible !== false && Number.isFinite(c.monthly) ? c.monthly : Infinity; };
+  const winner = result.recommended || result.winner;
+  const monthly = monthlyOf(winner);
+  const rest = paths.filter((key) => key !== winner && Number.isFinite(monthlyOf(key)));
+  const runnerUp = rest.length ? rest.reduce((a, b) => monthlyOf(a) <= monthlyOf(b) ? a : b) : null;
+  const savingsPct = runnerUp && monthlyOf(runnerUp) > 0 ? (monthlyOf(runnerUp) - monthly) / monthlyOf(runnerUp) : null;
+  return { winner, monthly, runnerUp, savingsPct };
+}
+
 function regressionFixtureModels() {
   return [
     { name: 'Regression Terra', id: 'regression-terra', family: 'openai', pin: 2, pout: 12, ctx: 1050000, maxOutput: 128000, alwaysThinks: false, tier: { above: 272000, pin: 4, pout: 18 }, offPeak: null },
@@ -1742,18 +1761,22 @@ function render() {
   ].filter((i) => (i.key !== 'api' || api.eligible) && (i.key !== 'small' || small.eligible)));
   const maxU = 20000;
   const beCloud = result.breakEvenCloud, beOwn = result.breakEvenOwn, beSmall = result.breakEvenSmall;
-  const beTxt = (n) => !api.eligible ? t('unavailable') : n === 0 ? t('apiNever') : n >= maxU ? '≥ ' + fmtNum(maxU) + ' ' + t('usersUnit') : '~' + fmtNum(n) + ' ' + t('usersUnit');
+  const beTxt = (n) => n === 0 ? t('apiNever') : n >= maxU ? t('apiAlways') : fmtNum(n) + ' ' + t('usersUnit');
   const pbCloud = result.payback, pbSmall = result.paybackSmall;
   const minuteRatio = api.perReq / MINUTE_OF_WORK;
-  const answers = [
-    [t('aApiVsCloud'), beTxt(beCloud)],
-    [t('aApiVsSmall'), small.eligible ? beTxt(beSmall) : t('unavailable')],
-    [t('aApiVsOwn'), beTxt(beOwn)],
-    [t('aPaybackSmall'), !small.eligible ? t('unavailable') : pbSmall == null ? t('never') : pbSmall + ' ' + t('monthsUnit')],
-    [t('aPayback'), pbCloud == null ? t('never') : pbCloud + ' ' + t('monthsUnit')],
-    [t('aMinute'), api.eligible ? money(api.perReq, 4) + ' · ' + (minuteRatio < 0.01 ? '<1%' : pct(minuteRatio)) : t('unavailable')],
-  ];
-  $('answers').replaceChildren(...answers.map(([l, v]) => { const li = el('li'); li.append(el('span', {}, l), el('b', {}, v)); return li; }));
+  const v = verdict(result);
+  $('verdict').textContent = t(v.runnerUp ? 'verdictText' : 'verdictSingle', { users: fmtNum(s.users), winner: t(v.winner + 'Path'), monthly: money(v.monthly, 0), pct: pct(v.savingsPct || 0), runnerUp: t((v.runnerUp || '') + 'Path') });
+  const answers = [];
+  if (!api.eligible) answers.push(t('aApiUnavailable'));
+  else {
+    answers.push(t('aApiVsCloud', { n: beTxt(beCloud) }));
+    answers.push(small.eligible ? t('aApiVsSmall', { n: beTxt(beSmall) }) : t('aUnavailable'));
+    answers.push(t('aApiVsOwn', { n: beTxt(beOwn) }));
+  }
+  if (small.eligible) answers.push(t('aPaybackSmall', { n: pbSmall == null ? t('never') : pbSmall + ' ' + t('monthsUnit') }));
+  answers.push(t('aPayback', { n: pbCloud == null ? t('never') : pbCloud + ' ' + t('monthsUnit') }));
+  if (api.eligible) answers.push(t('aMinute', { cost: money(api.perReq, 2), pct: minuteRatio < 0.01 ? '<1%' : pct(minuteRatio), minute: money(MINUTE_OF_WORK, 2) }));
+  $('answers').replaceChildren(...answers.map((text) => el('li', {}, text)));
   $('answers').append(el('li', { class: 'hint' }, t('firstCrossNote')));
 
   renderModelTable(result.modelRows, cloud.monthly, own.monthly, small.eligible ? small.monthly : Infinity);
@@ -1775,7 +1798,7 @@ function render() {
     smallReplacementMonths: String(s.smallReplace), smallFirstYear: cumulativeCost('small', small, 12).toFixed(2), smallCapex: String(s.smallCapex),
     apiSoftware: api.software.monthly.toFixed(2), cloudSoftware: cloud.software.monthly.toFixed(2), smallSoftware: small.software.monthly.toFixed(2), ownSoftware: own.software.monthly.toFixed(2),
     softwareLicense: String(s.softLicense), softwareSupportYear: String(s.softSupport),
-    assumptionsOpen: String(dialogEl.open), softwareOn: String(s.softwareOn),
+    assumptionsOpen: String(dialogEl.open), softwareOn: String(s.softwareOn), verdictWinner: v.winner, verdictSavingsPct: v.savingsPct == null ? '' : v.savingsPct.toFixed(4),
   });
   $('live').textContent = t('live', { api: api.eligible ? money(api.monthly, 0) : t('unavailable'), cloud: money(cloud.monthly, 0), own: money(own.monthly, 0), small: small.eligible ? money(small.monthly, 0) : t('unavailable') });
 }

@@ -363,4 +363,15 @@ assert.equal(JSON.stringify(run('softwareCost("api", { ...DEFAULTS, softwareOn: 
 assert.equal(run('totalCost("own", { ...DEFAULTS, softwareOn: false }).oneOff'), 0, 'no licence when software is off');
 assert.ok(run('totalCost("cloud", { ...DEFAULTS, softwareOn: false }).monthly') < run('totalCost("cloud", DEFAULTS).monthly'), 'cloud drops the SaaS fee');
 
+// Task 4: verdict
+const verdict20 = run('(() => { const r = computeResults({ ...DEFAULTS, lang: "en" }, models); return { v: verdict(r), r }; })()');
+assert.equal(verdict20.v.winner, verdict20.r.recommended || verdict20.r.winner, 'verdict follows the recommended/winner path');
+assert.ok(verdict20.v.savingsPct > 0 && verdict20.v.savingsPct < 1, `savings fraction ${verdict20.v.savingsPct}`);
+assert.ok(verdict20.v.runnerUp && verdict20.v.runnerUp !== verdict20.v.winner, 'runner-up differs from winner');
+const verdict300 = run('verdict(computeResults({ ...DEFAULTS, users: 300 }, models))');
+assert.notEqual(verdict300.runnerUp, 'small', 'ineligible Dell never runner-up');
+assert.notEqual(verdict300.winner, 'small', 'ineligible Dell never winner');
+for (const key of ['verdictText', 'verdictSingle', 'aApiVsCloud', 'aApiVsSmall', 'aApiVsOwn', 'aPaybackSmall', 'aPayback', 'aMinute'])
+  for (const lang of ['pl', 'en']) assert.ok(/\{(n|cost|pct|minute|users|winner|monthly|runnerUp)\}/.test(run(`T.${lang}.${key}`)), `${lang}.${key} is a sentence template`);
+
 console.log('Core validation, CSV, cost-model, and regression checks passed');
