@@ -113,7 +113,9 @@ assert.ok(descendants(settingsPanel, (node) => node.attrs.id === 'advancedPanel'
 
 // Task 7: reset sits next to the presets; assumptions is not a solid button.
 const resetButton = byId('scenarioReset');
-assert.ok(resetButton && resetButton.parent && hasClass(resetButton.parent, 'sec-row'), '#scenarioReset lives in the workload .sec-row');
+const navBar = descendants(documentRoot, (node) => hasClass(node, 'nav'))[0];
+assert.ok(resetButton && navBar && contains(navBar, resetButton), '#scenarioReset lives in the top nav');
+assert.ok(resetButton.parent === descendants(documentRoot, (node) => hasClass(node, 'js-assump'))[0].parent, '#scenarioReset sits next to the assumptions button');
 const assumpButton = descendants(documentRoot, (node) => hasClass(node, 'js-assump'))[0];
 assert.ok(assumpButton && !hasClass(assumpButton, 'pill-solid'), 'assumptions button is outlined, not solid');
 

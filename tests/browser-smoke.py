@@ -701,7 +701,7 @@ def check_layout_contract(parser: ContractParser, label: str) -> None:
         if len(records) != 1 or not is_descendant(records[0], "settingsPanel"):
             raise SmokeFailure(f"{label}: #{node_id} must be inside #settingsPanel")
 
-    for node_id in ("scenarioSave", "scenarioExport", "scenarioImport", "scenarioReset"):
+    for node_id in ("scenarioSave", "scenarioExport", "scenarioImport"):
         records = records_with_id(node_id)
         if len(records) != 1 or not is_descendant(records[0], "settingsPanel"):
             raise SmokeFailure(f"{label}: #{node_id} must be inside #settingsPanel")

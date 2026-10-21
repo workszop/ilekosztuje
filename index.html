@@ -446,6 +446,7 @@ td.src a:hover { text-decoration: underline; }
   .nav .pill { font-size: var(--tiny-size); padding: 8px 9px; white-space: nowrap; }
   .nav .seg button { font-size: var(--tiny-size); padding: 6px 8px; }
   #settingsToggle, #settingsClose { display: inline-flex; }
+  #scenarioReset { display: none; }
   #settingsPanel { display: none; position: fixed; inset: 0 auto 0 0; z-index: 80; width: min(360px, calc(100% - 32px)); box-shadow: var(--shadow-lg); }
   #app[data-settings="open"] #settingsPanel { display: block; animation: fadeIn .18s ease-out; }
   #app[data-settings="open"] #settingsBackdrop:not([hidden]) { display: block; position: fixed; inset: 0; z-index: 70; width: 100%; height: 100%; padding: 0; border: 0; background: var(--dialog-backdrop); }
@@ -471,6 +472,7 @@ td.src a:hover { text-decoration: underline; }
   <span class="nav-tag" data-t="navTag"></span>
   <span class="header-spacer"></span>
   <button type="button" class="pill pill-ghost" id="settingsToggle" aria-controls="settingsPanel" aria-expanded="false" data-t="settingsTitle"></button>
+  <button type="button" class="pill pill-ghost" id="scenarioReset" data-t="scenarioReset"></button>
   <button type="button" class="pill pill-ghost js-assump" data-t="assumpBtn"></button>
   <div class="seg" role="group" aria-label="Język / Language">
     <button type="button" data-lang="pl">PL</button>
@@ -491,7 +493,6 @@ td.src a:hover { text-decoration: underline; }
     <div class="sec-row">
       <h2 class="sec-title" id="workloadTitle" data-t="secWorkload"></h2>
       <div class="presets" id="presets" role="group" aria-labelledby="workloadTitle"></div>
-      <button class="pill pill-ghost pill-sm" id="scenarioReset" type="button" data-t="scenarioReset"></button>
     </div>
     <details class="panel settings-section" id="workloadDetails">
     <summary data-t="workloadDetails"></summary>
