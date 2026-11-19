@@ -150,7 +150,7 @@ z paskami i odpowiedziami, wykres kosztu narastającego, tabela modeli i testy.
 Do 768 px panel ustawień staje się wysuwanym panelem; otwiera go przycisk
 **Ustawienia**, zamyka przycisk w nagłówku, tło albo `Escape`.
 
-Skróty: `1–3` scenariusze, `A` założenia, `L` język, `Ctrl/Cmd+S` zapis,
+Skróty: `1–4` scenariusze, `A` założenia, `L` język, `Ctrl/Cmd+S` zapis,
 `↑/↓` w tabeli modeli.
 
 ## Kontrakt DOM

@@ -210,6 +210,9 @@ CAPACITY_SMOKE_SCRIPT = r"""
     click('[data-preset="S3"]');
     expect(document.querySelector('#users').value === '300', 'S3 preset users');
     assertUnavailable('small');
+    click('[data-preset="S4"]');
+    expect(document.querySelector('#users').value === '1000', 'S4 preset users');
+    expect(document.querySelector('[data-preset="S4"]').getAttribute('aria-pressed') === 'true', 'S4 preset pressed');
     click('[data-preset="S1"]');
     expect(document.querySelector('#users').value === '20', 'S1 preset users');
     assertSized('small', 1, 20);
